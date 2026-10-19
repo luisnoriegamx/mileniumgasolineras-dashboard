@@ -187,18 +187,18 @@
         <button onclick="openAdminModal()" id="btnOpenAdmin" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold shadow-sm transition active:scale-95">
           <i data-lucide="shield" class="w-3.5 h-3.5 text-[#ff6600]"></i>
           <span class="hidden md:inline">Panel Admin</span>
-          <span class="text-[10px] bg-[#ff6600] px-1.5 py-0.2 rounded-full font-mono text-white" id="usersCountBadge">3</span>
+          <span class="text-[10px] bg-[#ff6600] px-1.5 py-0.2 rounded-full font-mono text-white" id="usersCountBadge">4</span>
         </button>
 
         <!-- Current User Profile & Role Switcher -->
         <div class="relative">
           <button onclick="toggleUserDropdown()" id="userProfileBtn" class="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-slate-300 text-xs text-slate-800 shadow-sm transition">
             <div class="w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-[11px]" id="userAvatar">
-              C
+              L
             </div>
             <div class="text-left hidden sm:block">
-              <p class="font-bold text-[11px] leading-tight" id="userNameLabel">CEO Director</p>
-              <p class="text-[9px] text-[#ff6600] font-mono leading-none font-bold" id="userRoleLabel">DIRECCIÓN GENERAL</p>
+              <p class="font-bold text-[11px] leading-tight" id="userNameLabel">Super Admin (lnoriega)</p>
+              <p class="text-[9px] text-[#ff6600] font-mono leading-none font-bold" id="userRoleLabel">SUPER_ADMIN</p>
             </div>
             <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400"></i>
           </button>
@@ -206,10 +206,13 @@
           <!-- User dropdown menu -->
           <div id="userDropdown" class="hidden absolute right-0 mt-2 w-64 bg-white border border-slate-200 rounded-2xl shadow-xl p-3 z-50 space-y-2 text-xs">
             <div class="border-b border-slate-100 pb-2">
-              <p class="font-bold text-slate-900" id="ddUserName">CEO Director General</p>
-              <p class="text-[11px] text-slate-500 font-mono" id="ddUserEmail">direccion@grupomilenium.mx</p>
+              <p class="font-bold text-slate-900" id="ddUserName">Super Administrador</p>
+              <p class="text-[11px] text-slate-500 font-mono" id="ddUserEmail">lnoriega@grupomilenium.mx</p>
             </div>
-            <p class="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Cambiar Perfil de Sesión:</p>
+            <div class="flex items-center justify-between">
+              <p class="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Cambiar Perfil de Sesión:</p>
+              <button onclick="openSuperAdminAuthModal()" class="text-[10px] text-[#ff6600] font-bold hover:underline">Login Clave</button>
+            </div>
             <div class="space-y-1" id="roleSwitchList">
               <!-- Dynamically populated from active users -->
             </div>
@@ -811,21 +814,57 @@
       <div class="flex items-center gap-2 font-medium">
         <span class="w-2 h-2 rounded-full bg-[#ff6600]"></span>
         <span class="text-slate-900 font-bold">Milenium Business Panel</span> &bull; 
-        <span class="text-slate-500">Diseñado para despliegue en Vercel con Firebase Firestore en tiempo real</span>
+        <span class="text-slate-500">Firebase Firestore Cloud Conectado en Tiempo Real</span>
       </div>
       <div class="flex items-center gap-3">
-        <button onclick="openFirebaseConfigModal()" class="text-slate-500 hover:text-[#ff6600] font-mono text-[11px] flex items-center gap-1 transition">
+        <!-- Oculto para todos excepto SUPER_ADMIN -->
+        <button id="btnOpenFirebaseConfig" onclick="openFirebaseConfigModal()" class="hidden text-slate-500 hover:text-[#ff6600] font-mono text-[11px] flex items-center gap-1 transition">
           <i data-lucide="database" class="w-3.5 h-3.5 text-[#ff6600]"></i> Configuración Firebase
         </button>
-        <span class="text-slate-300">|</span>
+        <span id="sepFirebaseConfig" class="hidden text-slate-300">|</span>
         <div class="font-mono text-[11px] text-slate-400">
-          Ambiente: Producción &bull; Directivo Light Edition &bull; Multi-Dispositivo
+          Proyecto: <strong class="text-slate-700">mileniumdbestaciones</strong> &bull; Multi-Dispositivo Activo
         </div>
       </div>
     </div>
   </footer>
 
-  <!-- Modal: Configuración de Credenciales Firebase -->
+  <!-- Modal: Super Admin Authentication Challenge -->
+  <div id="superAdminAuthModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-sm w-full overflow-hidden border border-slate-200 shadow-2xl p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-black text-[#ff6600] flex items-center justify-center font-bold">
+            <i data-lucide="lock" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-sm text-slate-900">Acceso Super Admin</h4>
+            <p class="text-[10px] text-slate-400 font-mono">Autenticación de seguridad</p>
+          </div>
+        </div>
+        <button onclick="closeSuperAdminAuthModal()" class="text-slate-400 hover:text-slate-700">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <form onsubmit="handleSuperAdminAuth(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Usuario</label>
+          <input type="text" id="authInputUser" required placeholder="lnoriega" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 font-mono text-slate-900 focus:outline-none focus:border-[#ff6600]">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Contraseña</label>
+          <input type="password" id="authInputPass" required placeholder="••••••••" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 font-mono text-slate-900 focus:outline-none focus:border-[#ff6600]">
+        </div>
+        <p id="authErrorMsg" class="hidden text-rose-600 text-[11px] font-bold"></p>
+        <button type="submit" class="w-full py-2.5 rounded-xl orange-glow-btn font-extrabold text-xs active:scale-95 shadow-sm">
+          Iniciar Sesión Super Admin
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Configuración de Credenciales Firebase (Sólo visible para SUPER_ADMIN) -->
   <div id="firebaseConfigModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
     <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden border border-slate-200 shadow-2xl flex flex-col">
       <div class="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
@@ -834,8 +873,8 @@
             <i data-lucide="database" class="w-5 h-5"></i>
           </div>
           <div>
-            <h4 class="font-bold text-sm text-slate-900">Configuración de Firebase Firestore</h4>
-            <p class="text-[11px] text-slate-500">Conecta tu proyecto de Firebase para sincronización multi-dispositivo</p>
+            <h4 class="font-bold text-sm text-slate-900">Configuración de Firebase Firestore (Super Admin)</h4>
+            <p class="text-[11px] text-slate-500">Credenciales activas del proyecto mileniumdbestaciones</p>
           </div>
         </div>
         <button onclick="closeFirebaseConfigModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700">
@@ -844,16 +883,9 @@
       </div>
       <div class="p-5 space-y-3 text-xs">
         <p class="text-slate-600 leading-relaxed">
-          Pega a continuación el objeto de configuración proporcionado por tu consola de <strong>Firebase Console &gt; Project Settings &gt; General &gt; Web Apps</strong>:
+          Configuración actual conectada directamente al proyecto <strong>mileniumdbestaciones</strong>:
         </p>
-        <textarea id="firebaseConfigInput" rows="8" placeholder='{
-  "apiKey": "AIzaSy...",
-  "authDomain": "tu-proyecto.firebaseapp.com",
-  "projectId": "tu-proyecto",
-  "storageBucket": "tu-proyecto.appspot.com",
-  "messagingSenderId": "123456789",
-  "appId": "1:123456789:web:abcdef"
-}' class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 font-mono text-[11px] text-slate-800 focus:outline-none focus:border-[#ff6600]"></textarea>
+        <textarea id="firebaseConfigInput" rows="8" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 font-mono text-[11px] text-slate-800 focus:outline-none focus:border-[#ff6600]"></textarea>
         <div class="bg-orange-50/70 p-3 rounded-xl border border-orange-200 text-[11px] text-slate-600 space-y-1">
           <p class="font-bold text-slate-800 flex items-center gap-1.5">
             <i data-lucide="shield-check" class="w-3.5 h-3.5 text-[#ff6600]"></i> Reglas de Seguridad en Firestore:
@@ -868,7 +900,7 @@
           Cancelar
         </button>
         <button onclick="applyCustomFirebaseConfig()" class="px-4 py-2 rounded-xl orange-glow-btn font-bold transition">
-          Conectar Firebase
+          Actualizar Conexión
         </button>
       </div>
     </div>
@@ -884,6 +916,16 @@
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'milenium-gas-dashboard';
     window.appId = appId;
 
+    // Configuración directa de tu proyecto en Firebase
+    const DIRECT_FIREBASE_CONFIG = {
+      apiKey: "AIzaSyAMc39xwB34CBaKz4qYjgTYeJXCYKIy4MY",
+      authDomain: "mileniumdbestaciones.firebaseapp.com",
+      projectId: "mileniumdbestaciones",
+      storageBucket: "mileniumdbestaciones.firebasestorage.app",
+      messagingSenderId: "82613183548",
+      appId: "1:82613183548:web:d05c5c906ef1fff2554f39"
+    };
+
     let app = null;
     let db = null;
     let auth = null;
@@ -891,7 +933,7 @@
     let stationsUnsub = null;
     let usersUnsub = null;
 
-    // Resolve Firebase configuration (environment config, custom stored config, or null)
+    // Resolve Firebase configuration
     function getResolvedFirebaseConfig() {
       if (typeof __firebase_config !== 'undefined' && __firebase_config) {
         try {
@@ -908,7 +950,7 @@
           console.warn("Error parsing stored firebase config:", e);
         }
       }
-      return null;
+      return DIRECT_FIREBASE_CONFIG;
     }
 
     // Cloud connection initialization
@@ -929,7 +971,7 @@
           }
 
           currentAuthUser = auth.currentUser;
-          console.log("Firebase conectado exitosamente. UID:", currentAuthUser?.uid);
+          console.log("Firebase conectado exitosamente a mileniumdbestaciones. UID:", currentAuthUser?.uid);
 
           markCloudStatus(true, `Firebase Conectado (${configToUse.projectId})`);
 
@@ -946,7 +988,7 @@
         }
       } catch (err) {
         console.error("Error al inicializar Firebase Firestore:", err);
-        markCloudStatus(false, "Error de Conexión Firebase");
+        markCloudStatus(false, "Firebase Conectando...");
       }
     }
 
@@ -969,7 +1011,7 @@
           updatedAt: new Date().toISOString(),
           updatedBy: window.activeUser?.email || 'despachador'
         }, { merge: true });
-        markCloudStatus(true, "Datos Guardados en Firebase");
+        markCloudStatus(true, "Datos Guardados en mileniumdbestaciones");
       } catch (e) {
         console.error("Error al guardar estaciones en Firestore:", e);
       }
@@ -984,7 +1026,7 @@
           users: usersList,
           updatedAt: new Date().toISOString()
         }, { merge: true });
-        markCloudStatus(true, "Usuarios Sincronizados en Firebase");
+        markCloudStatus(true, "Usuarios Sincronizados en Firestore");
       } catch (e) {
         console.error("Error al guardar usuarios en Firestore:", e);
       }
@@ -1028,8 +1070,12 @@
       });
     }
 
-    // Modal control for custom Firebase credentials
+    // Modal control for Firebase credentials (Exclusive to SUPER_ADMIN)
     window.openFirebaseConfigModal = function() {
+      if (window.activeUser?.rol !== 'SUPER_ADMIN') {
+        window.showBanner("⛔ Acceso restringido. Sólo el Super Administrador puede ver esta configuración.");
+        return;
+      }
       const modal = document.getElementById('firebaseConfigModal');
       const cfgArea = document.getElementById('firebaseConfigInput');
       const resolved = getResolvedFirebaseConfig();
@@ -1055,14 +1101,14 @@
         }
         window.sessionStorage?.setItem('milenium_custom_firebase_config', JSON.stringify(parsed));
         window.closeFirebaseConfigModal();
-        window.showBanner(`Conectando a Firebase Project: <strong>${parsed.projectId}</strong>...`);
+        window.showBanner(`Conectando a Firebase: <strong>${parsed.projectId}</strong>...`);
         await initCloudEngine(parsed);
       } catch (e) {
         window.showBanner("❌ Formato JSON inválido en la configuración de Firebase.");
       }
     };
 
-    // Initialize Firebase
+    // Initialize Firebase Engine
     initCloudEngine();
   </script>
 
@@ -1140,10 +1186,22 @@
       }
     ];
 
-    // Default Platform Users for Multi-Tenant Access
+    // Default Platform Users with SUPER_ADMIN (lnoriega / Mg-2026*)
     const DEFAULT_USERS = [
       {
+        id: "usr_superadmin",
+        username: "lnoriega",
+        passwordHash: "Mg-2026*", // Clave de acceso configurada
+        nombre: "Super Admin (lnoriega)",
+        email: "lnoriega@grupomilenium.mx",
+        rol: "SUPER_ADMIN",
+        estacion: "ALL",
+        estado: "ACTIVO",
+        creadoEl: "2026-09-01"
+      },
+      {
         id: "usr_ceo",
+        username: "ceo",
         nombre: "CEO Director General",
         email: "ceo@grupomilenium.mx",
         rol: "CEO",
@@ -1153,6 +1211,7 @@
       },
       {
         id: "usr_admin",
+        username: "admin",
         nombre: "Ing. Roberto M. (Administrador)",
         email: "admin@grupomilenium.mx",
         rol: "ADMIN",
@@ -1162,6 +1221,7 @@
       },
       {
         id: "usr_operador_gpe",
+        username: "operador_gpe",
         nombre: "Gerente Guadalupe",
         email: "estacion.guadalupe@grupomilenium.mx",
         rol: "OPERADOR",
@@ -1174,7 +1234,7 @@
     // State variables
     window.currentStations = [...DEFAULT_DATASETS];
     window.platformUsers = [...DEFAULT_USERS];
-    window.activeUser = window.platformUsers[0]; // Start as CEO
+    window.activeUser = window.platformUsers[0]; // Inicia como Super Admin (lnoriega)
     let currentPeriodFilter = 'MENSUAL'; // 'DIARIO' | 'SEMANAL' | 'MENSUAL'
     let processedFileHashes = new Set();
 
@@ -1206,12 +1266,15 @@
       window.currentStations = remoteList;
       populateStationSelect();
       updateDashboard();
-      showBanner(`Datos sincronizados en tiempo real desde la nube (${updatedAt ? new Date(updatedAt).toLocaleTimeString() : 'reciente'}).`);
+      showBanner(`Datos sincronizados en tiempo real desde Firebase mileniumdbestaciones (${updatedAt ? new Date(updatedAt).toLocaleTimeString() : 'reciente'}).`);
     };
 
     window.receiveRemoteUsers = function(remoteUsers) {
       if (!Array.isArray(remoteUsers) || remoteUsers.length === 0) return;
-      window.platformUsers = remoteUsers;
+      // Asegurar que el superadmin permanezca siempre intacto
+      const superAdminUser = window.platformUsers.find(u => u.rol === 'SUPER_ADMIN') || DEFAULT_USERS[0];
+      const mergedUsers = [superAdminUser, ...remoteUsers.filter(u => u.rol !== 'SUPER_ADMIN')];
+      window.platformUsers = mergedUsers;
       renderUserSwitcher();
       renderAdminUsersTable();
       document.getElementById('usersCountBadge').textContent = window.platformUsers.length;
@@ -1222,7 +1285,7 @@
       if (icon) icon.classList.add('animate-spin');
       setTimeout(() => {
         if (icon) icon.classList.remove('animate-spin');
-        showBanner("Panel sincronizado y actualizado con los reportes de la nube.");
+        showBanner("Panel sincronizado y actualizado con Firebase mileniumdbestaciones.");
         updateDashboard();
       }, 700);
     }
@@ -1233,6 +1296,8 @@
       const uploadBtn = document.getElementById('uploadBtnLabel');
       const dropZone = document.getElementById('dropZoneContainer');
       const adminBtn = document.getElementById('btnOpenAdmin');
+      const firebaseBtn = document.getElementById('btnOpenFirebaseConfig');
+      const firebaseSep = document.getElementById('sepFirebaseConfig');
 
       // Update Top Bar Indicators
       document.getElementById('userNameLabel').textContent = u.nombre;
@@ -1251,22 +1316,24 @@
         stSelect.disabled = false;
       }
 
-      // CEO: Read-only strategic view (can see all, doesn't need upload prompts)
-      // OPERADOR: Can upload files
-      // ADMIN: Can do everything
-      if (u.rol === 'CEO' || u.rol === 'AUDITOR') {
-        uploadBtn.classList.remove('hidden');
-        dropZone.classList.remove('hidden');
-      } else {
-        uploadBtn.classList.remove('hidden');
-        dropZone.classList.remove('hidden');
-      }
+      // Upload controls
+      uploadBtn.classList.remove('hidden');
+      dropZone.classList.remove('hidden');
 
-      // Admin button visible only to ADMIN and CEO
-      if (u.rol === 'ADMIN' || u.rol === 'CEO') {
+      // Admin button visible only to ADMIN, SUPER_ADMIN and CEO
+      if (u.rol === 'SUPER_ADMIN' || u.rol === 'ADMIN' || u.rol === 'CEO') {
         adminBtn.classList.remove('hidden');
       } else {
         adminBtn.classList.add('hidden');
+      }
+
+      // Configuración Firebase visible EXCLUSIVAMENTE para SUPER_ADMIN
+      if (u.rol === 'SUPER_ADMIN') {
+        firebaseBtn.classList.remove('hidden');
+        firebaseSep.classList.remove('hidden');
+      } else {
+        firebaseBtn.classList.add('hidden');
+        firebaseSep.classList.add('hidden');
       }
 
       updateDashboard();
@@ -1286,7 +1353,13 @@
         const isCurrent = u.id === window.activeUser.id;
         const btn = document.createElement('button');
         btn.className = `w-full text-left p-2 rounded-xl flex items-center justify-between transition ${isCurrent ? 'bg-orange-50 text-[#ff6600] font-bold border border-orange-200' : 'hover:bg-slate-50 text-slate-700'}`;
-        btn.onclick = () => switchActiveUser(u.id);
+        btn.onclick = () => {
+          if (u.rol === 'SUPER_ADMIN') {
+            openSuperAdminAuthModal();
+          } else {
+            switchActiveUser(u.id);
+          }
+        };
         btn.innerHTML = `
           <div>
             <p class="font-bold text-[11px]">${u.nombre}</p>
@@ -1311,6 +1384,39 @@
         applyUserRoleRestrictions();
         renderUserSwitcher();
         showBanner(`Sesión cambiada a: <strong>${found.nombre}</strong> (${found.rol}).`);
+      }
+    }
+
+    // Modal Super Admin Authentication
+    function openSuperAdminAuthModal() {
+      document.getElementById('userDropdown').classList.add('hidden');
+      document.getElementById('superAdminAuthModal').classList.remove('hidden');
+      document.getElementById('authErrorMsg').classList.add('hidden');
+      document.getElementById('authInputUser').value = 'lnoriega';
+      document.getElementById('authInputPass').value = '';
+      lucide.createIcons();
+    }
+
+    function closeSuperAdminAuthModal() {
+      document.getElementById('superAdminAuthModal').classList.add('hidden');
+    }
+
+    function handleSuperAdminAuth(e) {
+      e.preventDefault();
+      const user = document.getElementById('authInputUser').value.trim();
+      const pass = document.getElementById('authInputPass').value.trim();
+      const errBox = document.getElementById('authErrorMsg');
+
+      if (user === 'lnoriega' && pass === 'Mg-2026*') {
+        const superAdminUser = window.platformUsers.find(u => u.rol === 'SUPER_ADMIN') || DEFAULT_USERS[0];
+        window.activeUser = superAdminUser;
+        closeSuperAdminAuthModal();
+        applyUserRoleRestrictions();
+        renderUserSwitcher();
+        showBanner("👑 <strong>Super Administrador Autenticado:</strong> Panel de Firebase y control de usuarios desbloqueados.");
+      } else {
+        errBox.textContent = 'Usuario o contraseña de Super Admin incorrectos.';
+        errBox.classList.remove('hidden');
       }
     }
 
@@ -1349,6 +1455,10 @@
         // Edit existing
         const idx = window.platformUsers.findIndex(u => u.id === id);
         if (idx >= 0) {
+          if (window.platformUsers[idx].rol === 'SUPER_ADMIN' && window.activeUser.rol !== 'SUPER_ADMIN') {
+            showBanner("⛔ Sólo el Super Administrador puede modificar esta cuenta.");
+            return;
+          }
           window.platformUsers[idx] = {
             ...window.platformUsers[idx],
             nombre,
@@ -1389,6 +1499,10 @@
     function editUser(id) {
       const u = window.platformUsers.find(x => x.id === id);
       if (!u) return;
+      if (u.rol === 'SUPER_ADMIN' && window.activeUser.rol !== 'SUPER_ADMIN') {
+        showBanner("⛔ Esta cuenta está protegida por seguridad directiva.");
+        return;
+      }
       document.getElementById('editUserId').value = u.id;
       document.getElementById('inputUserName').value = u.nombre;
       document.getElementById('inputUserEmail').value = u.email;
@@ -1401,6 +1515,10 @@
     function toggleUserStatus(id) {
       const idx = window.platformUsers.findIndex(x => x.id === id);
       if (idx >= 0) {
+        if (window.platformUsers[idx].rol === 'SUPER_ADMIN') {
+          showBanner("⛔ No es posible suspender la cuenta de Super Administrador.");
+          return;
+        }
         const current = window.platformUsers[idx].estado;
         window.platformUsers[idx].estado = current === 'ACTIVO' ? 'SUSPENDIDO' : 'ACTIVO';
         if (window.saveUsersToCloud) window.saveUsersToCloud(window.platformUsers);
@@ -1411,6 +1529,11 @@
     }
 
     function deleteUser(id) {
+      const target = window.platformUsers.find(x => x.id === id);
+      if (target?.rol === 'SUPER_ADMIN') {
+        showBanner("⛔ La cuenta de Super Administrador no puede ser eliminada.");
+        return;
+      }
       if (window.platformUsers.length <= 1) {
         showBanner("Debe existir al menos un usuario administrador en la plataforma.");
         return;
@@ -1434,13 +1557,17 @@
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-50 transition";
         const badgeColor = u.estado === 'ACTIVO' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200';
+        const isSuperAdmin = u.rol === 'SUPER_ADMIN';
         tr.innerHTML = `
           <td class="py-2.5 px-3">
-            <p class="font-bold text-slate-900">${u.nombre}</p>
+            <p class="font-bold text-slate-900 flex items-center gap-1.5">
+              ${isSuperAdmin ? '<i data-lucide="crown" class="w-3.5 h-3.5 text-[#ff6600]"></i>' : ''}
+              ${u.nombre}
+            </p>
             <p class="text-[10px] text-slate-400 font-mono">${u.email}</p>
           </td>
           <td class="py-2.5 px-3">
-            <span class="font-mono text-[10px] font-black px-2 py-0.5 rounded bg-slate-100 text-slate-800">
+            <span class="font-mono text-[10px] font-black px-2 py-0.5 rounded ${isSuperAdmin ? 'bg-black text-[#ff6600]' : 'bg-slate-100 text-slate-800'}">
               ${u.rol}
             </span>
           </td>
@@ -1457,12 +1584,16 @@
               <button onclick="editUser('${u.id}')" title="Editar" class="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-black">
                 <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
               </button>
-              <button onclick="toggleUserStatus('${u.id}')" title="${u.estado === 'ACTIVO' ? 'Suspender' : 'Activar'}" class="p-1.5 rounded-lg hover:bg-amber-50 text-slate-400 hover:text-amber-600">
-                <i data-lucide="${u.estado === 'ACTIVO' ? 'lock' : 'unlock'}" class="w-3.5 h-3.5"></i>
-              </button>
-              <button onclick="deleteUser('${u.id}')" title="Eliminar" class="p-1.5 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600">
-                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-              </button>
+              ${!isSuperAdmin ? `
+                <button onclick="toggleUserStatus('${u.id}')" title="${u.estado === 'ACTIVO' ? 'Suspender' : 'Activar'}" class="p-1.5 rounded-lg hover:bg-amber-50 text-slate-400 hover:text-amber-600">
+                  <i data-lucide="${u.estado === 'ACTIVO' ? 'lock' : 'unlock'}" class="w-3.5 h-3.5"></i>
+                </button>
+                <button onclick="deleteUser('${u.id}')" title="Eliminar" class="p-1.5 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+              ` : `
+                <span class="p-1.5 text-slate-300" title="Protegido"><i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-500"></i></span>
+              `}
             </div>
           </td>
         `;
