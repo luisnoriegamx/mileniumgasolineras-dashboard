@@ -348,16 +348,28 @@
       </div>
     </div>
 
-    <!-- Filter & Station Selector Bar -->
+    <!-- Filter & Station / Month Selector Bar -->
     <div class="bg-white p-4 rounded-2xl flex flex-wrap items-center justify-between gap-4 border border-slate-200 shadow-sm">
       <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+        
+        <!-- Filtro 1: Estación -->
         <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
           <i data-lucide="filter" class="w-4 h-4 text-[#ff6600]"></i>
           <span>Estación:</span>
         </div>
-        <select id="stationSelect" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 text-slate-900 text-xs sm:text-sm font-bold rounded-xl px-4 py-2 focus:outline-none focus:border-[#ff6600] cursor-pointer min-w-[270px] shadow-sm">
+        <select id="stationSelect" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 text-slate-900 text-xs sm:text-sm font-bold rounded-xl px-4 py-2 focus:outline-none focus:border-[#ff6600] cursor-pointer min-w-[240px] shadow-sm">
           <option value="ALL">🌐 Red Milenium (Consolidado Total)</option>
         </select>
+
+        <!-- Filtro 2: Mes / Periodo (NUEVO BOTÓN SELECTOR) -->
+        <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500 ml-0 sm:ml-2">
+          <i data-lucide="calendar" class="w-4 h-4 text-[#ff6600]"></i>
+          <span>Mes:</span>
+        </div>
+        <select id="monthPeriodSelect" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 text-slate-900 text-xs sm:text-sm font-bold rounded-xl px-4 py-2 focus:outline-none focus:border-[#ff6600] cursor-pointer min-w-[260px] shadow-sm">
+          <option value="ALL">📅 Todos los Meses (Acumulado Total)</option>
+        </select>
+
       </div>
 
       <div class="flex items-center gap-3 ml-auto text-xs font-mono text-slate-500">
@@ -560,7 +572,7 @@
               <i data-lucide="bar-chart-3" class="w-4 h-4 text-[#ff6600]"></i>
               Rendimiento por Estación
             </h4>
-            <p class="text-[11px] text-slate-500">Comparativo cruzado: Facturación Total ($) vs. Litros</p>
+            <p class="text-[11px] text-slate-500">Comparativo cruzado: Facturación Total (\$) vs. Litros</p>
           </div>
           <div class="flex items-center gap-3 text-xs font-mono">
             <span class="inline-flex items-center gap-1.5 text-[#ff6600] font-bold">
@@ -723,12 +735,12 @@
             <tr>
               <th class="py-3.5 px-4">Estación</th>
               <th class="py-3.5 px-4 text-right">Volumen (L)</th>
-              <th class="py-3.5 px-4 text-right">Combustibles ($)</th>
-              <th class="py-3.5 px-4 text-right">Aceites ($)</th>
-              <th class="py-3.5 px-4 text-right text-slate-900">Venta Total ($)</th>
-              <th class="py-3.5 px-4 text-right text-[#ff6600]">Efectivo ($)</th>
-              <th class="py-3.5 px-4 text-right">Tarjetas ($)</th>
-              <th class="py-3.5 px-4 text-right">Créditos ($)</th>
+              <th class="py-3.5 px-4 text-right">Combustibles (\$)</th>
+              <th class="py-3.5 px-4 text-right">Aceites (\$)</th>
+              <th class="py-3.5 px-4 text-right text-slate-900">Venta Total (\$)</th>
+              <th class="py-3.5 px-4 text-right text-[#ff6600]">Efectivo (\$)</th>
+              <th class="py-3.5 px-4 text-right">Tarjetas (\$)</th>
+              <th class="py-3.5 px-4 text-right">Créditos (\$)</th>
               <th class="py-3.5 px-4 text-center">Acciones</th>
             </tr>
           </thead>
@@ -1201,7 +1213,6 @@
       if (!db) return;
       try {
         const stationsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'stations_summary', 'current');
-        // Usar setDoc SIN merge para sobreescribir la lista completa y persistir borrados
         await setDoc(stationsDocRef, {
           stations: stationsList,
           isInitialized: true,
@@ -1233,7 +1244,6 @@
 
   <!-- ==================== LÓGICA DEL PANEL ADMIN Y DEPURACIÓN ==================== -->
   <script>
-    // Control de pestañas del Panel Admin
     let currentAdminTab = 'users';
     let currentPurgeMode = 'ALL';
 
@@ -1246,7 +1256,6 @@
       const modal = document.getElementById('adminModal');
       const isSuper = window.activeUser.rol === 'SUPER_ADMIN';
 
-      // Mostrar/ocultar elementos según sea Super Admin o Admin
       const superBadge = document.getElementById('adminSuperBadge');
       if (superBadge) superBadge.classList.toggle('hidden', !isSuper);
 
@@ -1256,7 +1265,6 @@
       const firebaseTabBtn = document.getElementById('adminTabBtn-firebase');
       if (firebaseTabBtn) firebaseTabBtn.classList.toggle('hidden', !isSuper);
 
-      // Si no es super admin y pide purge, enviarlo a users
       const targetTab = (!isSuper && tabName === 'purge') ? 'users' : tabName;
 
       switchAdminTab(targetTab);
@@ -1324,7 +1332,6 @@
       const allCountBadge = document.getElementById('purgeAllCountBadge');
       if (allCountBadge) allCountBadge.textContent = `${stations.length} estación(es) activa(s)`;
 
-      // 1. Selector de Estaciones
       const stSelect = document.getElementById('purgeStationSelect');
       if (stSelect) {
         stSelect.innerHTML = '';
@@ -1340,7 +1347,6 @@
         }
       }
 
-      // 2. Selector de Periodos / Meses
       const periodSelect = document.getElementById('purgePeriodSelect');
       if (periodSelect) {
         periodSelect.innerHTML = '';
@@ -1358,7 +1364,6 @@
         }
       }
 
-      // 3. Selector de Archivos individuales
       const fileSelect = document.getElementById('purgeFileSelect');
       if (fileSelect) {
         fileSelect.innerHTML = '';
@@ -1416,7 +1421,6 @@
         deletedDescription = `Se eliminó el archivo <strong>${fileName}</strong> del sistema.`;
       }
 
-      // Persistir de inmediato tanto en localStorage como en Firebase Firestore
       localStorage.setItem('milenium_cached_stations', JSON.stringify(window.currentStations));
       localStorage.setItem('milenium_stations_initialized', 'true');
 
@@ -1424,17 +1428,15 @@
         await window.saveStationsToCloud(window.currentStations);
       }
 
-      // Limpiar input de confirmación
       document.getElementById('purgeConfirmKeywordInput').value = '';
 
-      // Cerrar modal y refrescar la vista
       closeAdminModal();
       populateStationSelect();
+      populateMonthPeriodSelect();
       updateDashboard();
       showBanner(`🗑️ <strong>Depuración completada:</strong> ${deletedDescription}`);
     }
 
-    // Eliminación de usuarios persistente en Firebase
     window.deleteUser = function(id) {
       if (!window.activeUser || (window.activeUser.rol !== 'SUPER_ADMIN' && window.activeUser.rol !== 'ADMIN')) {
         showBanner("⛔ Se requiere permiso administrativo para dar de baja usuarios.");
@@ -1451,11 +1453,9 @@
 
       const userName = target.nombre || target.username || 'Usuario';
       
-      // Eliminar del estado local
       window.platformUsers = window.platformUsers.filter(x => x.id !== id);
       localStorage.setItem('milenium_cached_users', JSON.stringify(window.platformUsers));
 
-      // Persistir en Firebase Firestore
       if (window.saveUsersToCloud) {
         const usersToSave = window.platformUsers.filter(u => u.id !== ROOT_SUPER_ADMIN.id);
         window.saveUsersToCloud(usersToSave);
@@ -1469,7 +1469,6 @@
   </script>
 
   <script>
-    // Initial dataset based on Guadalupe, Reynosa, and Sto Domingo files
     const DEFAULT_DATASETS = [
       {
         id: "GUADALUPE",
@@ -1542,7 +1541,6 @@
       }
     ];
 
-    // ROOT SUPER ADMIN (Único usuario maestro por defecto, sin usuarios ficticios)
     const ROOT_SUPER_ADMIN = {
       id: "usr_root_superadmin",
       username: "lnoriega",
@@ -1555,24 +1553,20 @@
       creadoEl: "2026-09-01"
     };
 
-    // State variables
     window.currentStations = [];
     window.platformUsers = [ROOT_SUPER_ADMIN];
-    window.activeUser = null; // No hay usuario autenticado al cargar
-    let currentPeriodFilter = 'MENSUAL'; // 'DIARIO' | 'SEMANAL' | 'MENSUAL'
+    window.activeUser = null;
+    let currentPeriodFilter = 'MENSUAL';
     let processedFileHashes = new Set();
 
-    // Chart references
     let fuelDonutChart = null;
     let stationsBarChart = null;
     let paymentPieChart = null;
 
-    // Formatters
     const formatCurrency = (val) => '$' + Number(val || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const formatNumber = (val) => Number(val || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     function initData() {
-      // 1. Cargar caché de estaciones si existe
       const hasInitMarker = localStorage.getItem('milenium_stations_initialized');
       const cachedStations = localStorage.getItem('milenium_cached_stations');
 
@@ -1583,14 +1577,11 @@
           window.currentStations = [];
         }
       } else if (!hasInitMarker) {
-        // Solo la primera vez que se visita y antes de cualquier borrado
         window.currentStations = [...DEFAULT_DATASETS];
       } else {
-        // Si ya fue inicializado y está vacío porque se borró, permanece vacío
         window.currentStations = [];
       }
 
-      // Cargar usuarios en caché si existen
       const cachedUsers = localStorage.getItem('milenium_cached_users');
       if (cachedUsers) {
         try {
@@ -1600,7 +1591,6 @@
         } catch(e) {}
       }
 
-      // Cargar huellas de archivos
       window.currentStations.forEach(s => {
         const fp = `${s.id}_${s.periodo}_${Number(s.litros).toFixed(2)}_${Number(s.ventaTotal).toFixed(2)}`;
         processedFileHashes.add(fp);
@@ -1610,7 +1600,6 @@
       populateMonthPeriodSelect();
       updateDashboard();
       
-      // Comprobar si ya existe una sesión guardada en sessionStorage (mantiene sesión activa en F5)
       const savedSession = sessionStorage.getItem('milenium_active_session');
       if (savedSession) {
         try {
@@ -1622,20 +1611,16 @@
         }
       }
 
-      // Si no hay sesión, mostrar pantalla obligatoria de login
       showLoginScreen();
     }
 
-    // Remote update callbacks
     window.receiveRemoteStations = function(remoteList, updatedAt) {
-      // Aceptar arreglos vacíos para reflejar borrados remotos sin restaurar los datos por defecto
       if (!Array.isArray(remoteList)) return;
       
       window.currentStations = remoteList;
       localStorage.setItem('milenium_cached_stations', JSON.stringify(remoteList));
       localStorage.setItem('milenium_stations_initialized', 'true');
 
-      // Actualizar huellas para control de duplicidad
       processedFileHashes.clear();
       window.currentStations.forEach(s => {
         const fp = `${s.id}_${s.periodo}_${Number(s.litros).toFixed(2)}_${Number(s.ventaTotal).toFixed(2)}`;
@@ -1652,7 +1637,6 @@
 
     window.receiveRemoteUsers = function(remoteUsers) {
       if (!Array.isArray(remoteUsers)) return;
-      // Mantener al superadmin intacto y fusionar con los usuarios reales de Firestore
       const filteredRemote = remoteUsers.filter(u => u.username !== ROOT_SUPER_ADMIN.username && u.rol !== 'SUPER_ADMIN');
       window.platformUsers = [ROOT_SUPER_ADMIN, ...filteredRemote];
       localStorage.setItem('milenium_cached_users', JSON.stringify(window.platformUsers));
@@ -1697,7 +1681,6 @@
       const userInput = userElem ? userElem.value.trim().toLowerCase() : '';
       const passInput = passElem ? passElem.value.trim() : '';
 
-      // Buscar usuario coincidente por username o email
       const matched = window.platformUsers.find(u => 
         (u.username && u.username.toLowerCase() === userInput) || 
         (u.email && u.email.toLowerCase() === userInput)
@@ -1721,7 +1704,6 @@
         return;
       }
 
-      // Login exitoso
       if (errBox) errBox.classList.add('hidden');
       authenticateUser(matched);
       sessionStorage.setItem('milenium_active_session', JSON.stringify(matched));
@@ -1743,7 +1725,6 @@
       showLoginScreen();
     }
 
-    // User Roles & Access Control
     function applyUserRoleRestrictions() {
       const u = window.activeUser;
       if (!u) return;
@@ -1751,10 +1732,7 @@
       const uploadBtn = document.getElementById('uploadBtnLabel');
       const dropZone = document.getElementById('dropZoneContainer');
       const adminBtn = document.getElementById('btnOpenAdmin');
-      const firebaseBtn = document.getElementById('btnOpenFirebaseConfig');
-      const firebaseSep = document.getElementById('sepFirebaseConfig');
 
-      // Update Top Bar Indicators
       document.getElementById('userNameLabel').textContent = u.nombre;
       document.getElementById('userRoleLabel').textContent = u.rol === 'CEO' ? 'DIRECCIÓN GENERAL' : u.rol;
       document.getElementById('userAvatar').textContent = u.nombre.charAt(0).toUpperCase();
@@ -1764,7 +1742,6 @@
       document.getElementById('sessionRoleBadge').textContent = u.rol;
       document.getElementById('sessionStationBadge').textContent = u.estacion === 'ALL' ? 'Red Completa' : 'Estación ' + u.estacion;
 
-      // Restrict station select if bound to a single station
       const stSelect = document.getElementById('stationSelect');
       if (u.estacion !== 'ALL') {
         stSelect.value = u.estacion;
@@ -1773,7 +1750,6 @@
         stSelect.disabled = false;
       }
 
-      // Upload controls visibility
       if (u.rol === 'OPERADOR' || u.rol === 'ADMIN' || u.rol === 'SUPER_ADMIN') {
         uploadBtn.classList.remove('hidden');
         dropZone.classList.remove('hidden');
@@ -1782,14 +1758,12 @@
         dropZone.classList.add('hidden');
       }
 
-      // Admin button visible only to ADMIN and SUPER_ADMIN
       if (u.rol === 'SUPER_ADMIN' || u.rol === 'ADMIN') {
         adminBtn.classList.remove('hidden');
       } else {
         adminBtn.classList.add('hidden');
       }
 
-      // Accesos directos de Super Admin dentro del perfil
       const saShortcuts = document.getElementById('superAdminShortcuts');
       if (saShortcuts) {
         saShortcuts.classList.toggle('hidden', u.rol !== 'SUPER_ADMIN');
@@ -1823,7 +1797,6 @@
       if (!nombre || !username || !password || !email) return;
 
       if (id) {
-        // Edit existing
         const idx = window.platformUsers.findIndex(u => u.id === id);
         if (idx >= 0) {
           if (window.platformUsers[idx].rol === 'SUPER_ADMIN' && window.activeUser.rol !== 'SUPER_ADMIN') {
@@ -1843,13 +1816,11 @@
           showBanner(`Usuario <strong>${nombre}</strong> actualizado correctamente.`);
         }
       } else {
-        // Validar que no exista el username
         if (window.platformUsers.some(u => u.username && u.username.toLowerCase() === username.toLowerCase())) {
           showBanner("⚠️ El nombre de usuario ya está registrado. Elige otro.");
           return;
         }
 
-        // Create new user
         const newUser = {
           id: 'usr_' + Date.now(),
           nombre,
@@ -1865,7 +1836,6 @@
         showBanner(`Nuevo usuario <strong>${nombre}</strong> dado de alta con éxito.`);
       }
 
-      // Save to cloud (Guardar usuarios dinámicos en Firestore)
       if (window.saveUsersToCloud) {
         const usersToSave = window.platformUsers.filter(u => u.id !== ROOT_SUPER_ADMIN.id);
         window.saveUsersToCloud(usersToSave);
@@ -2010,13 +1980,13 @@
       const prev = sel.value;
       sel.innerHTML = '<option value="ALL">🌐 Red Milenium (Consolidado Total)</option>';
       
-      // Obtener nombres únicos de estaciones
       const uniqueStations = [];
       const seen = new Set();
-      currentStations.forEach(s => {
-        if (!seen.has(s.id)) {
-          seen.add(s.id);
-          uniqueStations.push(s);
+      (window.currentStations || []).forEach(s => {
+        const rawId = s.stationId || s.id.split('_')[0] || s.id;
+        if (!seen.has(rawId)) {
+          seen.add(rawId);
+          uniqueStations.push({ id: rawId, nombre: s.nombre });
         }
       });
 
@@ -2033,14 +2003,15 @@
       }
     }
 
+    // ==================== NUEVO SELECTOR DE MES / PERIODO ====================
     function populateMonthPeriodSelect() {
       const sel = document.getElementById('monthPeriodSelect');
       if (!sel) return;
       const prev = sel.value;
-      sel.innerHTML = '<option value="ALL">📅 Todos los Meses (Acumulado Histórico)</option>';
+      sel.innerHTML = '<option value="ALL">📅 Todos los Meses (Acumulado Total)</option>';
 
-      // Extraer periodos únicos disponibles en los datos
-      const uniquePeriods = [...new Set(window.currentStations.map(s => s.periodo).filter(Boolean))];
+      // Extraer periodos o meses únicos de las estaciones cargadas
+      const uniquePeriods = [...new Set((window.currentStations || []).map(s => s.periodo).filter(Boolean))];
 
       uniquePeriods.forEach(p => {
         const opt = document.createElement('option');
@@ -2066,18 +2037,18 @@
       const selectedId = stationSel ? stationSel.value : 'ALL';
       const selectedPeriod = monthSel ? monthSel.value : 'ALL';
 
-      // Filtrado simultáneo por Estación y por Mes/Periodo
+      // Filtrado conjunto por Estación y por Mes/Periodo
       let dataset = window.currentStations || [];
       
       if (selectedId !== 'ALL') {
-        dataset = dataset.filter(s => s.id === selectedId);
+        dataset = dataset.filter(s => (s.stationId || s.id.split('_')[0] || s.id) === selectedId || s.id === selectedId);
       }
       
       if (selectedPeriod !== 'ALL') {
         dataset = dataset.filter(s => s.periodo === selectedPeriod);
       }
 
-      // Period factor for CEO strategic projection
+      // Multiplicador según la frecuencia (Diario / Semanal / Mensual)
       let multiplier = 1;
       let periodLabel = selectedPeriod === 'ALL' ? "Todos los Meses Acumulados" : selectedPeriod;
       if (currentPeriodFilter === 'DIARIO') {
@@ -2097,7 +2068,7 @@
         statCountText.textContent = `${uniqueStationsInFiltered} Estación(es) &bull; ${dataset.length} Corte(s)`;
       }
 
-      // Totals
+      // Totales
       let totRevenue = 0;
       let totFuelRev = 0;
       let totLiters = 0;
@@ -2145,7 +2116,7 @@
         }
       });
 
-      // Update KPI Top Cards
+      // Actualizar tarjetas de KPI superiores
       document.getElementById('kpiTotalRevenue').textContent = formatCurrency(totRevenue);
       document.getElementById('kpiFuelRevenue').textContent = formatCurrency(totFuelRev);
       document.getElementById('kpiTotalLiters').textContent = formatNumber(totLiters) + ' L';
@@ -2216,10 +2187,10 @@
         const topSt = [...dataset].sort((a,b) => b.ventaTotal - a.ventaTotal)[0];
         document.getElementById('topStationNote').textContent = `Líder: ${topSt.nombre} (${formatCurrency(topSt.ventaTotal * multiplier)})`;
       } else {
-        document.getElementById('topStationNote').textContent = `Sin datos disponibles`;
+        document.getElementById('topStationNote').textContent = `Sin datos disponibles para esta selección`;
       }
 
-      renderLeaderboard(currentStations, multiplier);
+      renderLeaderboard(dataset, multiplier);
 
       // Render Charts
       renderFuelDonut(prodTotals);
@@ -2385,7 +2356,7 @@
       tbody.innerHTML = '';
 
       if (dataset.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-8 text-slate-400 font-mono">No hay estaciones registradas. Arrastra archivos de Excel arriba.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-8 text-slate-400 font-mono">No hay registros para los filtros seleccionados.</td></tr>`;
         return;
       }
 
@@ -2479,6 +2450,7 @@
         window.saveStationsToCloud(window.currentStations);
       }
       populateStationSelect();
+      populateMonthPeriodSelect();
       updateDashboard();
       showBanner("Estación removida del panel consolidado.");
     }
@@ -2493,14 +2465,12 @@
             const sheet = workbook.Sheets[workbook.SheetNames[0]];
             const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-            // Detect Station and Period from Cell [0][0]
             const topHeader = rows[0] && rows[0][0] ? String(rows[0][0]) : '';
             let stationName = file.name.replace(/\.[^/.]+$/, "").replace("reporte_periodo_concentrado", "").trim();
             if (topHeader.includes("ESTACIÓN:")) {
               stationName = topHeader.split("ESTACIÓN:")[1].trim().split("\n")[0];
             }
 
-            // Standardize Guadalupe name
             if (/ISIGAS/i.test(stationName) || /GUADALUPE/i.test(file.name)) {
               stationName = "GUADALUPE";
             }
@@ -2567,14 +2537,12 @@
               if (c1.includes('Total de Aceites y Lubricantes:')) totalAceites = c5;
               if (c1.includes('Venta Total')) ventaTotal = c5;
 
-              // Taxes
               if (c1.includes('Totales($):')) {
                 subtotal = parseFloat(row[2]) || 0;
                 ieps = parseFloat(row[3]) || 0;
                 iva = parseFloat(row[4]) || 0;
               }
 
-              // Payment channels
               if (c1 === 'EFECTIVO') efectivo = c5;
               if (c1 === 'TARJETAS') tarjetas = c5;
               if (c1 === 'CRÉDITOS') creditos = c5;
@@ -2591,7 +2559,8 @@
             const dataFingerprint = `${cleanId}_${period}_${litrosCombustibles.toFixed(2)}_${ventaTotal.toFixed(2)}`;
 
             const parsedStation = {
-              id: cleanId,
+              id: `${cleanId}_${period.replace(/\s+/g, '_')}`,
+              stationId: cleanId,
               nombre: stationName,
               periodo: period,
               litros: litrosCombustibles,
@@ -2635,7 +2604,6 @@
             const stObj = await parseExcelFile(file);
             const fp = stObj.fileFingerprint;
 
-            // 1. Strict Duplicate Check
             const isExactDuplicate = window.currentStations.some(s => s.fileFingerprint === fp || (s.id === stObj.id && Math.abs(s.ventaTotal - stObj.ventaTotal) < 0.01 && Math.abs(s.litros - stObj.litros) < 0.01));
 
             if (isExactDuplicate) {
@@ -2649,8 +2617,7 @@
               continue;
             }
 
-            // 2. Update Check
-            const existingIdx = window.currentStations.findIndex(s => s.id === stObj.id || s.nombre.toLowerCase() === stObj.nombre.toLowerCase());
+            const existingIdx = window.currentStations.findIndex(s => s.id === stObj.id);
 
             if (existingIdx >= 0) {
               window.currentStations[existingIdx] = stObj;
@@ -2658,18 +2625,17 @@
               updatedCount++;
               logEntries.push(`
                 <div class="flex items-center justify-between text-blue-700 bg-blue-50 px-2 py-1 rounded">
-                  <span>🔄 <strong>${stObj.nombre}</strong>: Datos actualizados (${formatCurrency(stObj.ventaTotal)}).</span>
+                  <span>🔄 <strong>${stObj.nombre}</strong> (${stObj.periodo}): Datos actualizados (${formatCurrency(stObj.ventaTotal)}).</span>
                   <span class="text-[10px] uppercase font-bold text-blue-600">Actualizado</span>
                 </div>
               `);
             } else {
-              // 3. New Station
               window.currentStations.push(stObj);
               processedFileHashes.add(fp);
               addedCount++;
               logEntries.push(`
                 <div class="flex items-center justify-between text-emerald-700 bg-emerald-50 px-2 py-1 rounded">
-                  <span>✅ <strong>${stObj.nombre}</strong>: Nueva estación incorporada con éxito.</span>
+                  <span>✅ <strong>${stObj.nombre}</strong> (${stObj.periodo}): Nuevo corte incorporado con éxito.</span>
                   <span class="text-[10px] uppercase font-bold text-emerald-600">Agregada</span>
                 </div>
               `);
@@ -2685,40 +2651,27 @@
         }
       }
 
-      // Display audit log
       const alertEl = document.getElementById('ingestionAlert');
       const logDetailsEl = document.getElementById('ingestionLogDetails');
       const titleEl = document.getElementById('ingestionTitle');
 
       if (logEntries.length > 0) {
         logDetailsEl.innerHTML = logEntries.join('');
-        titleEl.textContent = `Auditoría de Ingesta: ${addedCount} nueva(s), ${updatedCount} actualizada(s), ${duplicateCount} duplicada(s)`;
+        titleEl.textContent = `Auditoría de Ingesta: ${addedCount} nuevo(s), ${updatedCount} actualizado(s), ${duplicateCount} duplicado(s)`;
         alertEl.classList.remove('hidden');
       }
 
       if (addedCount > 0 || updatedCount > 0) {
-        // Save automatically to Cloud
         if (window.saveStationsToCloud) {
           window.saveStationsToCloud(window.currentStations);
         }
         populateStationSelect();
         populateMonthPeriodSelect();
         updateDashboard();
-        showBanner(`Sistema y nube actualizados: ${addedCount} estación(es) agregada(s), ${updatedCount} actualizada(s).`);
+        showBanner(`Sistema y nube actualizados: ${addedCount} registro(s) nuevo(s), ${updatedCount} actualizado(s).`);
       } else if (duplicateCount > 0) {
         showBanner(`⚠️ No se incorporaron nuevos datos: ${duplicateCount} reporte(s) duplicado(s) detectado(s).`);
       }
-    }
-
-    function removeStation(id) {
-      window.currentStations = window.currentStations.filter(s => s.id !== id);
-      if (window.saveStationsToCloud) {
-        window.saveStationsToCloud(window.currentStations);
-      }
-      populateStationSelect();
-      populateMonthPeriodSelect();
-      updateDashboard();
-      showBanner("Estación removida del panel consolidado.");
     }
 
     function exportCurrentViewCSV() {
