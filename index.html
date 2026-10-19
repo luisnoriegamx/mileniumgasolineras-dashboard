@@ -9,7 +9,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   
-  <title>Milenium Business Panel | CEO Executive Dashboard & Admin</title>
+  <title>Milenium Business Panel | Control Operativo & Ventas</title>
   
   <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -59,7 +59,6 @@
   </script>
 
   <style>
-    /* Clean Crisp White Foundation */
     body {
       background-color: #f8fafc;
       color: #09090b;
@@ -110,7 +109,6 @@
       color: #ea580c;
     }
 
-    /* Custom light scrollbars */
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -126,7 +124,6 @@
       background: #ff6600;
     }
 
-    /* Pulse animation */
     @keyframes orange-pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.35; transform: scale(1.15); }
@@ -282,7 +279,7 @@
               </div>
             </div>
 
-            <!-- Accesos rápidos directos para Super Admin dentro del perfil -->
+            <!-- Shortcuts for Super Admin -->
             <div id="superAdminShortcuts" class="pt-1 border-t border-slate-100 space-y-1">
               <button onclick="toggleUserDropdown(); openAdminModal('users')" class="w-full flex items-center gap-2 p-2 rounded-xl hover:bg-slate-50 text-slate-700 font-semibold text-[11px] transition">
                 <i data-lucide="users" class="w-3.5 h-3.5 text-[#ff6600]"></i>
@@ -330,7 +327,7 @@
       </div>
     </div>
 
-    <!-- Duplicate Detection & Ingestion Audit Modal / Toast -->
+    <!-- Duplicate Detection & Ingestion Audit Toast -->
     <div id="ingestionAlert" class="hidden p-4 rounded-2xl bg-white border border-slate-200 shadow-lg text-xs space-y-2 transition-all">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
@@ -348,27 +345,27 @@
       </div>
     </div>
 
-    <!-- Filter & Station / Month Selector Bar -->
+    <!-- Filter & Station + Month / Period Selector Bar (EXACT REQUESTED POSITION) -->
     <div class="bg-white p-4 rounded-2xl flex flex-wrap items-center justify-between gap-4 border border-slate-200 shadow-sm">
-      <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+      <div class="flex flex-wrap items-center gap-4 w-full lg:w-auto">
         
-        <!-- Filtro 1: Estación -->
+        <!-- Filter 1: Estación -->
         <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
           <i data-lucide="filter" class="w-4 h-4 text-[#ff6600]"></i>
           <span>Estación:</span>
+          <select id="stationSelect" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 text-slate-900 text-xs sm:text-sm font-bold rounded-xl px-4 py-2 focus:outline-none focus:border-[#ff6600] cursor-pointer min-w-[240px] shadow-sm ml-1">
+            <option value="ALL">🌐 Red Milenium (Consolidado Total)</option>
+          </select>
         </div>
-        <select id="stationSelect" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 text-slate-900 text-xs sm:text-sm font-bold rounded-xl px-4 py-2 focus:outline-none focus:border-[#ff6600] cursor-pointer min-w-[240px] shadow-sm">
-          <option value="ALL">🌐 Red Milenium (Consolidado Total)</option>
-        </select>
 
-        <!-- Filtro 2: Mes / Periodo (NUEVO BOTÓN SELECTOR) -->
-        <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500 ml-0 sm:ml-2">
+        <!-- Filter 2: Mes / Periodo (DIRECTLY NEXT TO STATION) -->
+        <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
           <i data-lucide="calendar" class="w-4 h-4 text-[#ff6600]"></i>
-          <span>Mes:</span>
+          <span>Mes / Periodo:</span>
+          <select id="monthPeriodSelect" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 text-slate-900 text-xs sm:text-sm font-bold rounded-xl px-4 py-2 focus:outline-none focus:border-[#ff6600] cursor-pointer min-w-[260px] shadow-sm ml-1">
+            <option value="ALL">📅 Todos los Meses (Acumulado Total)</option>
+          </select>
         </div>
-        <select id="monthPeriodSelect" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 text-slate-900 text-xs sm:text-sm font-bold rounded-xl px-4 py-2 focus:outline-none focus:border-[#ff6600] cursor-pointer min-w-[260px] shadow-sm">
-          <option value="ALL">📅 Todos los Meses (Acumulado Total)</option>
-        </select>
 
       </div>
 
@@ -525,7 +522,7 @@
     <!-- Charts Row: Fuel Mix & Station Performance -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-      <!-- Doughnut Chart: Fuel Volume Breakdown -->
+      <!-- Doughnut Chart: Fuel Volume Breakdown (Magna Green, Premium Red, Diesel Black) -->
       <div class="milenium-card p-5 rounded-2xl flex flex-col justify-between">
         <div class="flex items-center justify-between mb-2">
           <div>
@@ -572,7 +569,7 @@
               <i data-lucide="bar-chart-3" class="w-4 h-4 text-[#ff6600]"></i>
               Rendimiento por Estación
             </h4>
-            <p class="text-[11px] text-slate-500">Comparativo cruzado: Facturación Total (\$) vs. Litros</p>
+            <p class="text-[11px] text-slate-500">Comparativo cruzado: Facturación Total ($) vs. Litros</p>
           </div>
           <div class="flex items-center gap-3 text-xs font-mono">
             <span class="inline-flex items-center gap-1.5 text-[#ff6600] font-bold">
@@ -692,7 +689,7 @@
 
     </div>
 
-    <!-- Station Leaderboard and Comparative Efficiency Matrix -->
+    <!-- Station Leaderboard -->
     <div class="milenium-card rounded-2xl p-5 border border-slate-200">
       <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
         <div>
@@ -735,12 +732,12 @@
             <tr>
               <th class="py-3.5 px-4">Estación</th>
               <th class="py-3.5 px-4 text-right">Volumen (L)</th>
-              <th class="py-3.5 px-4 text-right">Combustibles (\$)</th>
-              <th class="py-3.5 px-4 text-right">Aceites (\$)</th>
-              <th class="py-3.5 px-4 text-right text-slate-900">Venta Total (\$)</th>
-              <th class="py-3.5 px-4 text-right text-[#ff6600]">Efectivo (\$)</th>
-              <th class="py-3.5 px-4 text-right">Tarjetas (\$)</th>
-              <th class="py-3.5 px-4 text-right">Créditos (\$)</th>
+              <th class="py-3.5 px-4 text-right">Combustibles ($)</th>
+              <th class="py-3.5 px-4 text-right">Aceites ($)</th>
+              <th class="py-3.5 px-4 text-right text-slate-900">Venta Total ($)</th>
+              <th class="py-3.5 px-4 text-right text-[#ff6600]">Efectivo ($)</th>
+              <th class="py-3.5 px-4 text-right">Tarjetas ($)</th>
+              <th class="py-3.5 px-4 text-right">Créditos ($)</th>
               <th class="py-3.5 px-4 text-center">Acciones</th>
             </tr>
           </thead>
@@ -759,7 +756,7 @@
         </div>
         <p class="text-sm font-bold text-slate-900">Arrastra nuevos reportes (.xlsx) de estaciones aquí</p>
         <p class="text-xs text-slate-500 leading-relaxed">
-          Detecta automáticamente el encabezado de corte, nombre de estación, volúmenes de Magna/Diesel/Premium, arqueo de pagos e impuestos sin recargar la página. Los datos se sincronizan con la nube para que el CEO los visualice desde cualquier lugar.
+          Detecta automáticamente el encabezado de corte, nombre de estación, rango de fechas del mes, volúmenes de Magna/Diesel/Premium, arqueo de pagos e impuestos sin recargar la página. Los datos se sincronizan con Firebase.
         </p>
       </div>
     </div>
@@ -808,7 +805,7 @@
         </button>
       </div>
 
-      <!-- Contenedor Principal con Scroll Limpio (Sin Cortes) -->
+      <!-- Contenedor Principal con Scroll Limpio -->
       <div class="flex-1 overflow-y-auto p-5 sm:p-7 space-y-6">
 
         <!-- ================= PESTAÑA 1: GESTIÓN DE USUARIOS ================= -->
@@ -906,7 +903,7 @@
                 <span class="text-xs font-mono font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200" id="tableUserCount">1 usuario</span>
               </div>
 
-              <!-- Tabla de Usuarios con Scroll Horizontal y Vertical Independiente -->
+              <!-- Tabla de Usuarios con Scroll -->
               <div class="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-sm max-h-[460px] overflow-y-auto">
                 <div class="overflow-x-auto min-w-full">
                   <table class="w-full text-left text-xs">
@@ -1089,7 +1086,6 @@
         <span class="text-slate-500">Firebase Firestore Cloud Conectado en Tiempo Real</span>
       </div>
       <div class="flex items-center gap-3">
-        <!-- Oculto para todos excepto SUPER_ADMIN -->
         <button id="btnOpenFirebaseConfig" onclick="openFirebaseConfigModal()" class="hidden text-slate-500 hover:text-[#ff6600] font-mono text-[11px] flex items-center gap-1 transition">
           <i data-lucide="database" class="w-3.5 h-3.5 text-[#ff6600]"></i> Configuración Firebase
         </button>
@@ -1101,7 +1097,7 @@
     </div>
   </footer>
 
-  <!-- Modal: Configuración de Credenciales Firebase (Sólo visible para SUPER_ADMIN) -->
+  <!-- Modal: Configuración de Credenciales Firebase (Super Admin) -->
   <div id="firebaseConfigModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
     <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden border border-slate-200 shadow-2xl flex flex-col">
       <div class="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
@@ -1123,21 +1119,10 @@
           Configuración actual conectada directamente al proyecto <strong>mileniumdbestaciones</strong>:
         </p>
         <textarea id="firebaseConfigInput" rows="8" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 font-mono text-[11px] text-slate-800 focus:outline-none focus:border-[#ff6600]"></textarea>
-        <div class="bg-orange-50/70 p-3 rounded-xl border border-orange-200 text-[11px] text-slate-600 space-y-1">
-          <p class="font-bold text-slate-800 flex items-center gap-1.5">
-            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-[#ff6600]"></i> Reglas de Seguridad en Firestore:
-          </p>
-          <p class="font-mono text-[10px] text-slate-500">
-            match /artifacts/{appId}/public/data/{document=**} { allow read, write: if request.auth != null; }
-          </p>
-        </div>
       </div>
       <div class="p-4 border-t border-slate-200 bg-slate-50 flex justify-end gap-2">
         <button onclick="closeFirebaseConfigModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-bold hover:bg-slate-100 transition">
-          Cancelar
-        </button>
-        <button onclick="applyCustomFirebaseConfig()" class="px-4 py-2 rounded-xl orange-glow-btn font-bold transition">
-          Actualizar Conexión
+          Cerrar
         </button>
       </div>
     </div>
@@ -1147,12 +1132,10 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // Application ID configuration
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'milenium-gas-dashboard';
 
-    // Firebase Configuration for mileniumdbestaciones
     const firebaseConfig = {
       apiKey: "AIzaSyAMc39xwB34CBaKz4qYjgTYeJXCYKIy4MY",
       authDomain: "mileniumdbestaciones.firebaseapp.com",
@@ -1171,7 +1154,6 @@
       auth = getAuth(app);
       db = getFirestore(app);
 
-      // Sign in anonymously to comply with Firestore security rules
       signInAnonymously(auth).then(() => {
         setupFirestoreListeners();
       }).catch(err => {
@@ -1185,7 +1167,6 @@
     function setupFirestoreListeners() {
       if (!db) return;
 
-      // Realtime listener for stations summary
       const stationsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'stations_summary', 'current');
       onSnapshot(stationsDocRef, (snap) => {
         if (snap.exists()) {
@@ -1196,7 +1177,6 @@
         }
       }, (err) => console.warn("Stations listener note:", err));
 
-      // Realtime listener for platform users
       const usersDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'platform_users', 'current');
       onSnapshot(usersDocRef, (snap) => {
         if (snap.exists()) {
@@ -1208,7 +1188,6 @@
       }, (err) => console.warn("Users listener note:", err));
     }
 
-    // Save stations to Firestore
     window.saveStationsToCloud = async function(stationsList) {
       if (!db) return;
       try {
@@ -1225,7 +1204,6 @@
       }
     };
 
-    // Save users to Firestore
     window.saveUsersToCloud = async function(usersList) {
       if (!db) return;
       try {
@@ -1330,40 +1308,47 @@
     function populatePurgeSelectors() {
       const stations = window.currentStations || [];
       const allCountBadge = document.getElementById('purgeAllCountBadge');
-      if (allCountBadge) allCountBadge.textContent = `${stations.length} estación(es) activa(s)`;
+      if (allCountBadge) allCountBadge.textContent = `${stations.length} corte(s) activo(s)`;
 
+      // 1. Selector de Estaciones
       const stSelect = document.getElementById('purgeStationSelect');
       if (stSelect) {
         stSelect.innerHTML = '';
         if (stations.length === 0) {
           stSelect.innerHTML = '<option value="">No hay estaciones cargadas</option>';
         } else {
-          stations.forEach(s => {
+          const uniqueStationIds = [...new Set(stations.map(s => s.stationId || s.id))];
+          uniqueStationIds.forEach(id => {
+            const stObj = stations.find(s => (s.stationId || s.id) === id);
             const opt = document.createElement('option');
-            opt.value = s.id;
-            opt.textContent = `⛽ ${s.nombre} (${formatCurrency(s.ventaTotal)} - ${formatNumber(s.litros)} L)`;
+            opt.value = id;
+            opt.textContent = `⛽ ${stObj ? stObj.nombre : id}`;
             stSelect.appendChild(opt);
           });
         }
       }
 
+      // 2. Selector de Periodos / Meses
       const periodSelect = document.getElementById('purgePeriodSelect');
       if (periodSelect) {
         periodSelect.innerHTML = '';
-        const uniquePeriods = [...new Set(stations.map(s => s.periodo).filter(Boolean))];
+        const uniquePeriods = [...new Set(stations.map(s => s.periodKey || s.periodo).filter(Boolean))];
         if (uniquePeriods.length === 0) {
           periodSelect.innerHTML = '<option value="">No hay periodos disponibles</option>';
         } else {
-          uniquePeriods.forEach(p => {
-            const countInPeriod = stations.filter(s => s.periodo === p).length;
+          uniquePeriods.forEach(pk => {
+            const match = stations.find(s => (s.periodKey || s.periodo) === pk);
+            const label = match ? (match.monthLabel || match.periodo) : pk;
+            const countInPeriod = stations.filter(s => (s.periodKey || s.periodo) === pk).length;
             const opt = document.createElement('option');
-            opt.value = p;
-            opt.textContent = `📅 ${p} (${countInPeriod} estación/es)`;
+            opt.value = pk;
+            opt.textContent = `📅 ${label} (${countInPeriod} corte/s)`;
             periodSelect.appendChild(opt);
           });
         }
       }
 
+      // 3. Selector de Archivos individuales
       const fileSelect = document.getElementById('purgeFileSelect');
       if (fileSelect) {
         fileSelect.innerHTML = '';
@@ -1406,13 +1391,14 @@
         deletedDescription = `Se vaciaron todas las estaciones (${prevCount} registros). El panel quedó en ceros.`;
       } else if (currentPurgeMode === 'STATION') {
         const targetId = document.getElementById('purgeStationSelect').value;
-        const targetName = window.currentStations.find(s => s.id === targetId)?.nombre || targetId;
-        window.currentStations = window.currentStations.filter(s => s.id !== targetId);
-        deletedDescription = `Se eliminó la estación <strong>${targetName}</strong> de la base de datos.`;
+        const targetObj = window.currentStations.find(s => (s.stationId || s.id) === targetId);
+        const targetName = targetObj ? targetObj.nombre : targetId;
+        window.currentStations = window.currentStations.filter(s => (s.stationId || s.id) !== targetId);
+        deletedDescription = `Se eliminaron todos los cortes de la estación <strong>${targetName}</strong>.`;
       } else if (currentPurgeMode === 'PERIOD') {
         const targetPeriod = document.getElementById('purgePeriodSelect').value;
-        window.currentStations = window.currentStations.filter(s => s.periodo !== targetPeriod);
-        deletedDescription = `Se eliminaron todos los registros correspondientes al periodo <strong>${targetPeriod}</strong>.`;
+        window.currentStations = window.currentStations.filter(s => (s.periodKey || s.periodo) !== targetPeriod);
+        deletedDescription = `Se eliminaron todos los cortes del periodo <strong>${targetPeriod}</strong>.`;
       } else if (currentPurgeMode === 'FILE') {
         const targetId = document.getElementById('purgeFileSelect').value;
         const targetItem = window.currentStations.find(s => s.id === targetId);
@@ -1468,11 +1454,84 @@
     };
   </script>
 
+  <!-- ==================== MOTOR DE DATOS, MESES Y DASHBOARD ==================== -->
   <script>
+    // Intelligent month/period extractor for any date format
+    function extractPeriodDetails(rawText, fallbackName = '') {
+      const text = `${rawText} ${fallbackName}`.toUpperCase();
+      
+      const monthDict = {
+        'ENERO': { num: '01', label: 'Enero' },
+        'JANUARY': { num: '01', label: 'Enero' },
+        'FEBRERO': { num: '02', label: 'Febrero' },
+        'FEBRUARY': { num: '02', label: 'Febrero' },
+        'MARZO': { num: '03', label: 'Marzo' },
+        'MARCH': { num: '03', label: 'Marzo' },
+        'ABRIL': { num: '04', label: 'Abril' },
+        'APRIL': { num: '04', label: 'Abril' },
+        'MAYO': { num: '05', label: 'Mayo' },
+        'MAY': { num: '05', label: 'Mayo' },
+        'JUNIO': { num: '06', label: 'Junio' },
+        'JUNE': { num: '06', label: 'Junio' },
+        'JULIO': { num: '07', label: 'Julio' },
+        'JULY': { num: '07', label: 'Julio' },
+        'AGOSTO': { num: '08', label: 'Agosto' },
+        'AUGUST': { num: '08', label: 'Agosto' },
+        'SEPTIEMBRE': { num: '09', label: 'Septiembre' },
+        'SEPTEMBER': { num: '09', label: 'Septiembre' },
+        'OCTUBRE': { num: '10', label: 'Octubre' },
+        'OCTOBER': { num: '10', label: 'Octubre' },
+        'NOVIEMBRE': { num: '11', label: 'Noviembre' },
+        'NOVEMBER': { num: '11', label: 'Noviembre' },
+        'DICIEMBRE': { num: '12', label: 'Diciembre' },
+        'DECEMBER': { num: '12', label: 'Diciembre' },
+      };
+
+      let detectedYear = '2026';
+      const yearMatch = text.match(/202[0-9]/);
+      if (yearMatch) detectedYear = yearMatch[0];
+
+      let detectedMonthNum = '09';
+      let detectedMonthName = 'Septiembre';
+
+      for (const [key, val] of Object.entries(monthDict)) {
+        if (text.includes(key)) {
+          detectedMonthNum = val.num;
+          detectedMonthName = val.label;
+          break;
+        }
+      }
+
+      // Check numeric dates like 01/10/2026 or 2026-10-01
+      const numericMatch = text.match(/([0-3]?[0-9])[/-]([0-1]?[0-9])[/-](202[0-9])/);
+      if (numericMatch && (!text.includes('SEPTEMBER') && !text.includes('OCTOBER'))) {
+        const m = String(numericMatch[2]).padStart(2, '0');
+        const monthsByNum = {
+          '01': 'Enero', '02': 'Febrero', '03': 'Marzo', '04': 'Abril',
+          '05': 'Mayo', '06': 'Junio', '07': 'Julio', '08': 'Agosto',
+          '09': 'Septiembre', '10': 'Octubre', '11': 'Noviembre', '12': 'Diciembre'
+        };
+        if (monthsByNum[m]) {
+          detectedMonthNum = m;
+          detectedMonthName = monthsByNum[m];
+          detectedYear = numericMatch[3];
+        }
+      }
+
+      const periodKey = `${detectedYear}-${detectedMonthNum}`;
+      const monthLabel = `${detectedMonthName} ${detectedYear}`;
+
+      return { periodKey, monthLabel };
+    }
+
+    // Default Seed Dataset with explicit month labels and IDs
     const DEFAULT_DATASETS = [
       {
-        id: "GUADALUPE",
+        id: "GUADALUPE_2026-09",
+        stationId: "GUADALUPE",
         nombre: "GUADALUPE",
+        periodKey: "2026-09",
+        monthLabel: "Septiembre 2026",
         periodo: "01 September 2026 AL 30 September 2026",
         litros: 306358.86,
         jarras: 19.53,
@@ -1494,8 +1553,11 @@
         }
       },
       {
-        id: "REYNOSA",
+        id: "REYNOSA_2026-09",
+        stationId: "REYNOSA",
         nombre: "REYNOSA",
+        periodKey: "2026-09",
+        monthLabel: "Septiembre 2026",
         periodo: "01 September 2026 AL 30 September 2026",
         litros: 206270.56,
         jarras: 861.61,
@@ -1517,8 +1579,11 @@
         }
       },
       {
-        id: "STO_DOMINGO",
+        id: "STO_DOMINGO_2026-09",
+        stationId: "STO_DOMINGO",
         nombre: "STO DOMINGO",
+        periodKey: "2026-09",
+        monthLabel: "Septiembre 2026",
         periodo: "01 September 2026 AL 30 September 2026",
         litros: 31624.40,
         jarras: 40.64,
@@ -1655,7 +1720,6 @@
       }, 700);
     }
 
-    // ==================== GESTIÓN DE ACCESO Y AUTENTICACIÓN ====================
     function showLoginScreen() {
       const loginModal = document.getElementById('loginScreen');
       if (loginModal) loginModal.classList.remove('hidden');
@@ -1974,6 +2038,7 @@
       updateDashboard();
     }
 
+    // Populate Station dropdown by grouping distinct stations
     function populateStationSelect() {
       const sel = document.getElementById('stationSelect');
       if (!sel) return;
@@ -1996,6 +2061,7 @@
         opt.textContent = `⛽ ${s.nombre}`;
         sel.appendChild(opt);
       });
+
       if ([...sel.options].some(o => o.value === prev)) {
         sel.value = prev;
       } else {
@@ -2003,20 +2069,29 @@
       }
     }
 
-    // ==================== NUEVO SELECTOR DE MES / PERIODO ====================
+    // Populate Month / Period selector based on extracted periods
     function populateMonthPeriodSelect() {
       const sel = document.getElementById('monthPeriodSelect');
       if (!sel) return;
       const prev = sel.value;
       sel.innerHTML = '<option value="ALL">📅 Todos los Meses (Acumulado Total)</option>';
 
-      // Extraer periodos o meses únicos de las estaciones cargadas
-      const uniquePeriods = [...new Set((window.currentStations || []).map(s => s.periodo).filter(Boolean))];
+      const periodMap = new Map();
+      (window.currentStations || []).forEach(s => {
+        const key = s.periodKey || s.periodo;
+        if (!periodMap.has(key)) {
+          periodMap.set(key, s.monthLabel || s.periodo);
+        }
+      });
 
-      uniquePeriods.forEach(p => {
+      // Sort chronological descending
+      const sortedKeys = Array.from(periodMap.keys()).sort().reverse();
+
+      sortedKeys.forEach(pk => {
+        const label = periodMap.get(pk);
         const opt = document.createElement('option');
-        opt.value = p;
-        opt.textContent = `🗓️ ${p}`;
+        opt.value = pk;
+        opt.textContent = `🗓️ ${label}`;
         sel.appendChild(opt);
       });
 
@@ -2034,23 +2109,21 @@
     function updateDashboard() {
       const stationSel = document.getElementById('stationSelect');
       const monthSel = document.getElementById('monthPeriodSelect');
-      const selectedId = stationSel ? stationSel.value : 'ALL';
+      const selectedStation = stationSel ? stationSel.value : 'ALL';
       const selectedPeriod = monthSel ? monthSel.value : 'ALL';
 
-      // Filtrado conjunto por Estación y por Mes/Periodo
       let dataset = window.currentStations || [];
       
-      if (selectedId !== 'ALL') {
-        dataset = dataset.filter(s => (s.stationId || s.id.split('_')[0] || s.id) === selectedId || s.id === selectedId);
+      if (selectedStation !== 'ALL') {
+        dataset = dataset.filter(s => (s.stationId || s.id.split('_')[0] || s.id) === selectedStation);
       }
       
       if (selectedPeriod !== 'ALL') {
-        dataset = dataset.filter(s => s.periodo === selectedPeriod);
+        dataset = dataset.filter(s => (s.periodKey || s.periodo) === selectedPeriod);
       }
 
-      // Multiplicador según la frecuencia (Diario / Semanal / Mensual)
       let multiplier = 1;
-      let periodLabel = selectedPeriod === 'ALL' ? "Todos los Meses Acumulados" : selectedPeriod;
+      let periodLabel = selectedPeriod === 'ALL' ? "Todos los Meses Acumulados" : (dataset[0]?.monthLabel || selectedPeriod);
       if (currentPeriodFilter === 'DIARIO') {
         multiplier = 1 / 30;
         periodLabel += " (Ritmo Estimado Diario)";
@@ -2064,11 +2137,10 @@
 
       const statCountText = document.getElementById('statCountText');
       if (statCountText) {
-        const uniqueStationsInFiltered = new Set(dataset.map(s => s.id)).size;
+        const uniqueStationsInFiltered = new Set(dataset.map(s => s.stationId || s.id.split('_')[0] || s.id)).size;
         statCountText.textContent = `${uniqueStationsInFiltered} Estación(es) &bull; ${dataset.length} Corte(s)`;
       }
 
-      // Totales
       let totRevenue = 0;
       let totFuelRev = 0;
       let totLiters = 0;
@@ -2116,7 +2188,6 @@
         }
       });
 
-      // Actualizar tarjetas de KPI superiores
       document.getElementById('kpiTotalRevenue').textContent = formatCurrency(totRevenue);
       document.getElementById('kpiFuelRevenue').textContent = formatCurrency(totFuelRev);
       document.getElementById('kpiTotalLiters').textContent = formatNumber(totLiters) + ' L';
@@ -2131,18 +2202,15 @@
       const digPct = totRevenue > 0 ? ((cardsPlusCredits / totRevenue) * 100).toFixed(1) : '0';
       document.getElementById('kpiDigitalPct').textContent = `${digPct}% penetración`;
 
-      // Strategic KPI 1: Weighted Average Price per Liter
       const avgPrice = totLiters > 0 ? (totFuelRev / totLiters) : 0;
       document.getElementById('kpiAvgPricePerLiter').textContent = `${formatCurrency(avgPrice)} / L`;
       document.getElementById('kpiAvgPriceNote').textContent = avgPrice > 25 ? 'Mezcla Premium/Diesel' : 'Mezcla Regular/Frontera';
 
-      // Strategic KPI 2: Cross-sell Lubricants ($ per 1,000 Liters / m3)
       const oilsPerM3 = totLiters > 0 ? (totOils / (totLiters / 1000)) : 0;
       document.getElementById('kpiOilsPerM3').textContent = `${formatCurrency(oilsPerM3)} / m³`;
       const oilShare = totRevenue > 0 ? ((totOils / totRevenue) * 100).toFixed(2) : '0.00';
       document.getElementById('kpiOilSharePct').textContent = `${oilShare}% de venta neta`;
 
-      // Strategic KPI 3: Merma / Jarreo Ratio
       const jarreoRatio = totLiters > 0 ? ((totJarras / totLiters) * 100) : 0;
       document.getElementById('kpiJarreosRatio').textContent = `${jarreoRatio.toFixed(3)}%`;
       const jarreosStatusEl = document.getElementById('kpiJarreosStatus');
@@ -2154,18 +2222,15 @@
         jarreosStatusEl.className = 'font-mono font-bold text-emerald-600';
       }
 
-      // Legends
       document.getElementById('legendMagnaLit').textContent = formatNumber(prodTotals.MAGNA.lts) + ' L';
       document.getElementById('legendPremiumLit').textContent = formatNumber(prodTotals.PREMIUM.lts) + ' L';
       document.getElementById('legendDieselLit').textContent = formatNumber(prodTotals.DIESEL.lts) + ' L';
 
-      // Tax Audit
       document.getElementById('taxSubtotal').textContent = formatCurrency(totSubtotal);
       document.getElementById('taxIEPS').textContent = formatCurrency(totIEPS);
       document.getElementById('taxIVA').textContent = formatCurrency(totIVA);
       document.getElementById('totalOilsKpi').textContent = formatCurrency(totOils);
 
-      // Tax Progress Ratios
       const safeTot = totRevenue > 0 ? totRevenue : 1;
       const subPct = Math.round((totSubtotal / safeTot) * 100);
       const ivaPct = Math.round((totIVA / safeTot) * 100);
@@ -2177,30 +2242,23 @@
         <div class="bg-slate-300 h-full" style="width: ${iepsPct}%" title="IEPS: ${iepsPct}%"></div>
       `;
 
-      // Cash breakdown texts
       document.getElementById('cashBreakdownVal').textContent = formatCurrency(totCash);
       document.getElementById('cardBreakdownVal').textContent = formatCurrency(totCards);
       document.getElementById('creditBreakdownVal').textContent = formatCurrency(totCredits);
 
-      // Station Leader note & Leaderboard rendering
       if (dataset.length > 0) {
         const topSt = [...dataset].sort((a,b) => b.ventaTotal - a.ventaTotal)[0];
         document.getElementById('topStationNote').textContent = `Líder: ${topSt.nombre} (${formatCurrency(topSt.ventaTotal * multiplier)})`;
       } else {
-        document.getElementById('topStationNote').textContent = `Sin datos disponibles para esta selección`;
+        document.getElementById('topStationNote').textContent = `Sin datos disponibles`;
       }
 
       renderLeaderboard(dataset, multiplier);
-
-      // Render Charts
       renderFuelDonut(prodTotals);
       renderStationsBar(dataset, multiplier);
       renderPaymentPie(totCash, totCards, totCredits);
-
-      // Render Table
       renderTable(dataset, multiplier);
 
-      // Refresh lucide icons
       lucide.createIcons();
     }
 
@@ -2247,12 +2305,21 @@
       const ctx = document.getElementById('stationsBarChart').getContext('2d');
       if (stationsBarChart) stationsBarChart.destroy();
 
-      const labels = dataset.map(s => {
-        let name = s.nombre.replace(/EST ISIGAS/gi, 'GUADALUPE').replace(/ISIGAS/gi, 'GUADALUPE');
-        return name.trim();
+      // Aggregate by distinct station
+      const stMap = new Map();
+      dataset.forEach(s => {
+        const name = s.nombre.replace(/EST ISIGAS/gi, 'GUADALUPE').replace(/ISIGAS/gi, 'GUADALUPE').trim();
+        if (!stMap.has(name)) {
+          stMap.set(name, { sales: 0, liters: 0 });
+        }
+        const cur = stMap.get(name);
+        cur.sales += (s.ventaTotal * multiplier);
+        cur.liters += (s.litros * multiplier);
       });
-      const sales = dataset.map(s => s.ventaTotal * multiplier);
-      const liters = dataset.map(s => s.litros * multiplier);
+
+      const labels = Array.from(stMap.keys());
+      const sales = labels.map(l => stMap.get(l).sales);
+      const liters = labels.map(l => stMap.get(l).liters);
 
       stationsBarChart = new Chart(ctx, {
         type: 'bar',
@@ -2356,7 +2423,7 @@
       tbody.innerHTML = '';
 
       if (dataset.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-8 text-slate-400 font-mono">No hay registros para los filtros seleccionados.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-8 text-slate-400 font-mono">No hay cortes de estaciones para el filtro seleccionado.</td></tr>`;
         return;
       }
 
@@ -2368,6 +2435,7 @@
             <div class="flex items-center gap-2">
               <span class="w-2 h-2 rounded-full bg-[#ff6600]"></span>
               <span>${st.nombre}</span>
+              <span class="text-[9px] px-1.5 py-0.2 rounded bg-orange-100 text-[#ea580c] font-mono font-bold">${st.monthLabel || 'Mes'}</span>
             </div>
             <span class="text-[10px] text-slate-400 font-mono">${st.periodo || 'Corte Mensual'}</span>
           </td>
@@ -2379,7 +2447,7 @@
           <td class="py-3 px-4 text-right text-slate-700">${formatCurrency(st.tarjetas * multiplier)}</td>
           <td class="py-3 px-4 text-right text-slate-700">${formatCurrency(st.creditos * multiplier)}</td>
           <td class="py-3 px-4 text-center">
-            <button onclick="removeStation('${st.id}')" title="Eliminar Estación" class="p-1.5 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-500 transition">
+            <button onclick="removeStation('${st.id}')" title="Eliminar este corte" class="p-1.5 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-500 transition">
               <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
             </button>
           </td>
@@ -2398,8 +2466,29 @@
         return;
       }
 
-      const totalNetworkVolume = allStations.reduce((acc, s) => acc + s.litros, 0);
-      const sorted = [...allStations].sort((a, b) => b.litros - a.litros);
+      // Aggregate stations by name for leaderboard
+      const aggregatedMap = new Map();
+      allStations.forEach(s => {
+        const key = s.stationId || s.nombre;
+        if (!aggregatedMap.has(key)) {
+          aggregatedMap.set(key, {
+            nombre: s.nombre,
+            litros: 0,
+            ventaTotal: 0,
+            totalCombustibles: 0,
+            totalAceites: 0
+          });
+        }
+        const cur = aggregatedMap.get(key);
+        cur.litros += s.litros;
+        cur.ventaTotal += s.ventaTotal;
+        cur.totalCombustibles += s.totalCombustibles;
+        cur.totalAceites += s.totalAceites;
+      });
+
+      const stList = Array.from(aggregatedMap.values());
+      const totalNetworkVolume = stList.reduce((acc, s) => acc + s.litros, 0);
+      const sorted = [...stList].sort((a, b) => b.litros - a.litros);
 
       sorted.forEach((st, idx) => {
         const shareVolume = totalNetworkVolume > 0 ? ((st.litros / totalNetworkVolume) * 100).toFixed(1) : '0';
@@ -2452,9 +2541,10 @@
       populateStationSelect();
       populateMonthPeriodSelect();
       updateDashboard();
-      showBanner("Estación removida del panel consolidado.");
+      showBanner("Corte de estación removido del panel.");
     }
 
+    // Parsing Excel with multi-month accuracy
     async function parseExcelFile(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -2480,6 +2570,9 @@
             if (matchPeriod) {
               period = `${matchPeriod[1]} al ${matchPeriod[2]}`.trim();
             }
+
+            // Extract distinct period and month
+            const { periodKey, monthLabel } = extractPeriodDetails(topHeader, file.name);
 
             let totalCombustibles = 0;
             let litrosCombustibles = 0;
@@ -2555,13 +2648,17 @@
               iva = ventaTotal - subtotal;
             }
 
-            const cleanId = stationName.replace(/\s+/g, '_').toUpperCase();
-            const dataFingerprint = `${cleanId}_${period}_${litrosCombustibles.toFixed(2)}_${ventaTotal.toFixed(2)}`;
+            const cleanStationId = stationName.replace(/\s+/g, '_').toUpperCase();
+            // Compound ID per station AND month so months never overwrite each other
+            const recordId = `${cleanStationId}_${periodKey}`;
+            const dataFingerprint = `${recordId}_${period}_${litrosCombustibles.toFixed(2)}_${ventaTotal.toFixed(2)}`;
 
             const parsedStation = {
-              id: `${cleanId}_${period.replace(/\s+/g, '_')}`,
-              stationId: cleanId,
+              id: recordId,
+              stationId: cleanStationId,
               nombre: stationName,
+              periodKey: periodKey,
+              monthLabel: monthLabel,
               periodo: period,
               litros: litrosCombustibles,
               jarras: jarrasTotal,
@@ -2604,19 +2701,23 @@
             const stObj = await parseExcelFile(file);
             const fp = stObj.fileFingerprint;
 
-            const isExactDuplicate = window.currentStations.some(s => s.fileFingerprint === fp || (s.id === stObj.id && Math.abs(s.ventaTotal - stObj.ventaTotal) < 0.01 && Math.abs(s.litros - stObj.litros) < 0.01));
+            const isExactDuplicate = window.currentStations.some(s => 
+              s.fileFingerprint === fp || 
+              (s.id === stObj.id && Math.abs(s.ventaTotal - stObj.ventaTotal) < 0.01 && Math.abs(s.litros - stObj.litros) < 0.01)
+            );
 
             if (isExactDuplicate) {
               duplicateCount++;
               logEntries.push(`
                 <div class="flex items-center justify-between text-amber-700 bg-amber-50 px-2 py-1 rounded">
-                  <span>⚠️ <strong>${stObj.nombre}</strong> (${file.name}): Reporte idéntico ignorado (Evita duplicidad).</span>
+                  <span>⚠️ <strong>${stObj.nombre}</strong> (${stObj.monthLabel}): Reporte idéntico ignorado (Evita duplicidad).</span>
                   <span class="text-[10px] uppercase font-bold text-amber-600">Duplicado</span>
                 </div>
               `);
               continue;
             }
 
+            // Update only if same station AND same month
             const existingIdx = window.currentStations.findIndex(s => s.id === stObj.id);
 
             if (existingIdx >= 0) {
@@ -2625,7 +2726,7 @@
               updatedCount++;
               logEntries.push(`
                 <div class="flex items-center justify-between text-blue-700 bg-blue-50 px-2 py-1 rounded">
-                  <span>🔄 <strong>${stObj.nombre}</strong> (${stObj.periodo}): Datos actualizados (${formatCurrency(stObj.ventaTotal)}).</span>
+                  <span>🔄 <strong>${stObj.nombre}</strong> (${stObj.monthLabel}): Corte actualizado (${formatCurrency(stObj.ventaTotal)}).</span>
                   <span class="text-[10px] uppercase font-bold text-blue-600">Actualizado</span>
                 </div>
               `);
@@ -2635,7 +2736,7 @@
               addedCount++;
               logEntries.push(`
                 <div class="flex items-center justify-between text-emerald-700 bg-emerald-50 px-2 py-1 rounded">
-                  <span>✅ <strong>${stObj.nombre}</strong> (${stObj.periodo}): Nuevo corte incorporado con éxito.</span>
+                  <span>✅ <strong>${stObj.nombre}</strong> (${stObj.monthLabel}): Nuevo corte incorporado con éxito.</span>
                   <span class="text-[10px] uppercase font-bold text-emerald-600">Agregada</span>
                 </div>
               `);
@@ -2657,7 +2758,7 @@
 
       if (logEntries.length > 0) {
         logDetailsEl.innerHTML = logEntries.join('');
-        titleEl.textContent = `Auditoría de Ingesta: ${addedCount} nuevo(s), ${updatedCount} actualizado(s), ${duplicateCount} duplicado(s)`;
+        titleEl.textContent = `Auditoría de Ingesta: ${addedCount} nueva(s), ${updatedCount} actualizada(s), ${duplicateCount} duplicada(s)`;
         alertEl.classList.remove('hidden');
       }
 
@@ -2668,7 +2769,7 @@
         populateStationSelect();
         populateMonthPeriodSelect();
         updateDashboard();
-        showBanner(`Sistema y nube actualizados: ${addedCount} registro(s) nuevo(s), ${updatedCount} actualizado(s).`);
+        showBanner(`Sistema y nube actualizados: ${addedCount} corte(s) agregado(s), ${updatedCount} actualizado(s).`);
       } else if (duplicateCount > 0) {
         showBanner(`⚠️ No se incorporaron nuevos datos: ${duplicateCount} reporte(s) duplicado(s) detectado(s).`);
       }
@@ -2676,9 +2777,9 @@
 
     function exportCurrentViewCSV() {
       if (!window.currentStations || window.currentStations.length === 0) return;
-      let csv = "Estacion,Periodo,Litros,Combustibles,Aceites,VentaTotal,Efectivo,Tarjetas,Creditos\n";
+      let csv = "Estacion,Mes,Periodo,Litros,Combustibles,Aceites,VentaTotal,Efectivo,Tarjetas,Creditos\n";
       window.currentStations.forEach(s => {
-        csv += `"${s.nombre}","${s.periodo}",${s.litros},${s.totalCombustibles},${s.totalAceites},${s.ventaTotal},${s.efectivo},${s.tarjetas},${s.creditos}\n`;
+        csv += `"${s.nombre}","${s.monthLabel || ''}","${s.periodo}",${s.litros},${s.totalCombustibles},${s.totalAceites},${s.ventaTotal},${s.efectivo},${s.tarjetas},${s.creditos}\n`;
       });
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
@@ -2690,7 +2791,6 @@
       document.body.removeChild(link);
     }
 
-    // Drag and drop event wiring
     window.addEventListener('DOMContentLoaded', () => {
       initData();
 
