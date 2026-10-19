@@ -1607,6 +1607,7 @@
       });
 
       populateStationSelect();
+      populateMonthPeriodSelect();
       updateDashboard();
       
       // Comprobar si ya existe una sesión guardada en sessionStorage (mantiene sesión activa en F5)
@@ -1642,6 +1643,7 @@
       });
 
       populateStationSelect();
+      populateMonthPeriodSelect();
       updateDashboard();
       if (window.activeUser) {
         showBanner(`Datos sincronizados en tiempo real desde Firebase (${updatedAt ? new Date(updatedAt).toLocaleTimeString() : 'reciente'}).`);
@@ -2004,9 +2006,21 @@
 
     function populateStationSelect() {
       const sel = document.getElementById('stationSelect');
+      if (!sel) return;
       const prev = sel.value;
       sel.innerHTML = '<option value="ALL">🌐 Red Milenium (Consolidado Total)</option>';
+      
+      // Obtener nombres únicos de estaciones
+      const uniqueStations = [];
+      const seen = new Set();
       currentStations.forEach(s => {
+        if (!seen.has(s.id)) {
+          seen.add(s.id);
+          uniqueStations.push(s);
+        }
+      });
+
+      uniqueStations.forEach(s => {
         const opt = document.createElement('option');
         opt.value = s.id;
         opt.textContent = `⛽ ${s.nombre}`;
@@ -2019,27 +2033,69 @@
       }
     }
 
+    function populateMonthPeriodSelect() {
+      const sel = document.getElementById('monthPeriodSelect');
+      if (!sel) return;
+      const prev = sel.value;
+      sel.innerHTML = '<option value="ALL">📅 Todos los Meses (Acumulado Histórico)</option>';
+
+      // Extraer periodos únicos disponibles en los datos
+      const uniquePeriods = [...new Set(window.currentStations.map(s => s.periodo).filter(Boolean))];
+
+      uniquePeriods.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p;
+        opt.textContent = `🗓️ ${p}`;
+        sel.appendChild(opt);
+      });
+
+      if ([...sel.options].some(o => o.value === prev)) {
+        sel.value = prev;
+      } else {
+        sel.value = 'ALL';
+      }
+    }
+
     function applyFilters() {
       updateDashboard();
     }
 
     function updateDashboard() {
-      const selectedId = document.getElementById('stationSelect').value;
-      let dataset = selectedId === 'ALL' ? currentStations : currentStations.filter(s => s.id === selectedId);
+      const stationSel = document.getElementById('stationSelect');
+      const monthSel = document.getElementById('monthPeriodSelect');
+      const selectedId = stationSel ? stationSel.value : 'ALL';
+      const selectedPeriod = monthSel ? monthSel.value : 'ALL';
+
+      // Filtrado simultáneo por Estación y por Mes/Periodo
+      let dataset = window.currentStations || [];
+      
+      if (selectedId !== 'ALL') {
+        dataset = dataset.filter(s => s.id === selectedId);
+      }
+      
+      if (selectedPeriod !== 'ALL') {
+        dataset = dataset.filter(s => s.periodo === selectedPeriod);
+      }
 
       // Period factor for CEO strategic projection
       let multiplier = 1;
-      let periodLabel = "Corte Consolidado (Periodo Completo)";
+      let periodLabel = selectedPeriod === 'ALL' ? "Todos los Meses Acumulados" : selectedPeriod;
       if (currentPeriodFilter === 'DIARIO') {
         multiplier = 1 / 30;
-        periodLabel = "Ritmo Estimado Diario (Promedio día)";
+        periodLabel += " (Ritmo Estimado Diario)";
       } else if (currentPeriodFilter === 'SEMANAL') {
         multiplier = 7 / 30;
-        periodLabel = "Ritmo Estimado Semanal (7 Días)";
+        periodLabel += " (Ritmo Estimado Semanal)";
       }
 
-      document.getElementById('storageScopeSpan').textContent = `Nube Activa &bull; ${periodLabel}`;
-      document.getElementById('statCountText').textContent = `${dataset.length} Estación(es) seleccionada(s)`;
+      const scopeSpan = document.getElementById('storageScopeSpan');
+      if (scopeSpan) scopeSpan.innerHTML = `Nube Activa &bull; <span class="font-bold text-slate-900">${periodLabel}</span>`;
+
+      const statCountText = document.getElementById('statCountText');
+      if (statCountText) {
+        const uniqueStationsInFiltered = new Set(dataset.map(s => s.id)).size;
+        statCountText.textContent = `${uniqueStationsInFiltered} Estación(es) &bull; ${dataset.length} Corte(s)`;
+      }
 
       // Totals
       let totRevenue = 0;
@@ -2646,15 +2702,27 @@
           window.saveStationsToCloud(window.currentStations);
         }
         populateStationSelect();
+        populateMonthPeriodSelect();
         updateDashboard();
         showBanner(`Sistema y nube actualizados: ${addedCount} estación(es) agregada(s), ${updatedCount} actualizada(s).`);
       } else if (duplicateCount > 0) {
-        showBanner(`ℹ️ <strong>Protección anti-duplicidad activa:</strong> Los ${duplicateCount} archivo(s) ya existían con cifras idénticas y fueron omitidos.`);
+        showBanner(`⚠️ No se incorporaron nuevos datos: ${duplicateCount} reporte(s) duplicado(s) detectado(s).`);
       }
     }
 
+    function removeStation(id) {
+      window.currentStations = window.currentStations.filter(s => s.id !== id);
+      if (window.saveStationsToCloud) {
+        window.saveStationsToCloud(window.currentStations);
+      }
+      populateStationSelect();
+      populateMonthPeriodSelect();
+      updateDashboard();
+      showBanner("Estación removida del panel consolidado.");
+    }
+
     function exportCurrentViewCSV() {
-      if (window.currentStations.length === 0) return;
+      if (!window.currentStations || window.currentStations.length === 0) return;
       let csv = "Estacion,Periodo,Litros,Combustibles,Aceites,VentaTotal,Efectivo,Tarjetas,Creditos\n";
       window.currentStations.forEach(s => {
         csv += `"${s.nombre}","${s.periodo}",${s.litros},${s.totalCombustibles},${s.totalAceites},${s.ventaTotal},${s.efectivo},${s.tarjetas},${s.creditos}\n`;
@@ -2674,29 +2742,33 @@
       initData();
 
       const fileInput = document.getElementById('fileUploadInput');
-      fileInput.addEventListener('change', (e) => handleIncomingFiles(e.target.files));
+      if (fileInput) {
+        fileInput.addEventListener('change', (e) => handleIncomingFiles(e.target.files));
+      }
 
       const dropZone = document.getElementById('dropZoneContainer');
-      dropZone.addEventListener('click', () => fileInput.click());
+      if (dropZone && fileInput) {
+        dropZone.addEventListener('click', () => fileInput.click());
 
-      ['dragenter', 'dragover'].forEach(name => {
-        dropZone.addEventListener(name, (e) => {
-          e.preventDefault();
-          dropZone.classList.add('border-[#ff6600]', 'bg-orange-50/40');
+        ['dragenter', 'dragover'].forEach(name => {
+          dropZone.addEventListener(name, (e) => {
+            e.preventDefault();
+            dropZone.classList.add('border-[#ff6600]', 'bg-orange-50/40');
+          });
         });
-      });
 
-      ['dragleave', 'drop'].forEach(name => {
-        dropZone.addEventListener(name, (e) => {
-          e.preventDefault();
-          dropZone.classList.remove('border-[#ff6600]', 'bg-orange-50/40');
+        ['dragleave', 'drop'].forEach(name => {
+          dropZone.addEventListener(name, (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-[#ff6600]', 'bg-orange-50/40');
+          });
         });
-      });
 
-      dropZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        handleIncomingFiles(e.dataTransfer.files);
-      });
+        dropZone.addEventListener('drop', (e) => {
+          e.preventDefault();
+          handleIncomingFiles(e.dataTransfer.files);
+        });
+      }
     });
   </script>
 </body>
