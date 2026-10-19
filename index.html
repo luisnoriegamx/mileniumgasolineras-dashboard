@@ -1201,10 +1201,14 @@
       if (!db) return;
       try {
         const stationsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'stations_summary', 'current');
+        // Usar setDoc SIN merge para sobreescribir la lista completa y persistir borrados
         await setDoc(stationsDocRef, {
           stations: stationsList,
+          isInitialized: true,
           updatedAt: new Date().toISOString()
-        }, { merge: true });
+        });
+        localStorage.setItem('milenium_cached_stations', JSON.stringify(stationsList));
+        localStorage.setItem('milenium_stations_initialized', 'true');
       } catch (err) {
         console.error("Error al guardar estaciones en Firestore:", err);
       }
@@ -1217,8 +1221,10 @@
         const usersDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'platform_users', 'current');
         await setDoc(usersDocRef, {
           users: usersList,
+          isInitialized: true,
           updatedAt: new Date().toISOString()
-        }, { merge: true });
+        });
+        localStorage.setItem('milenium_cached_users', JSON.stringify(usersList));
       } catch (err) {
         console.error("Error al guardar usuarios en Firestore:", err);
       }
@@ -1410,7 +1416,10 @@
         deletedDescription = `Se eliminó el archivo <strong>${fileName}</strong> del sistema.`;
       }
 
-      // Persistir de inmediato en Firebase Firestore
+      // Persistir de inmediato tanto en localStorage como en Firebase Firestore
+      localStorage.setItem('milenium_cached_stations', JSON.stringify(window.currentStations));
+      localStorage.setItem('milenium_stations_initialized', 'true');
+
       if (window.saveStationsToCloud) {
         await window.saveStationsToCloud(window.currentStations);
       }
@@ -1444,6 +1453,7 @@
       
       // Eliminar del estado local
       window.platformUsers = window.platformUsers.filter(x => x.id !== id);
+      localStorage.setItem('milenium_cached_users', JSON.stringify(window.platformUsers));
 
       // Persistir en Firebase Firestore
       if (window.saveUsersToCloud) {
@@ -1545,8 +1555,8 @@
       creadoEl: "2026-09-01"
     };
 
-    // State variables (Ningún usuario pre-logueado por defecto)
-    window.currentStations = [...DEFAULT_DATASETS];
+    // State variables
+    window.currentStations = [];
     window.platformUsers = [ROOT_SUPER_ADMIN];
     window.activeUser = null; // No hay usuario autenticado al cargar
     let currentPeriodFilter = 'MENSUAL'; // 'DIARIO' | 'SEMANAL' | 'MENSUAL'
@@ -1562,11 +1572,40 @@
     const formatNumber = (val) => Number(val || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     function initData() {
-      // Load initial fingerprints
-      currentStations.forEach(s => {
-        const fp = `${s.id}_${s.periodo}_${s.litros.toFixed(2)}_${s.ventaTotal.toFixed(2)}`;
+      // 1. Cargar caché de estaciones si existe
+      const hasInitMarker = localStorage.getItem('milenium_stations_initialized');
+      const cachedStations = localStorage.getItem('milenium_cached_stations');
+
+      if (cachedStations) {
+        try {
+          window.currentStations = JSON.parse(cachedStations);
+        } catch(e) {
+          window.currentStations = [];
+        }
+      } else if (!hasInitMarker) {
+        // Solo la primera vez que se visita y antes de cualquier borrado
+        window.currentStations = [...DEFAULT_DATASETS];
+      } else {
+        // Si ya fue inicializado y está vacío porque se borró, permanece vacío
+        window.currentStations = [];
+      }
+
+      // Cargar usuarios en caché si existen
+      const cachedUsers = localStorage.getItem('milenium_cached_users');
+      if (cachedUsers) {
+        try {
+          const parsedU = JSON.parse(cachedUsers);
+          const filtered = parsedU.filter(u => u.username !== ROOT_SUPER_ADMIN.username && u.rol !== 'SUPER_ADMIN');
+          window.platformUsers = [ROOT_SUPER_ADMIN, ...filtered];
+        } catch(e) {}
+      }
+
+      // Cargar huellas de archivos
+      window.currentStations.forEach(s => {
+        const fp = `${s.id}_${s.periodo}_${Number(s.litros).toFixed(2)}_${Number(s.ventaTotal).toFixed(2)}`;
         processedFileHashes.add(fp);
       });
+
       populateStationSelect();
       updateDashboard();
       
@@ -1588,8 +1627,20 @@
 
     // Remote update callbacks
     window.receiveRemoteStations = function(remoteList, updatedAt) {
-      if (!Array.isArray(remoteList) || remoteList.length === 0) return;
+      // Aceptar arreglos vacíos para reflejar borrados remotos sin restaurar los datos por defecto
+      if (!Array.isArray(remoteList)) return;
+      
       window.currentStations = remoteList;
+      localStorage.setItem('milenium_cached_stations', JSON.stringify(remoteList));
+      localStorage.setItem('milenium_stations_initialized', 'true');
+
+      // Actualizar huellas para control de duplicidad
+      processedFileHashes.clear();
+      window.currentStations.forEach(s => {
+        const fp = `${s.id}_${s.periodo}_${Number(s.litros).toFixed(2)}_${Number(s.ventaTotal).toFixed(2)}`;
+        processedFileHashes.add(fp);
+      });
+
       populateStationSelect();
       updateDashboard();
       if (window.activeUser) {
@@ -1602,6 +1653,7 @@
       // Mantener al superadmin intacto y fusionar con los usuarios reales de Firestore
       const filteredRemote = remoteUsers.filter(u => u.username !== ROOT_SUPER_ADMIN.username && u.rol !== 'SUPER_ADMIN');
       window.platformUsers = [ROOT_SUPER_ADMIN, ...filteredRemote];
+      localStorage.setItem('milenium_cached_users', JSON.stringify(window.platformUsers));
       renderAdminUsersTable();
       const badge = document.getElementById('usersCountBadge');
       if (badge) badge.textContent = window.platformUsers.length;
