@@ -1622,7 +1622,10 @@
     window.platformUsers = [ROOT_SUPER_ADMIN];
     window.activeUser = null;
     let currentPeriodFilter = 'MENSUAL';
+    let currentTableMode = 'CONSOLIDATED'; // 'CONSOLIDATED' (meses juntos) or 'BY_MONTH' (desglosado por mes)
     let processedFileHashes = new Set();
+    let currentRenderDataset = [];
+    let currentRenderMultiplier = 1;
 
     let fuelDonutChart = null;
     let stationsBarChart = null;
@@ -2038,6 +2041,58 @@
       updateDashboard();
     }
 
+    // Toggle de la tabla: Consolidado (meses juntos) vs Desglose por Mes
+    function setTableMode(mode) {
+      currentTableMode = mode;
+      
+      const btnConsolidated = document.getElementById('tblMode-CONSOLIDATED');
+      const btnByMonth = document.getElementById('tblMode-BY_MONTH');
+      const monthWrap = document.getElementById('tableMonthFilterWrap');
+
+      if (mode === 'CONSOLIDATED') {
+        if (btnConsolidated) btnConsolidated.className = 'px-3 py-1.5 rounded-lg bg-black text-white font-extrabold shadow-sm transition flex items-center gap-1.5';
+        if (btnByMonth) btnByMonth.className = 'px-3 py-1.5 rounded-lg text-slate-500 hover:text-black transition flex items-center gap-1.5';
+        if (monthWrap) monthWrap.classList.add('hidden');
+      } else {
+        if (btnConsolidated) btnConsolidated.className = 'px-3 py-1.5 rounded-lg text-slate-500 hover:text-black transition flex items-center gap-1.5';
+        if (btnByMonth) btnByMonth.className = 'px-3 py-1.5 rounded-lg bg-black text-white font-extrabold shadow-sm transition flex items-center gap-1.5';
+        if (monthWrap) monthWrap.classList.remove('hidden');
+      }
+
+      renderTableFromState();
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function populateTableMonthFilter() {
+      const sel = document.getElementById('tableSpecificMonthSelect');
+      if (!sel) return;
+      const prev = sel.value;
+      sel.innerHTML = '<option value="ALL">📅 Todos los Meses Disponibles</option>';
+
+      const periodMap = new Map();
+      (window.currentStations || []).forEach(s => {
+        const key = s.periodKey || s.periodo;
+        if (!periodMap.has(key)) {
+          periodMap.set(key, s.monthLabel || s.periodo);
+        }
+      });
+
+      const sortedKeys = Array.from(periodMap.keys()).sort().reverse();
+      sortedKeys.forEach(pk => {
+        const label = periodMap.get(pk);
+        const opt = document.createElement('option');
+        opt.value = pk;
+        opt.textContent = `🗓️ ${label}`;
+        sel.appendChild(opt);
+      });
+
+      if ([...sel.options].some(o => o.value === prev)) {
+        sel.value = prev;
+      } else {
+        sel.value = 'ALL';
+      }
+    }
+
     // Populate Station dropdown by grouping distinct stations
     function populateStationSelect() {
       const sel = document.getElementById('stationSelect');
@@ -2253,13 +2308,111 @@
         document.getElementById('topStationNote').textContent = `Sin datos disponibles`;
       }
 
+      currentRenderDataset = dataset;
+      currentRenderMultiplier = multiplier;
+
+      populateTableMonthFilter();
       renderLeaderboard(dataset, multiplier);
       renderFuelDonut(prodTotals);
       renderStationsBar(dataset, multiplier);
       renderPaymentPie(totCash, totCards, totCredits);
-      renderTable(dataset, multiplier);
+      renderTableFromState();
 
       lucide.createIcons();
+    }
+
+    function renderLeaderboard(dataset, multiplier) {
+      const container = document.getElementById('leaderboardCardsContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (!dataset || dataset.length === 0) {
+        container.innerHTML = `<div class="col-span-3 text-center py-6 text-slate-400 font-mono text-xs">No hay datos para clasificar en el periodo seleccionado.</div>`;
+        return;
+      }
+
+      // Group by distinct station and aggregate totals
+      const stMap = new Map();
+      let grandTotalRevenue = 0;
+
+      dataset.forEach(s => {
+        const rawId = s.stationId || s.id.split('_')[0] || s.id;
+        const name = s.nombre.replace(/EST ISIGAS/gi, 'GUADALUPE').replace(/ISIGAS/gi, 'GUADALUPE').trim();
+        const sales = (s.ventaTotal || 0) * multiplier;
+        const liters = (s.litros || 0) * multiplier;
+        const cash = (s.efectivo || 0) * multiplier;
+        const oils = (s.totalAceites || 0) * multiplier;
+
+        grandTotalRevenue += sales;
+
+        if (!stMap.has(rawId)) {
+          stMap.set(rawId, { id: rawId, nombre: name, sales: 0, liters: 0, cash: 0, oils: 0, count: 0 });
+        }
+        const cur = stMap.get(rawId);
+        cur.sales += sales;
+        cur.liters += liters;
+        cur.cash += cash;
+        cur.oils += oils;
+        cur.count += 1;
+      });
+
+      const rankedStations = Array.from(stMap.values()).sort((a, b) => b.sales - a.sales);
+
+      const medals = [
+        { badge: '🥇 1º LUGAR', bg: 'bg-amber-500/10 text-amber-700 border-amber-300', ring: 'border-amber-200' },
+        { badge: '🥈 2º LUGAR', bg: 'bg-slate-200 text-slate-700 border-slate-300', ring: 'border-slate-200' },
+        { badge: '🥉 3º LUGAR', bg: 'bg-orange-500/10 text-orange-800 border-orange-300', ring: 'border-orange-200' }
+      ];
+
+      rankedStations.forEach((st, idx) => {
+        const medal = medals[idx] || { badge: `#${idx + 1}`, bg: 'bg-slate-100 text-slate-600 border-slate-200', ring: 'border-slate-200' };
+        const sharePct = grandTotalRevenue > 0 ? ((st.sales / grandTotalRevenue) * 100).toFixed(1) : '0';
+        const cashRatio = st.sales > 0 ? ((st.cash / st.sales) * 100).toFixed(1) : '0';
+        const avgPrice = st.liters > 0 ? (st.sales / st.liters).toFixed(2) : '0.00';
+
+        const card = document.createElement('div');
+        card.className = `p-4 rounded-xl border ${medal.ring} bg-white shadow-sm hover:shadow-md transition flex flex-col justify-between space-y-3`;
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-black px-2 py-0.5 rounded-full border ${medal.bg} font-mono">
+              ${medal.badge}
+            </span>
+            <span class="text-[10px] font-bold text-slate-400 font-mono">
+              ${sharePct}% de la red
+            </span>
+          </div>
+
+          <div>
+            <h5 class="font-extrabold text-sm text-slate-900 tracking-tight flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-[#ff6600]"></span>
+              ${st.nombre}
+            </h5>
+            <p class="text-xs text-slate-400 font-mono mt-0.5">${st.count} reporte(s) sumado(s)</p>
+          </div>
+
+          <div class="pt-2 border-t border-slate-100 space-y-1.5 text-xs font-mono">
+            <div class="flex justify-between items-center">
+              <span class="text-slate-500 font-sans">Facturación:</span>
+              <span class="font-black text-slate-900">${formatCurrency(st.sales)}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-slate-500 font-sans">Volumen:</span>
+              <span class="font-bold text-[#ff6600]">${formatNumber(st.liters)} L</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-slate-500 font-sans">Efectivo Líquido:</span>
+              <span class="font-bold text-emerald-600">${formatCurrency(st.cash)} (${cashRatio}%)</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-slate-500 font-sans">Precio Promedio:</span>
+              <span class="font-bold text-slate-700">$${avgPrice} / L</span>
+            </div>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
     }
 
     function renderFuelDonut(prodTotals) {
@@ -2418,8 +2571,11 @@
       });
     }
 
-    function renderTable(dataset, multiplier) {
+    function renderTableFromState() {
+      const dataset = currentRenderDataset || [];
+      const multiplier = currentRenderMultiplier || 1;
       const tbody = document.getElementById('stationsTableBody');
+      if (!tbody) return;
       tbody.innerHTML = '';
 
       if (dataset.length === 0) {
@@ -2427,110 +2583,135 @@
         return;
       }
 
-      dataset.forEach(st => {
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-orange-50/40 transition group font-mono";
-        tr.innerHTML = `
-          <td class="py-3 px-4 font-sans font-bold text-slate-900">
-            <div class="flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-[#ff6600]"></span>
-              <span>${st.nombre}</span>
-              <span class="text-[9px] px-1.5 py-0.2 rounded bg-orange-100 text-[#ea580c] font-mono font-bold">${st.monthLabel || 'Mes'}</span>
-            </div>
-            <span class="text-[10px] text-slate-400 font-mono">${st.periodo || 'Corte Mensual'}</span>
-          </td>
-          <td class="py-3 px-4 text-right text-slate-800 font-bold">${formatNumber(st.litros * multiplier)}</td>
-          <td class="py-3 px-4 text-right text-[#ff6600] font-bold">${formatCurrency(st.totalCombustibles * multiplier)}</td>
-          <td class="py-3 px-4 text-right text-slate-600">${formatCurrency(st.totalAceites * multiplier)}</td>
-          <td class="py-3 px-4 text-right text-slate-900 font-black bg-slate-50">${formatCurrency(st.ventaTotal * multiplier)}</td>
-          <td class="py-3 px-4 text-right text-[#ff6600] font-bold">${formatCurrency(st.efectivo * multiplier)}</td>
-          <td class="py-3 px-4 text-right text-slate-700">${formatCurrency(st.tarjetas * multiplier)}</td>
-          <td class="py-3 px-4 text-right text-slate-700">${formatCurrency(st.creditos * multiplier)}</td>
-          <td class="py-3 px-4 text-center">
-            <button onclick="removeStation('${st.id}')" title="Eliminar este corte" class="p-1.5 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-500 transition">
-              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-            </button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
+      if (currentTableMode === 'CONSOLIDATED') {
+        // MODO 1: CONSOLIDADO (Suma todos los meses por cada estación)
+        const consolidatedMap = new Map();
 
-    function renderLeaderboard(allStations, multiplier) {
-      const container = document.getElementById('leaderboardCardsContainer');
-      if (!container) return;
-      container.innerHTML = '';
+        dataset.forEach(st => {
+          const key = st.stationId || st.nombre;
+          if (!consolidatedMap.has(key)) {
+            consolidatedMap.set(key, {
+              stationId: key,
+              nombre: st.nombre,
+              cortesCount: 0,
+              monthsList: new Set(),
+              litros: 0,
+              totalCombustibles: 0,
+              totalAceites: 0,
+              ventaTotal: 0,
+              efectivo: 0,
+              tarjetas: 0,
+              creditos: 0,
+              ids: []
+            });
+          }
+          const item = consolidatedMap.get(key);
+          item.cortesCount += 1;
+          if (st.monthLabel) item.monthsList.add(st.monthLabel);
+          item.litros += (st.litros * multiplier);
+          item.totalCombustibles += (st.totalCombustibles * multiplier);
+          item.totalAceites += (st.totalAceites * multiplier);
+          item.ventaTotal += (st.ventaTotal * multiplier);
+          item.efectivo += (st.efectivo * multiplier);
+          item.tarjetas += (st.tarjetas * multiplier);
+          item.creditos += (st.creditos * multiplier);
+          item.ids.push(st.id);
+        });
 
-      if (allStations.length === 0) {
-        container.innerHTML = `<p class="col-span-3 text-center text-slate-400 py-4 font-mono text-xs">Carga archivos para ver el ranking comparativo.</p>`;
-        return;
+        const consolidatedList = Array.from(consolidatedMap.values()).sort((a,b) => b.ventaTotal - a.ventaTotal);
+
+        consolidatedList.forEach(st => {
+          const tr = document.createElement('tr');
+          tr.className = "hover:bg-orange-50/40 transition group font-mono";
+          const monthsStr = Array.from(st.monthsList).join(', ') || 'Histórico';
+          tr.innerHTML = `
+            <td class="py-3.5 px-4 font-sans font-bold text-slate-900">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-[#ff6600]"></span>
+                <span class="text-sm font-extrabold">${st.nombre}</span>
+                <span class="text-[10px] px-2 py-0.5 rounded-md bg-black text-white font-mono font-bold tracking-tight">TOTAL ACUMULADO</span>
+                <span class="text-[10px] px-1.5 py-0.2 rounded bg-orange-100 text-[#ea580c] font-mono font-bold">${st.cortesCount} corte(s)</span>
+              </div>
+              <span class="text-[10px] text-slate-400 font-mono flex items-center gap-1 mt-0.5">
+                <i data-lucide="calendar" class="w-3 h-3 text-[#ff6600]"></i> Meses sumados: ${monthsStr}
+              </span>
+            </td>
+            <td class="py-3.5 px-4 text-right text-slate-900 font-black text-xs">${formatNumber(st.litros)}</td>
+            <td class="py-3.5 px-4 text-right text-[#ff6600] font-black text-xs">${formatCurrency(st.totalCombustibles)}</td>
+            <td class="py-3.5 px-4 text-right text-slate-700 font-bold">${formatCurrency(st.totalAceites)}</td>
+            <td class="py-3.5 px-4 text-right text-slate-950 font-black text-xs bg-slate-50">${formatCurrency(st.ventaTotal)}</td>
+            <td class="py-3.5 px-4 text-right text-[#ff6600] font-black">${formatCurrency(st.efectivo)}</td>
+            <td class="py-3.5 px-4 text-right text-slate-800 font-bold">${formatCurrency(st.tarjetas)}</td>
+            <td class="py-3.5 px-4 text-right text-slate-800 font-bold">${formatCurrency(st.creditos)}</td>
+            <td class="py-3.5 px-4 text-center">
+              <button onclick="removeStationGroup('${st.stationId}')" title="Eliminar todos los meses de esta estación" class="p-1.5 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+      } else {
+        // MODO 2: POR MES (Desglose mensual detallado)
+        const tableMonthSelect = document.getElementById('tableSpecificMonthSelect');
+        const selectedTableMonth = tableMonthSelect ? tableMonthSelect.value : 'ALL';
+
+        let filteredTableDataset = dataset;
+        if (selectedTableMonth !== 'ALL') {
+          filteredTableDataset = filteredTableDataset.filter(s => (s.periodKey || s.periodo) === selectedTableMonth);
+        }
+
+        if (filteredTableDataset.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="9" class="text-center py-8 text-slate-400 font-mono">No hay cortes para el mes seleccionado en la tabla.</td></tr>`;
+          return;
+        }
+
+        filteredTableDataset.forEach(st => {
+          const tr = document.createElement('tr');
+          tr.className = "hover:bg-orange-50/40 transition group font-mono";
+          tr.innerHTML = `
+            <td class="py-3.5 px-4 font-sans font-bold text-slate-900">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-[#ff6600]"></span>
+                <span class="font-extrabold">${st.nombre}</span>
+                <span class="text-[10px] px-2 py-0.5 rounded-md bg-orange-100 text-[#ea580c] font-mono font-bold">${st.monthLabel || 'Mes'}</span>
+              </div>
+              <span class="text-[10px] text-slate-400 font-mono block mt-0.5">${st.periodo || 'Corte Mensual'}</span>
+            </td>
+            <td class="py-3.5 px-4 text-right text-slate-800 font-bold">${formatNumber(st.litros * multiplier)}</td>
+            <td class="py-3.5 px-4 text-right text-[#ff6600] font-bold">${formatCurrency(st.totalCombustibles * multiplier)}</td>
+            <td class="py-3.5 px-4 text-right text-slate-600">${formatCurrency(st.totalAceites * multiplier)}</td>
+            <td class="py-3.5 px-4 text-right text-slate-900 font-black bg-slate-50">${formatCurrency(st.ventaTotal * multiplier)}</td>
+            <td class="py-3.5 px-4 text-right text-[#ff6600] font-bold">${formatCurrency(st.efectivo * multiplier)}</td>
+            <td class="py-3.5 px-4 text-right text-slate-700">${formatCurrency(st.tarjetas * multiplier)}</td>
+            <td class="py-3.5 px-4 text-right text-slate-700">${formatCurrency(st.creditos * multiplier)}</td>
+            <td class="py-3.5 px-4 text-center">
+              <button onclick="removeStation('${st.id}')" title="Eliminar este corte" class="p-1.5 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
       }
 
-      // Aggregate stations by name for leaderboard
-      const aggregatedMap = new Map();
-      allStations.forEach(s => {
-        const key = s.stationId || s.nombre;
-        if (!aggregatedMap.has(key)) {
-          aggregatedMap.set(key, {
-            nombre: s.nombre,
-            litros: 0,
-            ventaTotal: 0,
-            totalCombustibles: 0,
-            totalAceites: 0
-          });
-        }
-        const cur = aggregatedMap.get(key);
-        cur.litros += s.litros;
-        cur.ventaTotal += s.ventaTotal;
-        cur.totalCombustibles += s.totalCombustibles;
-        cur.totalAceites += s.totalAceites;
-      });
+      if (window.lucide) lucide.createIcons();
+    }
 
-      const stList = Array.from(aggregatedMap.values());
-      const totalNetworkVolume = stList.reduce((acc, s) => acc + s.litros, 0);
-      const sorted = [...stList].sort((a, b) => b.litros - a.litros);
-
-      sorted.forEach((st, idx) => {
-        const shareVolume = totalNetworkVolume > 0 ? ((st.litros / totalNetworkVolume) * 100).toFixed(1) : '0';
-        const stPricePerLiter = st.litros > 0 ? (st.totalCombustibles / st.litros).toFixed(2) : '0.00';
-        const stOilPerM3 = st.litros > 0 ? ((st.totalAceites / (st.litros / 1000))).toFixed(2) : '0.00';
-        const medalColor = idx === 0 ? 'bg-[#ff6600] text-white' : (idx === 1 ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-700');
-        const medalIcon = idx === 0 ? '🥇' : (idx === 1 ? '🥈' : '🥉');
-
-        const card = document.createElement('div');
-        card.className = "p-4 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-white hover:border-[#ff6600]/40 transition group";
-        card.innerHTML = `
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <span class="text-base font-bold">${medalIcon}</span>
-              <h5 class="font-extrabold text-xs text-slate-900 uppercase">${st.nombre}</h5>
-            </div>
-            <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded ${medalColor}">
-              #${idx + 1} en Volumen
-            </span>
-          </div>
-
-          <div class="mt-3 grid grid-cols-2 gap-2 text-xs">
-            <div class="p-2 rounded-lg bg-white border border-slate-100">
-              <span class="block text-[10px] text-slate-400 uppercase font-semibold">Participación Red</span>
-              <span class="font-mono font-black text-slate-900">${shareVolume}%</span>
-            </div>
-            <div class="p-2 rounded-lg bg-white border border-slate-100">
-              <span class="block text-[10px] text-slate-400 uppercase font-semibold">Precio Promedio</span>
-              <span class="font-mono font-black text-slate-900">$${stPricePerLiter}</span>
-            </div>
-            <div class="p-2 rounded-lg bg-white border border-slate-100">
-              <span class="block text-[10px] text-slate-400 uppercase font-semibold">Venta Total</span>
-              <span class="font-mono font-black text-[#ff6600]">${formatCurrency(st.ventaTotal * multiplier)}</span>
-            </div>
-            <div class="p-2 rounded-lg bg-white border border-slate-100">
-              <span class="block text-[10px] text-slate-400 uppercase font-semibold">Aceites / m³</span>
-              <span class="font-mono font-black text-slate-900">$${stOilPerM3}</span>
-            </div>
-          </div>
-        `;
-        container.appendChild(card);
-      });
+    function removeStationGroup(stationId) {
+      if (!window.activeUser || (window.activeUser.rol !== 'SUPER_ADMIN' && window.activeUser.rol !== 'ADMIN')) {
+        showBanner("⛔ Se requiere permiso de administrador para eliminar estaciones.");
+        return;
+      }
+      window.currentStations = window.currentStations.filter(s => (s.stationId || s.id.split('_')[0] || s.id) !== stationId);
+      if (window.saveStationsToCloud) {
+        window.saveStationsToCloud(window.currentStations);
+      }
+      populateStationSelect();
+      populateMonthPeriodSelect();
+      updateDashboard();
+      showBanner(`Se eliminaron todos los cortes históricos de la estación <strong>${stationId}</strong>.`);
     }
 
     function removeStation(id) {
