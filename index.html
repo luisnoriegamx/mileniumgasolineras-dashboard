@@ -1,0 +1,2191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Milenium Business Panel | CEO Executive Dashboard & Admin</title>
+  
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- SheetJS (Excel Parser) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  
+  <!-- Chart.js 4.4 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            milenium: {
+              white: '#ffffff',
+              canvas: '#f8fafc',
+              card: '#ffffff',
+              border: '#e2e8f0',
+              'border-subtle': '#f1f5f9',
+              black: '#09090b',
+              ink: '#18181b',
+              muted: '#71717a',
+              orange: '#ff6600',
+              'orange-dark': '#e05900',
+              'orange-light': '#ff7a1a',
+              'orange-soft': '#fff7ed',
+              'orange-glow': 'rgba(255, 102, 0, 0.18)',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Clean Crisp White Foundation */
+    body {
+      background-color: #f8fafc;
+      color: #09090b;
+      background-image: 
+        radial-gradient(circle at 15% 0%, rgba(255, 102, 0, 0.05) 0%, transparent 45%),
+        radial-gradient(circle at 95% 100%, rgba(255, 102, 0, 0.04) 0%, transparent 50%),
+        radial-gradient(#e2e8f0 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 28px 28px;
+    }
+
+    .milenium-glass {
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
+    }
+
+    .milenium-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 10px -2px rgba(15, 23, 42, 0.04), 0 8px 24px -6px rgba(15, 23, 42, 0.03);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .milenium-card:hover {
+      border-color: rgba(255, 102, 0, 0.5);
+      box-shadow: 0 10px 30px -4px rgba(255, 102, 0, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.05);
+      transform: translateY(-1px);
+    }
+
+    .orange-glow-btn {
+      background: #ff6600;
+      color: #ffffff;
+      box-shadow: 0 4px 14px 0 rgba(255, 102, 0, 0.35);
+      transition: all 0.2s ease;
+    }
+
+    .orange-glow-btn:hover {
+      background: #e05900;
+      box-shadow: 0 6px 20px 0 rgba(255, 102, 0, 0.45);
+      transform: translateY(-1px);
+    }
+
+    .badge-orange {
+      background: #fff7ed;
+      border: 1px solid rgba(255, 102, 0, 0.3);
+      color: #ea580c;
+    }
+
+    /* Custom light scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #ff6600;
+    }
+
+    /* Pulse animation */
+    @keyframes orange-pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.35; transform: scale(1.15); }
+    }
+    .status-pulse {
+      animation: orange-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-[#ff6600] selection:text-white">
+
+  <!-- Top Navigation Header -->
+  <header class="sticky top-0 z-40 milenium-glass border-b border-slate-200/90 px-4 sm:px-8 py-3.5 transition-all">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+      
+      <!-- Brand & Status -->
+      <div class="flex items-center gap-3.5">
+        <div class="relative flex items-center justify-center w-11 h-11 rounded-xl bg-black p-[2px] shadow-sm">
+          <div class="w-full h-full bg-[#ff6600] rounded-[9px] flex items-center justify-center text-white">
+            <i data-lucide="fuel" class="w-6 h-6 stroke-[2.3]"></i>
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-black text-lg sm:text-xl tracking-tight text-slate-900 uppercase font-sans">
+              Milenium <span class="text-[#ff6600]">Business Panel</span>
+            </span>
+            <span class="text-[10px] font-black px-2 py-0.5 rounded-full badge-orange uppercase tracking-wider hidden sm:inline-block">
+              CEO Executive
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-500 font-medium flex items-center gap-1.5" id="headerSubtitle">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 status-pulse" id="cloudStatusDot"></span>
+            <span id="cloudStatusText">Nube Sincronizada Multi-Dispositivo</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Actions, Role Badges & Admin Trigger -->
+      <div class="flex items-center flex-wrap gap-2.5">
+        
+        <!-- Frequency Selector (Diario / Semanal / Mensual) -->
+        <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-bold text-slate-600">
+          <button onclick="setPeriodView('DIARIO')" id="tab-DIARIO" class="period-btn px-3 py-1.5 rounded-lg text-slate-500 hover:text-black transition">
+            Diario
+          </button>
+          <button onclick="setPeriodView('SEMANAL')" id="tab-SEMANAL" class="period-btn px-3 py-1.5 rounded-lg text-slate-500 hover:text-black transition">
+            Semanal
+          </button>
+          <button onclick="setPeriodView('MENSUAL')" id="tab-MENSUAL" class="period-btn px-3 py-1.5 rounded-lg bg-black text-white font-extrabold shadow-sm transition">
+            Mensual
+          </button>
+        </div>
+
+        <!-- Import Button (Controlled by role) -->
+        <label id="uploadBtnLabel" class="cursor-pointer group flex items-center gap-2 px-4 py-2 rounded-xl orange-glow-btn text-xs sm:text-sm font-bold active:scale-95">
+          <i data-lucide="upload" class="w-4 h-4 transition-transform group-hover:-translate-y-0.5 stroke-[2.5]"></i>
+          <span class="hidden sm:inline">Cargar Reportes</span>
+          <span class="sm:hidden">Cargar</span>
+          <input type="file" id="fileUploadInput" multiple accept=".xlsx, .xls" class="hidden">
+        </label>
+
+        <!-- Admin Portal Trigger Button -->
+        <button onclick="openAdminModal()" id="btnOpenAdmin" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold shadow-sm transition active:scale-95">
+          <i data-lucide="shield" class="w-3.5 h-3.5 text-[#ff6600]"></i>
+          <span class="hidden md:inline">Panel Admin</span>
+          <span class="text-[10px] bg-[#ff6600] px-1.5 py-0.2 rounded-full font-mono text-white" id="usersCountBadge">3</span>
+        </button>
+
+        <!-- Current User Profile & Role Switcher -->
+        <div class="relative">
+          <button onclick="toggleUserDropdown()" id="userProfileBtn" class="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-slate-300 text-xs text-slate-800 shadow-sm transition">
+            <div class="w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-[11px]" id="userAvatar">
+              C
+            </div>
+            <div class="text-left hidden sm:block">
+              <p class="font-bold text-[11px] leading-tight" id="userNameLabel">CEO Director</p>
+              <p class="text-[9px] text-[#ff6600] font-mono leading-none font-bold" id="userRoleLabel">DIRECCIÓN GENERAL</p>
+            </div>
+            <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400"></i>
+          </button>
+
+          <!-- User dropdown menu -->
+          <div id="userDropdown" class="hidden absolute right-0 mt-2 w-64 bg-white border border-slate-200 rounded-2xl shadow-xl p-3 z-50 space-y-2 text-xs">
+            <div class="border-b border-slate-100 pb-2">
+              <p class="font-bold text-slate-900" id="ddUserName">CEO Director General</p>
+              <p class="text-[11px] text-slate-500 font-mono" id="ddUserEmail">direccion@grupomilenium.mx</p>
+            </div>
+            <p class="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Cambiar Perfil de Sesión:</p>
+            <div class="space-y-1" id="roleSwitchList">
+              <!-- Dynamically populated from active users -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Reload Data button -->
+        <button onclick="syncFromCloud()" title="Sincronizar Datos de la Nube" class="p-2 rounded-xl bg-white border border-slate-200 hover:border-slate-400 text-slate-600 hover:text-black shadow-sm transition">
+          <i data-lucide="refresh-cw" class="w-4 h-4" id="syncSpinIcon"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-7xl mx-auto w-full p-4 sm:p-6 lg:p-8 space-y-6">
+
+    <!-- Status Notification Banner -->
+    <div id="statusBanner" class="bg-white p-3.5 rounded-2xl flex flex-wrap items-center justify-between gap-3 text-xs border border-orange-200 shadow-sm bg-gradient-to-r from-orange-50/60 to-white">
+      <div class="flex items-center gap-2.5">
+        <div class="p-1 rounded-full bg-[#ff6600]/15 text-[#ff6600]">
+          <i data-lucide="shield-check" class="w-4 h-4"></i>
+        </div>
+        <p class="text-slate-800" id="bannerMessage">
+          Sincronizado con la nube: <strong>Guadalupe, Reynosa, Sto Domingo</strong> (Septiembre 2026).
+        </p>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="font-mono text-[11px] text-slate-500 font-semibold" id="lastUpdatedBadge">Almacenado & Global</span>
+        <button onclick="document.getElementById('statusBanner').classList.add('hidden')" class="text-slate-400 hover:text-slate-700">
+          <i data-lucide="x" class="w-3.5 h-3.5"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Duplicate Detection & Ingestion Audit Modal / Toast -->
+    <div id="ingestionAlert" class="hidden p-4 rounded-2xl bg-white border border-slate-200 shadow-lg text-xs space-y-2 transition-all">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="p-1.5 rounded-lg bg-orange-100 text-[#ff6600]" id="ingestionIconBox">
+            <i data-lucide="info" class="w-4 h-4"></i>
+          </span>
+          <h5 class="font-bold text-slate-900 text-sm" id="ingestionTitle">Control de Ingesta & Duplicidad</h5>
+        </div>
+        <button onclick="document.getElementById('ingestionAlert').classList.add('hidden')" class="text-slate-400 hover:text-slate-700">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <div id="ingestionLogDetails" class="text-slate-600 space-y-1 font-mono text-[11px] bg-slate-50 p-3 rounded-xl border border-slate-100 max-h-40 overflow-y-auto">
+        <!-- Ingestion summary inserted here -->
+      </div>
+    </div>
+
+    <!-- Filter & Station Selector Bar -->
+    <div class="bg-white p-4 rounded-2xl flex flex-wrap items-center justify-between gap-4 border border-slate-200 shadow-sm">
+      <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+        <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+          <i data-lucide="filter" class="w-4 h-4 text-[#ff6600]"></i>
+          <span>Estación:</span>
+        </div>
+        <select id="stationSelect" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 text-slate-900 text-xs sm:text-sm font-bold rounded-xl px-4 py-2 focus:outline-none focus:border-[#ff6600] cursor-pointer min-w-[270px] shadow-sm">
+          <option value="ALL">🌐 Red Milenium (Consolidado Total)</option>
+        </select>
+      </div>
+
+      <div class="flex items-center gap-3 ml-auto text-xs font-mono text-slate-500">
+        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200">
+          <span class="w-2 h-2 rounded-full bg-[#ff6600]"></span>
+          <span id="statCountText" class="text-slate-800 font-sans font-semibold">3 Estaciones en Operación</span>
+        </div>
+        <div class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200">
+          <i data-lucide="cloud" class="w-3.5 h-3.5 text-[#ff6600]"></i>
+          <span id="storageScopeSpan" class="text-slate-700 font-sans font-medium">Sincronización en la Nube Activa</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 High Impact Executive Cards (White cards, Black numbers, Orange accents) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <!-- Card 1: Facturación Total Neta -->
+      <div class="milenium-card p-5 rounded-2xl relative overflow-hidden group">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-[11px] font-extrabold uppercase tracking-widest text-slate-500">Facturación Total Neta</p>
+            <h3 class="text-2xl sm:text-3xl font-black text-slate-900 mt-2 tracking-tight" id="kpiTotalRevenue">$0.00</h3>
+          </div>
+          <div class="p-2.5 rounded-xl bg-orange-50 text-[#ff6600] border border-orange-200 group-hover:scale-110 transition duration-200 shadow-sm">
+            <i data-lucide="trending-up" class="w-5 h-5 stroke-[2.3]"></i>
+          </div>
+        </div>
+        <div class="mt-3.5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+          <span class="text-slate-500 font-medium">Combustibles:</span>
+          <span class="font-mono font-bold text-[#ff6600]" id="kpiFuelRevenue">$0.00</span>
+        </div>
+      </div>
+
+      <!-- Card 2: Volumen Litros Despachados -->
+      <div class="milenium-card p-5 rounded-2xl relative overflow-hidden group">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-[11px] font-extrabold uppercase tracking-widest text-slate-500">Volumen Despachado</p>
+            <h3 class="text-2xl sm:text-3xl font-black text-slate-900 mt-2 tracking-tight" id="kpiTotalLiters">0 L</h3>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-100 text-slate-900 border border-slate-200 group-hover:scale-110 transition duration-200 shadow-sm">
+            <i data-lucide="droplet" class="w-5 h-5 stroke-[2.3]"></i>
+          </div>
+        </div>
+        <div class="mt-3.5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+          <span class="text-slate-500 font-medium">Calibración Jarreos:</span>
+          <span class="font-mono font-bold text-slate-700" id="kpiJarreos">0.00 L</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Efectivo Líquido -->
+      <div class="milenium-card p-5 rounded-2xl relative overflow-hidden group">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-[11px] font-extrabold uppercase tracking-widest text-slate-500">Efectivo Líquido</p>
+            <h3 class="text-2xl sm:text-3xl font-black text-slate-900 mt-2 tracking-tight" id="kpiCash">$0.00</h3>
+          </div>
+          <div class="p-2.5 rounded-xl bg-orange-50 text-[#ff6600] border border-orange-200 group-hover:scale-110 transition duration-200 shadow-sm">
+            <i data-lucide="banknote" class="w-5 h-5 stroke-[2.3]"></i>
+          </div>
+        </div>
+        <div class="mt-3.5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+          <span class="text-slate-500 font-medium">Participación Efectivo:</span>
+          <span class="font-mono font-bold text-[#ff6600]" id="kpiCashPct">0%</span>
+        </div>
+      </div>
+
+      <!-- Card 4: Tarjetas Bancarias y Crédito Flotillas -->
+      <div class="milenium-card p-5 rounded-2xl relative overflow-hidden group">
+        <div class="flex items-start justify-between">
+          <div>
+            <p class="text-[11px] font-extrabold uppercase tracking-widest text-slate-500">Tarjetas & Créditos</p>
+            <h3 class="text-2xl sm:text-3xl font-black text-slate-900 mt-2 tracking-tight" id="kpiCardsCredits">$0.00</h3>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-900 text-white border border-slate-800 group-hover:scale-110 transition duration-200 shadow-sm">
+            <i data-lucide="credit-card" class="w-5 h-5 stroke-[2.3]"></i>
+          </div>
+        </div>
+        <div class="mt-3.5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+          <span class="text-slate-500 font-medium">Venta Bancarizada:</span>
+          <span class="font-mono font-bold text-slate-800" id="kpiDigitalPct">0%</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Second Row: Advanced CEO Strategic KPIs -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      
+      <!-- KPI Strategic 1: Precio Promedio Ponderado por Litro -->
+      <div class="milenium-card p-4 rounded-2xl relative overflow-hidden group">
+        <div class="flex items-start justify-between">
+          <div>
+            <div class="flex items-center gap-1.5">
+              <p class="text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Precio Promedio Ponderado</p>
+              <span class="text-[9px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-mono font-bold">$/L</span>
+            </div>
+            <h3 class="text-2xl font-black text-slate-900 mt-1.5 tracking-tight" id="kpiAvgPricePerLiter">$0.00 / L</h3>
+          </div>
+          <div class="p-2 rounded-xl bg-orange-50 text-[#ff6600] border border-orange-200">
+            <i data-lucide="gauge" class="w-4 h-4 stroke-[2.3]"></i>
+          </div>
+        </div>
+        <div class="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+          <span class="text-slate-500">Mezcla comercial real:</span>
+          <span class="font-mono font-bold text-[#ff6600]" id="kpiAvgPriceNote">Óptimo</span>
+        </div>
+      </div>
+
+      <!-- KPI Strategic 2: Venta Cruzada de Lubricantes ($ por m3 despachado) -->
+      <div class="milenium-card p-4 rounded-2xl relative overflow-hidden group">
+        <div class="flex items-start justify-between">
+          <div>
+            <div class="flex items-center gap-1.5">
+              <p class="text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Venta Cruzada Lubricantes</p>
+              <span class="text-[9px] px-1.5 py-0.2 rounded bg-orange-100 text-[#ea580c] font-mono font-bold">ALTO MARGEN</span>
+            </div>
+            <h3 class="text-2xl font-black text-slate-900 mt-1.5 tracking-tight" id="kpiOilsPerM3">$0.00 / m³</h3>
+          </div>
+          <div class="p-2 rounded-xl bg-slate-900 text-white border border-slate-800">
+            <i data-lucide="package" class="w-4 h-4 stroke-[2.3]"></i>
+          </div>
+        </div>
+        <div class="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+          <span class="text-slate-500">Aporte a venta total:</span>
+          <span class="font-mono font-bold text-slate-900" id="kpiOilSharePct">0.00%</span>
+        </div>
+      </div>
+
+      <!-- KPI Strategic 3: Merma Operativa y Calibración (% Jarreos) -->
+      <div class="milenium-card p-4 rounded-2xl relative overflow-hidden group">
+        <div class="flex items-start justify-between">
+          <div>
+            <div class="flex items-center gap-1.5">
+              <p class="text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Índice Merma / Jarreo</p>
+              <span class="text-[9px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-mono font-bold">CALIBRACIÓN</span>
+            </div>
+            <h3 class="text-2xl font-black text-slate-900 mt-1.5 tracking-tight" id="kpiJarreosRatio">0.00%</h3>
+          </div>
+          <div class="p-2 rounded-xl bg-slate-100 text-slate-800 border border-slate-200" id="kpiJarreosIconBox">
+            <i data-lucide="crosshair" class="w-4 h-4 stroke-[2.3]"></i>
+          </div>
+        </div>
+        <div class="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+          <span class="text-slate-500">Tolerancia operativa:</span>
+          <span class="font-mono font-bold text-emerald-600" id="kpiJarreosStatus">En norma (&lt; 0.40%)</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Charts Row: Fuel Mix & Station Performance -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Doughnut Chart: Fuel Volume Breakdown -->
+      <div class="milenium-card p-5 rounded-2xl flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <h4 class="font-extrabold text-sm text-slate-900 flex items-center gap-2 uppercase tracking-wide">
+              <i data-lucide="pie-chart" class="w-4 h-4 text-[#ff6600]"></i>
+              Mezcla de Combustibles
+            </h4>
+            <p class="text-[11px] text-slate-500">Volumen despachado por tipo de producto</p>
+          </div>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-orange font-bold">LITROS</span>
+        </div>
+        
+        <div class="relative h-56 w-full flex items-center justify-center my-2">
+          <canvas id="fuelDonutChart"></canvas>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 pt-3 border-t border-slate-100 text-center text-xs">
+          <div class="p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-200">
+            <span class="block text-[10px] font-black text-emerald-600 flex items-center justify-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span> MAGNA
+            </span>
+            <span class="font-mono text-[11px] font-black text-slate-900" id="legendMagnaLit">0 L</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-rose-50/70 border border-rose-200">
+            <span class="block text-[10px] font-black text-rose-600 flex items-center justify-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-rose-500"></span> PREMIUM
+            </span>
+            <span class="font-mono text-[11px] font-black text-slate-900" id="legendPremiumLit">0 L</span>
+          </div>
+          <div class="p-2.5 rounded-xl bg-slate-100/90 border border-slate-300">
+            <span class="block text-[10px] font-black text-black flex items-center justify-center gap-1">
+              <span class="w-2 h-2 rounded-full bg-black"></span> DIESEL
+            </span>
+            <span class="font-mono text-[11px] font-black text-slate-900" id="legendDieselLit">0 L</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bar Chart: Comparative Revenue & Volume by Station -->
+      <div class="milenium-card p-5 rounded-2xl lg:col-span-2 flex flex-col justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+          <div>
+            <h4 class="font-extrabold text-sm text-slate-900 flex items-center gap-2 uppercase tracking-wide">
+              <i data-lucide="bar-chart-3" class="w-4 h-4 text-[#ff6600]"></i>
+              Rendimiento por Estación
+            </h4>
+            <p class="text-[11px] text-slate-500">Comparativo cruzado: Facturación Total ($) vs. Litros</p>
+          </div>
+          <div class="flex items-center gap-3 text-xs font-mono">
+            <span class="inline-flex items-center gap-1.5 text-[#ff6600] font-bold">
+              <span class="w-3 h-3 rounded-sm bg-[#ff6600]"></span> Venta ($ MXN)
+            </span>
+            <span class="inline-flex items-center gap-1.5 text-slate-900 font-bold">
+              <span class="w-3 h-3 rounded-sm bg-black"></span> Volumen (L)
+            </span>
+          </div>
+        </div>
+
+        <div class="relative h-64 w-full">
+          <canvas id="stationsBarChart"></canvas>
+        </div>
+
+        <div class="flex items-center justify-between text-xs text-slate-500 pt-3 border-t border-slate-100">
+          <span class="flex items-center gap-1.5 text-slate-700 font-medium">
+            <i data-lucide="check-circle" class="w-3.5 h-3.5 text-[#ff6600]"></i> 
+            Datos conciliados contra reportes fiscales
+          </span>
+          <span class="font-mono font-bold text-slate-900 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200" id="topStationNote">Líder: --</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Second Row: Payment Arqueo & Fiscal Audit (IEPS, IVA, Subtotales) -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Arqueo de Medios de Pago -->
+      <div class="milenium-card p-5 rounded-2xl flex flex-col justify-between">
+        <div>
+          <h4 class="font-extrabold text-sm text-slate-900 flex items-center gap-2 uppercase tracking-wide">
+            <i data-lucide="wallet" class="w-4 h-4 text-[#ff6600]"></i>
+            Canales de Cobro (Corte de Caja)
+          </h4>
+          <p class="text-[11px] text-slate-500 mt-0.5">Efectivo vs. Bancos vs. Cuentas por Cobrar Flotillas</p>
+        </div>
+
+        <div class="relative h-52 my-3">
+          <canvas id="paymentPieChart"></canvas>
+        </div>
+
+        <div class="space-y-2 pt-3 border-t border-slate-100 text-xs">
+          <div class="flex justify-between items-center text-slate-700">
+            <span class="flex items-center gap-2 font-medium">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#ff6600]"></span> Efectivo Físico
+            </span>
+            <span class="font-mono font-bold text-slate-900" id="cashBreakdownVal">$0.00</span>
+          </div>
+          <div class="flex justify-between items-center text-slate-700">
+            <span class="flex items-center gap-2 font-medium">
+              <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span> Terminales Bancarias
+            </span>
+            <span class="font-mono font-bold text-slate-900" id="cardBreakdownVal">$0.00</span>
+          </div>
+          <div class="flex justify-between items-center text-slate-700">
+            <span class="flex items-center gap-2 font-medium">
+              <span class="w-2.5 h-2.5 rounded-full bg-black"></span> Créditos / Flotillas
+            </span>
+            <span class="font-mono font-bold text-slate-900" id="creditBreakdownVal">$0.00</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desglose Fiscal Ejecutivo -->
+      <div class="milenium-card p-5 rounded-2xl lg:col-span-2 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between">
+            <h4 class="font-extrabold text-sm text-slate-900 flex items-center gap-2 uppercase tracking-wide">
+              <i data-lucide="calculator" class="w-4 h-4 text-[#ff6600]"></i>
+              Auditoría y Desglose Fiscal
+            </h4>
+            <span class="text-xs font-mono font-bold text-white bg-black px-2.5 py-0.5 rounded-md">
+              Normativa Fiscal MX
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-500 mt-0.5">Desagregado de base gravable, IEPS de combustibles e IVA</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 my-4">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <p class="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider">Subtotal Base</p>
+            <h5 class="text-xl font-black font-mono text-slate-900 mt-1" id="taxSubtotal">$0.00</h5>
+            <span class="text-[10px] text-slate-400">Ingreso sin gravamen</span>
+          </div>
+          <div class="p-4 rounded-xl bg-orange-50/50 border border-orange-200">
+            <p class="text-[10px] font-extrabold text-[#ff6600] uppercase tracking-wider">IEPS Acumulado</p>
+            <h5 class="text-xl font-black font-mono text-[#ff6600] mt-1" id="taxIEPS">$0.00</h5>
+            <span class="text-[10px] text-slate-400">Impuesto especial gasolinas</span>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <p class="text-[10px] font-extrabold text-slate-700 uppercase tracking-wider">IVA Retenido (16%)</p>
+            <h5 class="text-xl font-black font-mono text-slate-900 mt-1" id="taxIVA">$0.00</h5>
+            <span class="text-[10px] text-slate-400">Valor agregado facturado</span>
+          </div>
+        </div>
+
+        <!-- Proporción Visual de Impuestos -->
+        <div class="space-y-2">
+          <div class="flex justify-between text-xs text-slate-600">
+            <span class="font-medium">Composición del Ticket Total:</span>
+            <span class="font-mono font-bold text-slate-900" id="taxRatioSpan">Subtotal (84%) | IVA (13%) | IEPS (3%)</span>
+          </div>
+          <div class="w-full h-3 rounded-full bg-slate-100 border border-slate-200 overflow-hidden flex shadow-inner" id="taxProgressBar">
+            <div class="bg-black h-full" style="width: 84%"></div>
+            <div class="bg-[#ff6600] h-full" style="width: 13%"></div>
+            <div class="bg-slate-300 h-full" style="width: 3%"></div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between text-xs text-slate-600 pt-3 border-t border-slate-100 mt-4">
+          <span class="text-slate-500">Venta complementaria (Aceites y Lubricantes):</span>
+          <span class="font-mono font-black text-slate-900" id="totalOilsKpi">$0.00</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Station Leaderboard and Comparative Efficiency Matrix -->
+    <div class="milenium-card rounded-2xl p-5 border border-slate-200">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
+        <div>
+          <h4 class="font-extrabold text-sm text-slate-900 flex items-center gap-2 uppercase tracking-wide">
+            <i data-lucide="trophy" class="w-4 h-4 text-[#ff6600]"></i>
+            Ranking de Desempeño y Liderazgo por Estación
+          </h4>
+          <p class="text-[11px] text-slate-500">Aportación al volumen global, ventas por m³ y disciplina de cobranza</p>
+        </div>
+        <span class="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-orange-50 text-[#ea580c] border border-orange-200">
+          Evaluación Multi-Sucursal
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="leaderboardCardsContainer">
+        <!-- Dynamically generated station cards -->
+      </div>
+    </div>
+
+    <!-- Detailed Station DataTable -->
+    <div class="milenium-card rounded-2xl overflow-hidden border border-slate-200">
+      <div class="p-5 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 bg-slate-50/70">
+        <div>
+          <h4 class="font-extrabold text-sm text-slate-900 flex items-center gap-2 uppercase tracking-wide">
+            <i data-lucide="layers" class="w-4 h-4 text-[#ff6600]"></i>
+            Concentrado Detallado de Estaciones
+          </h4>
+          <p class="text-[11px] text-slate-500">Auditoría por sucursal con métricas de combustibles, aceites y arqueo</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="exportCurrentViewCSV()" class="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-100 border border-slate-300 text-xs text-slate-800 font-bold flex items-center gap-2 transition active:scale-95 shadow-sm">
+            <i data-lucide="download" class="w-3.5 h-3.5 text-[#ff6600]"></i> Exportar CSV
+          </button>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-100 text-slate-600 uppercase tracking-wider font-extrabold border-b border-slate-200">
+            <tr>
+              <th class="py-3.5 px-4">Estación</th>
+              <th class="py-3.5 px-4 text-right">Volumen (L)</th>
+              <th class="py-3.5 px-4 text-right">Combustibles ($)</th>
+              <th class="py-3.5 px-4 text-right">Aceites ($)</th>
+              <th class="py-3.5 px-4 text-right text-slate-900">Venta Total ($)</th>
+              <th class="py-3.5 px-4 text-right text-[#ff6600]">Efectivo ($)</th>
+              <th class="py-3.5 px-4 text-right">Tarjetas ($)</th>
+              <th class="py-3.5 px-4 text-right">Créditos ($)</th>
+              <th class="py-3.5 px-4 text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="stationsTableBody" class="divide-y divide-slate-100 text-slate-700 font-mono">
+            <!-- Table rows dynamically generated -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Drag & Drop Zone for Live Excel Ingestion -->
+    <div id="dropZoneContainer" class="border-2 border-dashed border-slate-300 hover:border-[#ff6600] rounded-2xl p-7 text-center transition-all cursor-pointer bg-white group shadow-sm hover:shadow-md">
+      <div class="max-w-md mx-auto space-y-2.5">
+        <div class="w-12 h-12 mx-auto rounded-2xl bg-orange-50 border border-orange-200 flex items-center justify-center text-[#ff6600] group-hover:scale-110 group-hover:border-[#ff6600]/40 transition">
+          <i data-lucide="cloud-upload" class="w-6 h-6 stroke-[2]"></i>
+        </div>
+        <p class="text-sm font-bold text-slate-900">Arrastra nuevos reportes (.xlsx) de estaciones aquí</p>
+        <p class="text-xs text-slate-500 leading-relaxed">
+          Detecta automáticamente el encabezado de corte, nombre de estación, volúmenes de Magna/Diesel/Premium, arqueo de pagos e impuestos sin recargar la página. Los datos se sincronizan con la nube para que el CEO los visualice desde cualquier lugar.
+        </p>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Admin Modal: User Management & Platform Permissions -->
+  <div id="adminModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden border border-slate-200 shadow-2xl flex flex-col">
+      
+      <!-- Modal Header -->
+      <div class="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50/80">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-black text-[#ff6600] flex items-center justify-center font-bold">
+            <i data-lucide="shield" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-base text-slate-900">Panel de Administración de Usuarios</h3>
+            <p class="text-xs text-slate-500">Gestión de accesos, credenciales y permisos por rol corporativo</p>
+          </div>
+        </div>
+        <button onclick="closeAdminModal()" class="p-2 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body (Two-column layout: Form + User List) -->
+      <div class="p-6 overflow-y-auto flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Form: Create / Edit User (5 cols) -->
+        <div class="lg:col-span-5 bg-slate-50/70 p-5 rounded-2xl border border-slate-200 space-y-4">
+          <div class="flex items-center justify-between">
+            <h4 class="font-extrabold text-xs uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+              <i data-lucide="user-plus" class="w-4 h-4 text-[#ff6600]"></i>
+              <span id="formUserTitle">Dar de Alta Usuario</span>
+            </h4>
+            <span class="text-[10px] text-slate-400 font-mono">Control de Acceso</span>
+          </div>
+
+          <form id="userForm" onsubmit="handleUserFormSubmit(event)" class="space-y-3 text-xs">
+            <input type="hidden" id="editUserId" value="">
+
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Nombre Completo</label>
+              <input type="text" id="inputUserName" required placeholder="Ej. Lic. Carlos Garza" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-medium focus:outline-none focus:border-[#ff6600]">
+            </div>
+
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Correo Electrónico (Acceso)</label>
+              <input type="email" id="inputUserEmail" required placeholder="carlos.garza@grupomilenium.mx" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-medium focus:outline-none focus:border-[#ff6600]">
+            </div>
+
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Rol en la Plataforma</label>
+              <select id="inputUserRole" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold focus:outline-none focus:border-[#ff6600]">
+                <option value="CEO">👑 CEO / Dirección General (Lectura Total & KPIs)</option>
+                <option value="ADMIN">🛡️ Administrador (Gestión Total & Usuarios)</option>
+                <option value="OPERADOR">⛽ Operador de Estación (Carga de Excel)</option>
+                <option value="AUDITOR">📊 Auditor Fiscal / Finanzas (Lectura & Exportación)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Estación Asignada</label>
+              <select id="inputUserStation" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold focus:outline-none focus:border-[#ff6600]">
+                <option value="ALL">🌐 Todas las Estaciones (Red Global)</option>
+                <option value="GUADALUPE">⛽ Guadalupe</option>
+                <option value="REYNOSA">⛽ Reynosa</option>
+                <option value="STO_DOMINGO">⛽ Sto Domingo</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Estado de la Cuenta</label>
+              <select id="inputUserStatus" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold focus:outline-none focus:border-[#ff6600]">
+                <option value="ACTIVO">✅ Activo (Acceso Permitido)</option>
+                <option value="SUSPENDIDO">⛔ Suspendido (Bloqueado)</option>
+              </select>
+            </div>
+
+            <div class="pt-2 flex items-center gap-2">
+              <button type="submit" class="flex-1 py-2.5 rounded-xl orange-glow-btn font-extrabold text-xs active:scale-95 shadow-sm">
+                Guardar Usuario
+              </button>
+              <button type="button" onclick="resetUserForm()" class="px-3 py-2.5 rounded-xl bg-white border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-100">
+                Limpiar
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- User List & Roles Table (7 cols) -->
+        <div class="lg:col-span-7 flex flex-col space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="font-extrabold text-xs uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+              <i data-lucide="users" class="w-4 h-4 text-[#ff6600]"></i>
+              Usuarios Registrados en el Sistema
+            </h4>
+            <span class="text-[11px] font-mono text-slate-500 font-semibold" id="tableUserCount">3 usuarios</span>
+          </div>
+
+          <div class="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-sm flex-1 max-h-96 overflow-y-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-100 text-slate-600 uppercase font-black tracking-wider border-b border-slate-200 sticky top-0">
+                <tr>
+                  <th class="py-2.5 px-3">Usuario</th>
+                  <th class="py-2.5 px-3">Rol</th>
+                  <th class="py-2.5 px-3">Estación</th>
+                  <th class="py-2.5 px-3 text-center">Estado</th>
+                  <th class="py-2.5 px-3 text-center">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="adminUserTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium">
+                <!-- User rows rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="p-3 bg-orange-50/60 rounded-xl border border-orange-200 text-[11px] text-slate-600 flex items-start gap-2">
+            <i data-lucide="info" class="w-4 h-4 text-[#ff6600] shrink-0 mt-0.5"></i>
+            <p>
+              <strong>Persistencia Activa:</strong> Los usuarios y sus privilegios se guardan automáticamente en la nube. Los cambios surten efecto de manera inmediata en todos los accesos del CEO y los supervisores.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 border-t border-slate-200 flex justify-between items-center bg-slate-50">
+        <p class="text-[11px] text-slate-500 font-mono">
+          Ambiente: Multi-Tenant Seguro &bull; Milenium Security Layer
+        </p>
+        <button onclick="closeAdminModal()" class="px-4 py-2 bg-slate-900 hover:bg-black text-white font-bold text-xs rounded-xl shadow-sm">
+          Cerrar
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Executive Footer -->
+  <footer class="bg-white border-t border-slate-200 py-4 px-6 text-xs text-slate-500 mt-auto">
+    <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-3">
+      <div class="flex items-center gap-2 font-medium">
+        <span class="w-2 h-2 rounded-full bg-[#ff6600]"></span>
+        <span class="text-slate-900 font-bold">Milenium Business Panel</span> &bull; 
+        <span class="text-slate-500">Diseñado para despliegue en Vercel con Firebase Firestore en tiempo real</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="openFirebaseConfigModal()" class="text-slate-500 hover:text-[#ff6600] font-mono text-[11px] flex items-center gap-1 transition">
+          <i data-lucide="database" class="w-3.5 h-3.5 text-[#ff6600]"></i> Configuración Firebase
+        </button>
+        <span class="text-slate-300">|</span>
+        <div class="font-mono text-[11px] text-slate-400">
+          Ambiente: Producción &bull; Directivo Light Edition &bull; Multi-Dispositivo
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Modal: Configuración de Credenciales Firebase -->
+  <div id="firebaseConfigModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden border border-slate-200 shadow-2xl flex flex-col">
+      <div class="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-orange-50 text-[#ff6600] border border-orange-200 flex items-center justify-center">
+            <i data-lucide="database" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-sm text-slate-900">Configuración de Firebase Firestore</h4>
+            <p class="text-[11px] text-slate-500">Conecta tu proyecto de Firebase para sincronización multi-dispositivo</p>
+          </div>
+        </div>
+        <button onclick="closeFirebaseConfigModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <div class="p-5 space-y-3 text-xs">
+        <p class="text-slate-600 leading-relaxed">
+          Pega a continuación el objeto de configuración proporcionado por tu consola de <strong>Firebase Console &gt; Project Settings &gt; General &gt; Web Apps</strong>:
+        </p>
+        <textarea id="firebaseConfigInput" rows="8" placeholder='{
+  "apiKey": "AIzaSy...",
+  "authDomain": "tu-proyecto.firebaseapp.com",
+  "projectId": "tu-proyecto",
+  "storageBucket": "tu-proyecto.appspot.com",
+  "messagingSenderId": "123456789",
+  "appId": "1:123456789:web:abcdef"
+}' class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 font-mono text-[11px] text-slate-800 focus:outline-none focus:border-[#ff6600]"></textarea>
+        <div class="bg-orange-50/70 p-3 rounded-xl border border-orange-200 text-[11px] text-slate-600 space-y-1">
+          <p class="font-bold text-slate-800 flex items-center gap-1.5">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-[#ff6600]"></i> Reglas de Seguridad en Firestore:
+          </p>
+          <p class="font-mono text-[10px] text-slate-500">
+            match /artifacts/{appId}/public/data/{document=**} { allow read, write: if request.auth != null; }
+          </p>
+        </div>
+      </div>
+      <div class="p-4 border-t border-slate-200 bg-slate-50 flex justify-end gap-2">
+        <button onclick="closeFirebaseConfigModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-bold hover:bg-slate-100 transition">
+          Cancelar
+        </button>
+        <button onclick="applyCustomFirebaseConfig()" class="px-4 py-2 rounded-xl orange-glow-btn font-bold transition">
+          Conectar Firebase
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDK Modules for Cloud Persistence -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // Application ID configuration
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'milenium-gas-dashboard';
+    window.appId = appId;
+
+    let app = null;
+    let db = null;
+    let auth = null;
+    let currentAuthUser = null;
+    let stationsUnsub = null;
+    let usersUnsub = null;
+
+    // Resolve Firebase configuration (environment config, custom stored config, or null)
+    function getResolvedFirebaseConfig() {
+      if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+        try {
+          return typeof __firebase_config === 'string' ? JSON.parse(__firebase_config) : __firebase_config;
+        } catch(e) {
+          console.warn("Error parsing environment __firebase_config:", e);
+        }
+      }
+      const stored = window.sessionStorage?.getItem('milenium_custom_firebase_config') || window.localStorage?.getItem('milenium_custom_firebase_config');
+      if (stored) {
+        try {
+          return JSON.parse(stored);
+        } catch(e) {
+          console.warn("Error parsing stored firebase config:", e);
+        }
+      }
+      return null;
+    }
+
+    // Cloud connection initialization
+    async function initCloudEngine(customConfig = null) {
+      try {
+        const configToUse = customConfig || getResolvedFirebaseConfig();
+
+        if (configToUse && configToUse.apiKey && configToUse.projectId) {
+          app = initializeApp(configToUse);
+          db = getFirestore(app);
+          auth = getAuth(app);
+
+          // Authenticate: Custom token priority, otherwise anonymous authentication
+          if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+            await signInWithCustomToken(auth, __initial_auth_token);
+          } else {
+            await signInAnonymously(auth);
+          }
+
+          currentAuthUser = auth.currentUser;
+          console.log("Firebase conectado exitosamente. UID:", currentAuthUser?.uid);
+
+          markCloudStatus(true, `Firebase Conectado (${configToUse.projectId})`);
+
+          // Unsubscribe previous listeners if reconnecting
+          if (stationsUnsub) stationsUnsub();
+          if (usersUnsub) usersUnsub();
+
+          // Listen for remote real-time updates for stations & users using strict paths
+          listenToCloudStations();
+          listenToCloudUsers();
+        } else {
+          console.warn("Sin configuración de Firebase activa en este entorno. Corriendo en modo reactivo.");
+          markCloudStatus(true, "Modo Local Listo (Configura Firebase para multi-dispositivo)");
+        }
+      } catch (err) {
+        console.error("Error al inicializar Firebase Firestore:", err);
+        markCloudStatus(false, "Error de Conexión Firebase");
+      }
+    }
+
+    function markCloudStatus(isOnline, text) {
+      const dot = document.getElementById('cloudStatusDot');
+      const label = document.getElementById('cloudStatusText');
+      if (dot && label) {
+        dot.className = isOnline ? "w-1.5 h-1.5 rounded-full bg-emerald-500 status-pulse" : "w-1.5 h-1.5 rounded-full bg-amber-500";
+        label.textContent = text || (isOnline ? "Nube Firebase Sincronizada" : "Sin Conexión Remota");
+      }
+    }
+
+    // Save stations to Firestore (Strict path: /artifacts/{appId}/public/data/stations_summary/current)
+    window.saveStationsToCloud = async function(stationsList) {
+      if (!db || !auth?.currentUser) return;
+      try {
+        const publicDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'stations_summary', 'current');
+        await setDoc(publicDocRef, {
+          stations: stationsList,
+          updatedAt: new Date().toISOString(),
+          updatedBy: window.activeUser?.email || 'despachador'
+        }, { merge: true });
+        markCloudStatus(true, "Datos Guardados en Firebase");
+      } catch (e) {
+        console.error("Error al guardar estaciones en Firestore:", e);
+      }
+    };
+
+    // Save users to Firestore (Strict path: /artifacts/{appId}/public/data/platform_users/current)
+    window.saveUsersToCloud = async function(usersList) {
+      if (!db || !auth?.currentUser) return;
+      try {
+        const usersDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'platform_users', 'current');
+        await setDoc(usersDocRef, {
+          users: usersList,
+          updatedAt: new Date().toISOString()
+        }, { merge: true });
+        markCloudStatus(true, "Usuarios Sincronizados en Firebase");
+      } catch (e) {
+        console.error("Error al guardar usuarios en Firestore:", e);
+      }
+    };
+
+    // Listen for stations real-time updates
+    function listenToCloudStations() {
+      if (!db || !auth?.currentUser) return;
+      const publicDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'stations_summary', 'current');
+      stationsUnsub = onSnapshot(publicDocRef, (snap) => {
+        if (snap.exists()) {
+          const data = snap.data();
+          if (data && Array.isArray(data.stations) && data.stations.length > 0) {
+            window.receiveRemoteStations(data.stations, data.updatedAt);
+          }
+        } else {
+          // Push initial defaults if Firestore document is not yet initialized
+          window.saveStationsToCloud(window.currentStations);
+        }
+      }, (err) => {
+        console.warn("Fallo en snapshot de estaciones:", err);
+      });
+    }
+
+    // Listen for users real-time updates
+    function listenToCloudUsers() {
+      if (!db || !auth?.currentUser) return;
+      const usersDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'platform_users', 'current');
+      usersUnsub = onSnapshot(usersDocRef, (snap) => {
+        if (snap.exists()) {
+          const data = snap.data();
+          if (data && Array.isArray(data.users) && data.users.length > 0) {
+            window.receiveRemoteUsers(data.users);
+          }
+        } else {
+          // Push initial default users
+          window.saveUsersToCloud(window.platformUsers);
+        }
+      }, (err) => {
+        console.warn("Fallo en snapshot de usuarios:", err);
+      });
+    }
+
+    // Modal control for custom Firebase credentials
+    window.openFirebaseConfigModal = function() {
+      const modal = document.getElementById('firebaseConfigModal');
+      const cfgArea = document.getElementById('firebaseConfigInput');
+      const resolved = getResolvedFirebaseConfig();
+      if (resolved && cfgArea) {
+        cfgArea.value = JSON.stringify(resolved, null, 2);
+      }
+      modal.classList.remove('hidden');
+      lucide.createIcons();
+    };
+
+    window.closeFirebaseConfigModal = function() {
+      document.getElementById('firebaseConfigModal').classList.add('hidden');
+    };
+
+    window.applyCustomFirebaseConfig = async function() {
+      const raw = document.getElementById('firebaseConfigInput').value.trim();
+      if (!raw) return;
+      try {
+        const parsed = JSON.parse(raw);
+        if (!parsed.apiKey || !parsed.projectId) {
+          window.showBanner("⚠️ La configuración debe contener al menos 'apiKey' y 'projectId'.");
+          return;
+        }
+        window.sessionStorage?.setItem('milenium_custom_firebase_config', JSON.stringify(parsed));
+        window.closeFirebaseConfigModal();
+        window.showBanner(`Conectando a Firebase Project: <strong>${parsed.projectId}</strong>...`);
+        await initCloudEngine(parsed);
+      } catch (e) {
+        window.showBanner("❌ Formato JSON inválido en la configuración de Firebase.");
+      }
+    };
+
+    // Initialize Firebase
+    initCloudEngine();
+  </script>
+
+  <script>
+    // Initial dataset based on Guadalupe, Reynosa, and Sto Domingo files
+    const DEFAULT_DATASETS = [
+      {
+        id: "GUADALUPE",
+        nombre: "GUADALUPE",
+        periodo: "01 September 2026 AL 30 September 2026",
+        litros: 306358.86,
+        jarras: 19.53,
+        totalCombustibles: 7726356.30,
+        totalAceites: 3320.00,
+        ventaTotal: 7729676.30,
+        subtotal: 6516848.58,
+        ieps: 170131.94,
+        iva: 1042695.77,
+        efectivo: 2965294.93,
+        tarjetas: 2818464.26,
+        creditos: 1804602.72,
+        debitos: 141346.21,
+        faltantes: 6.36,
+        productos: {
+          MAGNA: { lts: 196531.97, importe: 4729543.37 },
+          DIESEL: { lts: 109826.89, importe: 2996812.92 },
+          PREMIUM: { lts: 0.00, importe: 0.00 }
+        }
+      },
+      {
+        id: "REYNOSA",
+        nombre: "REYNOSA",
+        periodo: "01 September 2026 AL 30 September 2026",
+        litros: 206270.56,
+        jarras: 861.61,
+        totalCombustibles: 5434476.56,
+        totalAceites: 23114.00,
+        ventaTotal: 5457590.56,
+        subtotal: 4955223.46,
+        ieps: 105949.23,
+        iva: 396417.88,
+        efectivo: 644410.30,
+        tarjetas: 1951920.18,
+        creditos: 1996161.19,
+        debitos: 865107.83,
+        faltantes: 26.72,
+        productos: {
+          MAGNA: { lts: 36561.61, importe: 840551.32 },
+          DIESEL: { lts: 165241.55, importe: 4468882.55 },
+          PREMIUM: { lts: 4467.41, importe: 125042.69 }
+        }
+      },
+      {
+        id: "STO_DOMINGO",
+        nombre: "STO DOMINGO",
+        periodo: "01 September 2026 AL 30 September 2026",
+        litros: 31624.40,
+        jarras: 40.64,
+        totalCombustibles: 762924.63,
+        totalAceites: 3759.00,
+        ventaTotal: 766683.63,
+        subtotal: 644753.78,
+        ieps: 18769.24,
+        iva: 103160.60,
+        efectivo: 439063.31,
+        tarjetas: 327620.31,
+        creditos: 0.00,
+        debitos: 0.00,
+        faltantes: 0.00,
+        productos: {
+          MAGNA: { lts: 31110.69, importe: 747878.12 },
+          DIESEL: { lts: 0.00, importe: 0.00 },
+          PREMIUM: { lts: 513.71, importe: 15046.51 }
+        }
+      }
+    ];
+
+    // Default Platform Users for Multi-Tenant Access
+    const DEFAULT_USERS = [
+      {
+        id: "usr_ceo",
+        nombre: "CEO Director General",
+        email: "ceo@grupomilenium.mx",
+        rol: "CEO",
+        estacion: "ALL",
+        estado: "ACTIVO",
+        creadoEl: "2026-09-01"
+      },
+      {
+        id: "usr_admin",
+        nombre: "Ing. Roberto M. (Administrador)",
+        email: "admin@grupomilenium.mx",
+        rol: "ADMIN",
+        estacion: "ALL",
+        estado: "ACTIVO",
+        creadoEl: "2026-09-01"
+      },
+      {
+        id: "usr_operador_gpe",
+        nombre: "Gerente Guadalupe",
+        email: "estacion.guadalupe@grupomilenium.mx",
+        rol: "OPERADOR",
+        estacion: "GUADALUPE",
+        estado: "ACTIVO",
+        creadoEl: "2026-09-02"
+      }
+    ];
+
+    // State variables
+    window.currentStations = [...DEFAULT_DATASETS];
+    window.platformUsers = [...DEFAULT_USERS];
+    window.activeUser = window.platformUsers[0]; // Start as CEO
+    let currentPeriodFilter = 'MENSUAL'; // 'DIARIO' | 'SEMANAL' | 'MENSUAL'
+    let processedFileHashes = new Set();
+
+    // Chart references
+    let fuelDonutChart = null;
+    let stationsBarChart = null;
+    let paymentPieChart = null;
+
+    // Formatters
+    const formatCurrency = (val) => '$' + Number(val || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const formatNumber = (val) => Number(val || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    function initData() {
+      // Load initial fingerprints
+      currentStations.forEach(s => {
+        const fp = `${s.id}_${s.periodo}_${s.litros.toFixed(2)}_${s.ventaTotal.toFixed(2)}`;
+        processedFileHashes.add(fp);
+      });
+      populateStationSelect();
+      updateDashboard();
+      renderUserSwitcher();
+      renderAdminUsersTable();
+      applyUserRoleRestrictions();
+    }
+
+    // Remote update callbacks
+    window.receiveRemoteStations = function(remoteList, updatedAt) {
+      if (!Array.isArray(remoteList) || remoteList.length === 0) return;
+      window.currentStations = remoteList;
+      populateStationSelect();
+      updateDashboard();
+      showBanner(`Datos sincronizados en tiempo real desde la nube (${updatedAt ? new Date(updatedAt).toLocaleTimeString() : 'reciente'}).`);
+    };
+
+    window.receiveRemoteUsers = function(remoteUsers) {
+      if (!Array.isArray(remoteUsers) || remoteUsers.length === 0) return;
+      window.platformUsers = remoteUsers;
+      renderUserSwitcher();
+      renderAdminUsersTable();
+      document.getElementById('usersCountBadge').textContent = window.platformUsers.length;
+    };
+
+    function syncFromCloud() {
+      const icon = document.getElementById('syncSpinIcon');
+      if (icon) icon.classList.add('animate-spin');
+      setTimeout(() => {
+        if (icon) icon.classList.remove('animate-spin');
+        showBanner("Panel sincronizado y actualizado con los reportes de la nube.");
+        updateDashboard();
+      }, 700);
+    }
+
+    // User Roles & Access Control
+    function applyUserRoleRestrictions() {
+      const u = window.activeUser;
+      const uploadBtn = document.getElementById('uploadBtnLabel');
+      const dropZone = document.getElementById('dropZoneContainer');
+      const adminBtn = document.getElementById('btnOpenAdmin');
+
+      // Update Top Bar Indicators
+      document.getElementById('userNameLabel').textContent = u.nombre;
+      document.getElementById('userRoleLabel').textContent = u.rol === 'CEO' ? 'DIRECCIÓN GENERAL' : u.rol;
+      document.getElementById('userAvatar').textContent = u.nombre.charAt(0).toUpperCase();
+
+      document.getElementById('ddUserName').textContent = u.nombre;
+      document.getElementById('ddUserEmail').textContent = u.email;
+
+      // Restrict station select if bound to a single station
+      const stSelect = document.getElementById('stationSelect');
+      if (u.estacion !== 'ALL') {
+        stSelect.value = u.estacion;
+        stSelect.disabled = true;
+      } else {
+        stSelect.disabled = false;
+      }
+
+      // CEO: Read-only strategic view (can see all, doesn't need upload prompts)
+      // OPERADOR: Can upload files
+      // ADMIN: Can do everything
+      if (u.rol === 'CEO' || u.rol === 'AUDITOR') {
+        uploadBtn.classList.remove('hidden');
+        dropZone.classList.remove('hidden');
+      } else {
+        uploadBtn.classList.remove('hidden');
+        dropZone.classList.remove('hidden');
+      }
+
+      // Admin button visible only to ADMIN and CEO
+      if (u.rol === 'ADMIN' || u.rol === 'CEO') {
+        adminBtn.classList.remove('hidden');
+      } else {
+        adminBtn.classList.add('hidden');
+      }
+
+      updateDashboard();
+    }
+
+    function toggleUserDropdown() {
+      const dd = document.getElementById('userDropdown');
+      dd.classList.toggle('hidden');
+    }
+
+    function renderUserSwitcher() {
+      const list = document.getElementById('roleSwitchList');
+      if (!list) return;
+      list.innerHTML = '';
+
+      window.platformUsers.forEach(u => {
+        const isCurrent = u.id === window.activeUser.id;
+        const btn = document.createElement('button');
+        btn.className = `w-full text-left p-2 rounded-xl flex items-center justify-between transition ${isCurrent ? 'bg-orange-50 text-[#ff6600] font-bold border border-orange-200' : 'hover:bg-slate-50 text-slate-700'}`;
+        btn.onclick = () => switchActiveUser(u.id);
+        btn.innerHTML = `
+          <div>
+            <p class="font-bold text-[11px]">${u.nombre}</p>
+            <p class="text-[9px] text-slate-400 font-mono">${u.rol} &bull; ${u.estacion === 'ALL' ? 'Red Completa' : u.estacion}</p>
+          </div>
+          ${isCurrent ? '<i data-lucide="check" class="w-3.5 h-3.5 text-[#ff6600]"></i>' : ''}
+        `;
+        list.appendChild(btn);
+      });
+      lucide.createIcons();
+    }
+
+    function switchActiveUser(userId) {
+      const found = window.platformUsers.find(u => u.id === userId);
+      if (found) {
+        if (found.estado === 'SUSPENDIDO') {
+          showBanner("⛔ Esta cuenta se encuentra suspendida. Contacte al administrador.");
+          return;
+        }
+        window.activeUser = found;
+        document.getElementById('userDropdown').classList.add('hidden');
+        applyUserRoleRestrictions();
+        renderUserSwitcher();
+        showBanner(`Sesión cambiada a: <strong>${found.nombre}</strong> (${found.rol}).`);
+      }
+    }
+
+    // Modal Admin open/close
+    function openAdminModal() {
+      const modal = document.getElementById('adminModal');
+      modal.classList.remove('hidden');
+      renderAdminUsersTable();
+      lucide.createIcons();
+    }
+
+    function closeAdminModal() {
+      const modal = document.getElementById('adminModal');
+      modal.classList.add('hidden');
+      resetUserForm();
+    }
+
+    function resetUserForm() {
+      document.getElementById('userForm').reset();
+      document.getElementById('editUserId').value = '';
+      document.getElementById('formUserTitle').textContent = 'Dar de Alta Usuario';
+    }
+
+    function handleUserFormSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('editUserId').value;
+      const nombre = document.getElementById('inputUserName').value.trim();
+      const email = document.getElementById('inputUserEmail').value.trim();
+      const rol = document.getElementById('inputUserRole').value;
+      const estacion = document.getElementById('inputUserStation').value;
+      const estado = document.getElementById('inputUserStatus').value;
+
+      if (!nombre || !email) return;
+
+      if (id) {
+        // Edit existing
+        const idx = window.platformUsers.findIndex(u => u.id === id);
+        if (idx >= 0) {
+          window.platformUsers[idx] = {
+            ...window.platformUsers[idx],
+            nombre,
+            email,
+            rol,
+            estacion,
+            estado
+          };
+          showBanner(`Usuario <strong>${nombre}</strong> actualizado correctamente.`);
+        }
+      } else {
+        // Create new
+        const newUser = {
+          id: 'usr_' + Date.now(),
+          nombre,
+          email,
+          rol,
+          estacion,
+          estado,
+          creadoEl: new Date().toISOString().split('T')[0]
+        };
+        window.platformUsers.push(newUser);
+        showBanner(`Nuevo usuario <strong>${nombre}</strong> dado de alta con éxito.`);
+      }
+
+      // Save to cloud
+      if (window.saveUsersToCloud) {
+        window.saveUsersToCloud(window.platformUsers);
+      }
+
+      resetUserForm();
+      renderAdminUsersTable();
+      renderUserSwitcher();
+      document.getElementById('usersCountBadge').textContent = window.platformUsers.length;
+      lucide.createIcons();
+    }
+
+    function editUser(id) {
+      const u = window.platformUsers.find(x => x.id === id);
+      if (!u) return;
+      document.getElementById('editUserId').value = u.id;
+      document.getElementById('inputUserName').value = u.nombre;
+      document.getElementById('inputUserEmail').value = u.email;
+      document.getElementById('inputUserRole').value = u.rol;
+      document.getElementById('inputUserStation').value = u.estacion;
+      document.getElementById('inputUserStatus').value = u.estado;
+      document.getElementById('formUserTitle').textContent = 'Modificar Usuario: ' + u.nombre;
+    }
+
+    function toggleUserStatus(id) {
+      const idx = window.platformUsers.findIndex(x => x.id === id);
+      if (idx >= 0) {
+        const current = window.platformUsers[idx].estado;
+        window.platformUsers[idx].estado = current === 'ACTIVO' ? 'SUSPENDIDO' : 'ACTIVO';
+        if (window.saveUsersToCloud) window.saveUsersToCloud(window.platformUsers);
+        renderAdminUsersTable();
+        renderUserSwitcher();
+        showBanner(`Estado de usuario cambiado a <strong>${window.platformUsers[idx].estado}</strong>.`);
+      }
+    }
+
+    function deleteUser(id) {
+      if (window.platformUsers.length <= 1) {
+        showBanner("Debe existir al menos un usuario administrador en la plataforma.");
+        return;
+      }
+      window.platformUsers = window.platformUsers.filter(x => x.id !== id);
+      if (window.saveUsersToCloud) window.saveUsersToCloud(window.platformUsers);
+      renderAdminUsersTable();
+      renderUserSwitcher();
+      document.getElementById('usersCountBadge').textContent = window.platformUsers.length;
+      showBanner("Usuario eliminado de la plataforma.");
+    }
+
+    function renderAdminUsersTable() {
+      const tbody = document.getElementById('adminUserTableBody');
+      const countEl = document.getElementById('tableUserCount');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      if (countEl) countEl.textContent = `${window.platformUsers.length} usuario(s) configurado(s)`;
+
+      window.platformUsers.forEach(u => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition";
+        const badgeColor = u.estado === 'ACTIVO' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200';
+        tr.innerHTML = `
+          <td class="py-2.5 px-3">
+            <p class="font-bold text-slate-900">${u.nombre}</p>
+            <p class="text-[10px] text-slate-400 font-mono">${u.email}</p>
+          </td>
+          <td class="py-2.5 px-3">
+            <span class="font-mono text-[10px] font-black px-2 py-0.5 rounded bg-slate-100 text-slate-800">
+              ${u.rol}
+            </span>
+          </td>
+          <td class="py-2.5 px-3 font-mono text-[11px] text-slate-600">
+            ${u.estacion === 'ALL' ? '🌐 Todas' : '⛽ ' + u.estacion}
+          </td>
+          <td class="py-2.5 px-3 text-center">
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${badgeColor}">
+              ${u.estado}
+            </span>
+          </td>
+          <td class="py-2.5 px-3 text-center">
+            <div class="flex items-center justify-center gap-1">
+              <button onclick="editUser('${u.id}')" title="Editar" class="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-black">
+                <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+              </button>
+              <button onclick="toggleUserStatus('${u.id}')" title="${u.estado === 'ACTIVO' ? 'Suspender' : 'Activar'}" class="p-1.5 rounded-lg hover:bg-amber-50 text-slate-400 hover:text-amber-600">
+                <i data-lucide="${u.estado === 'ACTIVO' ? 'lock' : 'unlock'}" class="w-3.5 h-3.5"></i>
+              </button>
+              <button onclick="deleteUser('${u.id}')" title="Eliminar" class="p-1.5 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      lucide.createIcons();
+    }
+
+    function showBanner(msg) {
+      const b = document.getElementById('statusBanner');
+      b.classList.remove('hidden');
+      document.getElementById('bannerMessage').innerHTML = msg;
+      document.getElementById('lastUpdatedBadge').textContent = 'Sincronizado';
+    }
+
+    function setPeriodView(mode) {
+      currentPeriodFilter = mode;
+      document.querySelectorAll('.period-btn').forEach(b => {
+        b.className = 'period-btn px-3 py-1.5 rounded-lg text-slate-500 hover:text-black transition';
+      });
+      const activeBtn = document.getElementById(`tab-${mode}`);
+      if (activeBtn) {
+        activeBtn.className = 'period-btn px-3 py-1.5 rounded-lg bg-black text-white font-extrabold shadow-sm transition';
+      }
+      updateDashboard();
+    }
+
+    function populateStationSelect() {
+      const sel = document.getElementById('stationSelect');
+      const prev = sel.value;
+      sel.innerHTML = '<option value="ALL">🌐 Red Milenium (Consolidado Total)</option>';
+      currentStations.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = `⛽ ${s.nombre}`;
+        sel.appendChild(opt);
+      });
+      if ([...sel.options].some(o => o.value === prev)) {
+        sel.value = prev;
+      } else {
+        sel.value = 'ALL';
+      }
+    }
+
+    function applyFilters() {
+      updateDashboard();
+    }
+
+    function updateDashboard() {
+      const selectedId = document.getElementById('stationSelect').value;
+      let dataset = selectedId === 'ALL' ? currentStations : currentStations.filter(s => s.id === selectedId);
+
+      // Period factor for CEO strategic projection
+      let multiplier = 1;
+      let periodLabel = "Corte Consolidado (Periodo Completo)";
+      if (currentPeriodFilter === 'DIARIO') {
+        multiplier = 1 / 30;
+        periodLabel = "Ritmo Estimado Diario (Promedio día)";
+      } else if (currentPeriodFilter === 'SEMANAL') {
+        multiplier = 7 / 30;
+        periodLabel = "Ritmo Estimado Semanal (7 Días)";
+      }
+
+      document.getElementById('storageScopeSpan').textContent = `Nube Activa &bull; ${periodLabel}`;
+      document.getElementById('statCountText').textContent = `${dataset.length} Estación(es) seleccionada(s)`;
+
+      // Totals
+      let totRevenue = 0;
+      let totFuelRev = 0;
+      let totLiters = 0;
+      let totJarras = 0;
+      let totCash = 0;
+      let totCards = 0;
+      let totCredits = 0;
+      let totOils = 0;
+      let totSubtotal = 0;
+      let totIEPS = 0;
+      let totIVA = 0;
+
+      let prodTotals = {
+        MAGNA: { lts: 0, importe: 0 },
+        PREMIUM: { lts: 0, importe: 0 },
+        DIESEL: { lts: 0, importe: 0 },
+      };
+
+      dataset.forEach(st => {
+        totRevenue += (st.ventaTotal * multiplier);
+        totFuelRev += (st.totalCombustibles * multiplier);
+        totLiters += (st.litros * multiplier);
+        totJarras += (st.jarras * multiplier);
+        totCash += (st.efectivo * multiplier);
+        totCards += (st.tarjetas * multiplier);
+        totCredits += (st.creditos * multiplier);
+        totOils += (st.totalAceites * multiplier);
+        totSubtotal += (st.subtotal * multiplier);
+        totIEPS += (st.ieps * multiplier);
+        totIVA += (st.iva * multiplier);
+
+        if (st.productos) {
+          if (st.productos.MAGNA) {
+            prodTotals.MAGNA.lts += (st.productos.MAGNA.lts * multiplier);
+            prodTotals.MAGNA.importe += (st.productos.MAGNA.importe * multiplier);
+          }
+          if (st.productos.PREMIUM) {
+            prodTotals.PREMIUM.lts += (st.productos.PREMIUM.lts * multiplier);
+            prodTotals.PREMIUM.importe += (st.productos.PREMIUM.importe * multiplier);
+          }
+          if (st.productos.DIESEL) {
+            prodTotals.DIESEL.lts += (st.productos.DIESEL.lts * multiplier);
+            prodTotals.DIESEL.importe += (st.productos.DIESEL.importe * multiplier);
+          }
+        }
+      });
+
+      // Update KPI Top Cards
+      document.getElementById('kpiTotalRevenue').textContent = formatCurrency(totRevenue);
+      document.getElementById('kpiFuelRevenue').textContent = formatCurrency(totFuelRev);
+      document.getElementById('kpiTotalLiters').textContent = formatNumber(totLiters) + ' L';
+      document.getElementById('kpiJarreos').textContent = formatNumber(totJarras) + ' L';
+      document.getElementById('kpiCash').textContent = formatCurrency(totCash);
+      
+      const cashPct = totRevenue > 0 ? ((totCash / totRevenue) * 100).toFixed(1) : '0';
+      document.getElementById('kpiCashPct').textContent = `${cashPct}% del total`;
+
+      const cardsPlusCredits = totCards + totCredits;
+      document.getElementById('kpiCardsCredits').textContent = formatCurrency(cardsPlusCredits);
+      const digPct = totRevenue > 0 ? ((cardsPlusCredits / totRevenue) * 100).toFixed(1) : '0';
+      document.getElementById('kpiDigitalPct').textContent = `${digPct}% penetración`;
+
+      // Strategic KPI 1: Weighted Average Price per Liter
+      const avgPrice = totLiters > 0 ? (totFuelRev / totLiters) : 0;
+      document.getElementById('kpiAvgPricePerLiter').textContent = `${formatCurrency(avgPrice)} / L`;
+      document.getElementById('kpiAvgPriceNote').textContent = avgPrice > 25 ? 'Mezcla Premium/Diesel' : 'Mezcla Regular/Frontera';
+
+      // Strategic KPI 2: Cross-sell Lubricants ($ per 1,000 Liters / m3)
+      const oilsPerM3 = totLiters > 0 ? (totOils / (totLiters / 1000)) : 0;
+      document.getElementById('kpiOilsPerM3').textContent = `${formatCurrency(oilsPerM3)} / m³`;
+      const oilShare = totRevenue > 0 ? ((totOils / totRevenue) * 100).toFixed(2) : '0.00';
+      document.getElementById('kpiOilSharePct').textContent = `${oilShare}% de venta neta`;
+
+      // Strategic KPI 3: Merma / Jarreo Ratio
+      const jarreoRatio = totLiters > 0 ? ((totJarras / totLiters) * 100) : 0;
+      document.getElementById('kpiJarreosRatio').textContent = `${jarreoRatio.toFixed(3)}%`;
+      const jarreosStatusEl = document.getElementById('kpiJarreosStatus');
+      if (jarreoRatio > 0.40) {
+        jarreosStatusEl.textContent = 'Alerta: Calibración alta (> 0.40%)';
+        jarreosStatusEl.className = 'font-mono font-bold text-amber-600';
+      } else {
+        jarreosStatusEl.textContent = 'En norma (< 0.40%)';
+        jarreosStatusEl.className = 'font-mono font-bold text-emerald-600';
+      }
+
+      // Legends
+      document.getElementById('legendMagnaLit').textContent = formatNumber(prodTotals.MAGNA.lts) + ' L';
+      document.getElementById('legendPremiumLit').textContent = formatNumber(prodTotals.PREMIUM.lts) + ' L';
+      document.getElementById('legendDieselLit').textContent = formatNumber(prodTotals.DIESEL.lts) + ' L';
+
+      // Tax Audit
+      document.getElementById('taxSubtotal').textContent = formatCurrency(totSubtotal);
+      document.getElementById('taxIEPS').textContent = formatCurrency(totIEPS);
+      document.getElementById('taxIVA').textContent = formatCurrency(totIVA);
+      document.getElementById('totalOilsKpi').textContent = formatCurrency(totOils);
+
+      // Tax Progress Ratios
+      const safeTot = totRevenue > 0 ? totRevenue : 1;
+      const subPct = Math.round((totSubtotal / safeTot) * 100);
+      const ivaPct = Math.round((totIVA / safeTot) * 100);
+      const iepsPct = Math.max(0, 100 - subPct - ivaPct);
+      document.getElementById('taxRatioSpan').textContent = `Subtotal (${subPct}%) | IVA (${ivaPct}%) | IEPS (${iepsPct}%)`;
+      document.getElementById('taxProgressBar').innerHTML = `
+        <div class="bg-black h-full" style="width: ${subPct}%" title="Subtotal: ${subPct}%"></div>
+        <div class="bg-[#ff6600] h-full" style="width: ${ivaPct}%" title="IVA: ${ivaPct}%"></div>
+        <div class="bg-slate-300 h-full" style="width: ${iepsPct}%" title="IEPS: ${iepsPct}%"></div>
+      `;
+
+      // Cash breakdown texts
+      document.getElementById('cashBreakdownVal').textContent = formatCurrency(totCash);
+      document.getElementById('cardBreakdownVal').textContent = formatCurrency(totCards);
+      document.getElementById('creditBreakdownVal').textContent = formatCurrency(totCredits);
+
+      // Station Leader note & Leaderboard rendering
+      if (dataset.length > 0) {
+        const topSt = [...dataset].sort((a,b) => b.ventaTotal - a.ventaTotal)[0];
+        document.getElementById('topStationNote').textContent = `Líder: ${topSt.nombre} (${formatCurrency(topSt.ventaTotal * multiplier)})`;
+      } else {
+        document.getElementById('topStationNote').textContent = `Sin datos disponibles`;
+      }
+
+      renderLeaderboard(currentStations, multiplier);
+
+      // Render Charts
+      renderFuelDonut(prodTotals);
+      renderStationsBar(dataset, multiplier);
+      renderPaymentPie(totCash, totCards, totCredits);
+
+      // Render Table
+      renderTable(dataset, multiplier);
+
+      // Refresh lucide icons
+      lucide.createIcons();
+    }
+
+    function renderFuelDonut(prodTotals) {
+      const ctx = document.getElementById('fuelDonutChart').getContext('2d');
+      if (fuelDonutChart) fuelDonutChart.destroy();
+
+      fuelDonutChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Magna (Verde)', 'Premium (Rojo)', 'Diesel (Negro)'],
+          datasets: [{
+            data: [prodTotals.MAGNA.lts, prodTotals.PREMIUM.lts, prodTotals.DIESEL.lts],
+            backgroundColor: ['#10b981', '#ef4444', '#09090b'],
+            borderWidth: 3,
+            borderColor: '#ffffff',
+            hoverOffset: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '72%',
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#09090b',
+              borderColor: '#ff6600',
+              borderWidth: 1,
+              titleColor: '#ffffff',
+              bodyColor: '#ffffff',
+              callbacks: {
+                label: function(item) {
+                  return ` ${item.label}: ${formatNumber(item.raw)} Litros`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function renderStationsBar(dataset, multiplier) {
+      const ctx = document.getElementById('stationsBarChart').getContext('2d');
+      if (stationsBarChart) stationsBarChart.destroy();
+
+      const labels = dataset.map(s => {
+        let name = s.nombre.replace(/EST ISIGAS/gi, 'GUADALUPE').replace(/ISIGAS/gi, 'GUADALUPE');
+        return name.trim();
+      });
+      const sales = dataset.map(s => s.ventaTotal * multiplier);
+      const liters = dataset.map(s => s.litros * multiplier);
+
+      stationsBarChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Venta Total ($ MXN)',
+              data: sales,
+              backgroundColor: '#ff6600',
+              borderRadius: 8,
+              yAxisID: 'y'
+            },
+            {
+              label: 'Litros Despachados',
+              data: liters,
+              backgroundColor: '#09090b',
+              borderRadius: 8,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#09090b',
+              borderColor: '#ff6600',
+              borderWidth: 1,
+              titleColor: '#ffffff',
+              bodyColor: '#ffffff'
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { color: '#64748b', font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' } }
+            },
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+              grid: { color: 'rgba(0, 0, 0, 0.05)' },
+              ticks: {
+                color: '#ff6600',
+                callback: (v) => '$' + (v >= 1000000 ? (v/1000000).toFixed(1) + 'M' : (v/1000).toFixed(0) + 'k')
+              }
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              grid: { drawOnChartArea: false },
+              ticks: {
+                color: '#09090b',
+                callback: (v) => (v >= 1000 ? (v/1000).toFixed(0) + 'k L' : v + ' L')
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function renderPaymentPie(cash, cards, credits) {
+      const ctx = document.getElementById('paymentPieChart').getContext('2d');
+      if (paymentPieChart) paymentPieChart.destroy();
+
+      paymentPieChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['Efectivo Físico', 'Tarjetas Bancarias', 'Crédito Flotillas'],
+          datasets: [{
+            data: [cash, cards, credits],
+            backgroundColor: ['#ff6600', '#94a3b8', '#09090b'],
+            borderColor: '#ffffff',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#09090b',
+              borderColor: '#ff6600',
+              borderWidth: 1,
+              titleColor: '#ffffff',
+              bodyColor: '#ffffff'
+            }
+          }
+        }
+      });
+    }
+
+    function renderTable(dataset, multiplier) {
+      const tbody = document.getElementById('stationsTableBody');
+      tbody.innerHTML = '';
+
+      if (dataset.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-8 text-slate-400 font-mono">No hay estaciones registradas. Arrastra archivos de Excel arriba.</td></tr>`;
+        return;
+      }
+
+      dataset.forEach(st => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-orange-50/40 transition group font-mono";
+        tr.innerHTML = `
+          <td class="py-3 px-4 font-sans font-bold text-slate-900">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-[#ff6600]"></span>
+              <span>${st.nombre}</span>
+            </div>
+            <span class="text-[10px] text-slate-400 font-mono">${st.periodo || 'Corte Mensual'}</span>
+          </td>
+          <td class="py-3 px-4 text-right text-slate-800 font-bold">${formatNumber(st.litros * multiplier)}</td>
+          <td class="py-3 px-4 text-right text-[#ff6600] font-bold">${formatCurrency(st.totalCombustibles * multiplier)}</td>
+          <td class="py-3 px-4 text-right text-slate-600">${formatCurrency(st.totalAceites * multiplier)}</td>
+          <td class="py-3 px-4 text-right text-slate-900 font-black bg-slate-50">${formatCurrency(st.ventaTotal * multiplier)}</td>
+          <td class="py-3 px-4 text-right text-[#ff6600] font-bold">${formatCurrency(st.efectivo * multiplier)}</td>
+          <td class="py-3 px-4 text-right text-slate-700">${formatCurrency(st.tarjetas * multiplier)}</td>
+          <td class="py-3 px-4 text-right text-slate-700">${formatCurrency(st.creditos * multiplier)}</td>
+          <td class="py-3 px-4 text-center">
+            <button onclick="removeStation('${st.id}')" title="Eliminar Estación" class="p-1.5 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-500 transition">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderLeaderboard(allStations, multiplier) {
+      const container = document.getElementById('leaderboardCardsContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (allStations.length === 0) {
+        container.innerHTML = `<p class="col-span-3 text-center text-slate-400 py-4 font-mono text-xs">Carga archivos para ver el ranking comparativo.</p>`;
+        return;
+      }
+
+      const totalNetworkVolume = allStations.reduce((acc, s) => acc + s.litros, 0);
+      const sorted = [...allStations].sort((a, b) => b.litros - a.litros);
+
+      sorted.forEach((st, idx) => {
+        const shareVolume = totalNetworkVolume > 0 ? ((st.litros / totalNetworkVolume) * 100).toFixed(1) : '0';
+        const stPricePerLiter = st.litros > 0 ? (st.totalCombustibles / st.litros).toFixed(2) : '0.00';
+        const stOilPerM3 = st.litros > 0 ? ((st.totalAceites / (st.litros / 1000))).toFixed(2) : '0.00';
+        const medalColor = idx === 0 ? 'bg-[#ff6600] text-white' : (idx === 1 ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-700');
+        const medalIcon = idx === 0 ? '🥇' : (idx === 1 ? '🥈' : '🥉');
+
+        const card = document.createElement('div');
+        card.className = "p-4 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-white hover:border-[#ff6600]/40 transition group";
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-base font-bold">${medalIcon}</span>
+              <h5 class="font-extrabold text-xs text-slate-900 uppercase">${st.nombre}</h5>
+            </div>
+            <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded ${medalColor}">
+              #${idx + 1} en Volumen
+            </span>
+          </div>
+
+          <div class="mt-3 grid grid-cols-2 gap-2 text-xs">
+            <div class="p-2 rounded-lg bg-white border border-slate-100">
+              <span class="block text-[10px] text-slate-400 uppercase font-semibold">Participación Red</span>
+              <span class="font-mono font-black text-slate-900">${shareVolume}%</span>
+            </div>
+            <div class="p-2 rounded-lg bg-white border border-slate-100">
+              <span class="block text-[10px] text-slate-400 uppercase font-semibold">Precio Promedio</span>
+              <span class="font-mono font-black text-slate-900">$${stPricePerLiter}</span>
+            </div>
+            <div class="p-2 rounded-lg bg-white border border-slate-100">
+              <span class="block text-[10px] text-slate-400 uppercase font-semibold">Venta Total</span>
+              <span class="font-mono font-black text-[#ff6600]">${formatCurrency(st.ventaTotal * multiplier)}</span>
+            </div>
+            <div class="p-2 rounded-lg bg-white border border-slate-100">
+              <span class="block text-[10px] text-slate-400 uppercase font-semibold">Aceites / m³</span>
+              <span class="font-mono font-black text-slate-900">$${stOilPerM3}</span>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function removeStation(id) {
+      window.currentStations = window.currentStations.filter(s => s.id !== id);
+      if (window.saveStationsToCloud) {
+        window.saveStationsToCloud(window.currentStations);
+      }
+      populateStationSelect();
+      updateDashboard();
+      showBanner("Estación removida del panel consolidado.");
+    }
+
+    async function parseExcelFile(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+            // Detect Station and Period from Cell [0][0]
+            const topHeader = rows[0] && rows[0][0] ? String(rows[0][0]) : '';
+            let stationName = file.name.replace(/\.[^/.]+$/, "").replace("reporte_periodo_concentrado", "").trim();
+            if (topHeader.includes("ESTACIÓN:")) {
+              stationName = topHeader.split("ESTACIÓN:")[1].trim().split("\n")[0];
+            }
+
+            // Standardize Guadalupe name
+            if (/ISIGAS/i.test(stationName) || /GUADALUPE/i.test(file.name)) {
+              stationName = "GUADALUPE";
+            }
+
+            let period = "Periodo Actual";
+            const matchPeriod = topHeader.match(/DEL (.*?) AL (.*?)(?:\n|$)/i);
+            if (matchPeriod) {
+              period = `${matchPeriod[1]} al ${matchPeriod[2]}`.trim();
+            }
+
+            let totalCombustibles = 0;
+            let litrosCombustibles = 0;
+            let totalAceites = 0;
+            let ventaTotal = 0;
+            let efectivo = 0;
+            let tarjetas = 0;
+            let creditos = 0;
+            let debitos = 0;
+            let faltantes = 0;
+            let jarrasTotal = 0;
+            let subtotal = 0;
+            let ieps = 0;
+            let iva = 0;
+
+            let productos = {
+              MAGNA: { lts: 0, importe: 0 },
+              DIESEL: { lts: 0, importe: 0 },
+              PREMIUM: { lts: 0, importe: 0 }
+            };
+
+            let inCombustibles = false;
+
+            for (let r = 0; r < rows.length; r++) {
+              const row = rows[r];
+              if (!row || row.length === 0) continue;
+              const c1 = String(row[1] || '').trim();
+              const c5 = parseFloat(row[5]) || 0;
+
+              if (c1 === 'COMBUSTIBLES') inCombustibles = true;
+              
+              if (c1.includes('Total de Combustibles:')) {
+                inCombustibles = false;
+                totalCombustibles = c5;
+                litrosCombustibles = parseFloat(row[3]) || 0;
+                jarrasTotal = parseFloat(row[2]) || 0;
+              }
+
+              if (inCombustibles) {
+                const prod = c1.toUpperCase();
+                const lts = parseFloat(row[3]) || 0;
+                const imp = c5;
+                if (prod.includes('MAGNA')) {
+                  productos.MAGNA.lts += lts;
+                  productos.MAGNA.importe += imp;
+                } else if (prod.includes('DIESEL')) {
+                  productos.DIESEL.lts += lts;
+                  productos.DIESEL.importe += imp;
+                } else if (prod.includes('PREMIUM')) {
+                  productos.PREMIUM.lts += lts;
+                  productos.PREMIUM.importe += imp;
+                }
+              }
+
+              if (c1.includes('Total de Aceites y Lubricantes:')) totalAceites = c5;
+              if (c1.includes('Venta Total')) ventaTotal = c5;
+
+              // Taxes
+              if (c1.includes('Totales($):')) {
+                subtotal = parseFloat(row[2]) || 0;
+                ieps = parseFloat(row[3]) || 0;
+                iva = parseFloat(row[4]) || 0;
+              }
+
+              // Payment channels
+              if (c1 === 'EFECTIVO') efectivo = c5;
+              if (c1 === 'TARJETAS') tarjetas = c5;
+              if (c1 === 'CRÉDITOS') creditos = c5;
+              if (c1 === 'DÉBITOS') debitos = c5;
+              if (c1 === 'FALTANTES') faltantes = c5;
+            }
+
+            if (subtotal === 0 && ventaTotal > 0) {
+              subtotal = ventaTotal / 1.16;
+              iva = ventaTotal - subtotal;
+            }
+
+            const cleanId = stationName.replace(/\s+/g, '_').toUpperCase();
+            const dataFingerprint = `${cleanId}_${period}_${litrosCombustibles.toFixed(2)}_${ventaTotal.toFixed(2)}`;
+
+            const parsedStation = {
+              id: cleanId,
+              nombre: stationName,
+              periodo: period,
+              litros: litrosCombustibles,
+              jarras: jarrasTotal,
+              totalCombustibles: totalCombustibles,
+              totalAceites: totalAceites,
+              ventaTotal: ventaTotal || (totalCombustibles + totalAceites),
+              subtotal: subtotal,
+              ieps: ieps,
+              iva: iva,
+              efectivo: efectivo,
+              tarjetas: tarjetas,
+              creditos: creditos,
+              debitos: debitos,
+              faltantes: faltantes,
+              productos: productos,
+              fileFingerprint: dataFingerprint,
+              sourceFileName: file.name
+            };
+
+            resolve(parsedStation);
+          } catch (err) {
+            reject(err);
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      });
+    }
+
+    async function handleIncomingFiles(fileList) {
+      if (!fileList || fileList.length === 0) return;
+
+      let addedCount = 0;
+      let updatedCount = 0;
+      let duplicateCount = 0;
+      let logEntries = [];
+
+      for (const file of fileList) {
+        if (file.name.match(/\.xlsx?$|\.xls?$/i)) {
+          try {
+            const stObj = await parseExcelFile(file);
+            const fp = stObj.fileFingerprint;
+
+            // 1. Strict Duplicate Check
+            const isExactDuplicate = window.currentStations.some(s => s.fileFingerprint === fp || (s.id === stObj.id && Math.abs(s.ventaTotal - stObj.ventaTotal) < 0.01 && Math.abs(s.litros - stObj.litros) < 0.01));
+
+            if (isExactDuplicate) {
+              duplicateCount++;
+              logEntries.push(`
+                <div class="flex items-center justify-between text-amber-700 bg-amber-50 px-2 py-1 rounded">
+                  <span>⚠️ <strong>${stObj.nombre}</strong> (${file.name}): Reporte idéntico ignorado (Evita duplicidad).</span>
+                  <span class="text-[10px] uppercase font-bold text-amber-600">Duplicado</span>
+                </div>
+              `);
+              continue;
+            }
+
+            // 2. Update Check
+            const existingIdx = window.currentStations.findIndex(s => s.id === stObj.id || s.nombre.toLowerCase() === stObj.nombre.toLowerCase());
+
+            if (existingIdx >= 0) {
+              window.currentStations[existingIdx] = stObj;
+              processedFileHashes.add(fp);
+              updatedCount++;
+              logEntries.push(`
+                <div class="flex items-center justify-between text-blue-700 bg-blue-50 px-2 py-1 rounded">
+                  <span>🔄 <strong>${stObj.nombre}</strong>: Datos actualizados (${formatCurrency(stObj.ventaTotal)}).</span>
+                  <span class="text-[10px] uppercase font-bold text-blue-600">Actualizado</span>
+                </div>
+              `);
+            } else {
+              // 3. New Station
+              window.currentStations.push(stObj);
+              processedFileHashes.add(fp);
+              addedCount++;
+              logEntries.push(`
+                <div class="flex items-center justify-between text-emerald-700 bg-emerald-50 px-2 py-1 rounded">
+                  <span>✅ <strong>${stObj.nombre}</strong>: Nueva estación incorporada con éxito.</span>
+                  <span class="text-[10px] uppercase font-bold text-emerald-600">Agregada</span>
+                </div>
+              `);
+            }
+          } catch (err) {
+            console.error("Error al procesar archivo:", file.name, err);
+            logEntries.push(`
+              <div class="text-red-700 bg-red-50 px-2 py-1 rounded">
+                ❌ Error al procesar archivo: <strong>${file.name}</strong>
+              </div>
+            `);
+          }
+        }
+      }
+
+      // Display audit log
+      const alertEl = document.getElementById('ingestionAlert');
+      const logDetailsEl = document.getElementById('ingestionLogDetails');
+      const titleEl = document.getElementById('ingestionTitle');
+
+      if (logEntries.length > 0) {
+        logDetailsEl.innerHTML = logEntries.join('');
+        titleEl.textContent = `Auditoría de Ingesta: ${addedCount} nueva(s), ${updatedCount} actualizada(s), ${duplicateCount} duplicada(s)`;
+        alertEl.classList.remove('hidden');
+      }
+
+      if (addedCount > 0 || updatedCount > 0) {
+        // Save automatically to Cloud
+        if (window.saveStationsToCloud) {
+          window.saveStationsToCloud(window.currentStations);
+        }
+        populateStationSelect();
+        updateDashboard();
+        showBanner(`Sistema y nube actualizados: ${addedCount} estación(es) agregada(s), ${updatedCount} actualizada(s).`);
+      } else if (duplicateCount > 0) {
+        showBanner(`ℹ️ <strong>Protección anti-duplicidad activa:</strong> Los ${duplicateCount} archivo(s) ya existían con cifras idénticas y fueron omitidos.`);
+      }
+    }
+
+    function exportCurrentViewCSV() {
+      if (window.currentStations.length === 0) return;
+      let csv = "Estacion,Periodo,Litros,Combustibles,Aceites,VentaTotal,Efectivo,Tarjetas,Creditos\n";
+      window.currentStations.forEach(s => {
+        csv += `"${s.nombre}","${s.periodo}",${s.litros},${s.totalCombustibles},${s.totalAceites},${s.ventaTotal},${s.efectivo},${s.tarjetas},${s.creditos}\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `milenium_business_panel_export_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // Drag and drop event wiring
+    window.addEventListener('DOMContentLoaded', () => {
+      initData();
+
+      const fileInput = document.getElementById('fileUploadInput');
+      fileInput.addEventListener('change', (e) => handleIncomingFiles(e.target.files));
+
+      const dropZone = document.getElementById('dropZoneContainer');
+      dropZone.addEventListener('click', () => fileInput.click());
+
+      ['dragenter', 'dragover'].forEach(name => {
+        dropZone.addEventListener(name, (e) => {
+          e.preventDefault();
+          dropZone.classList.add('border-[#ff6600]', 'bg-orange-50/40');
+        });
+      });
+
+      ['dragleave', 'drop'].forEach(name => {
+        dropZone.addEventListener(name, (e) => {
+          e.preventDefault();
+          dropZone.classList.remove('border-[#ff6600]', 'bg-orange-50/40');
+        });
+      });
+
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        handleIncomingFiles(e.dataTransfer.files);
+      });
+    });
+  </script>
+</body>
+</html>
