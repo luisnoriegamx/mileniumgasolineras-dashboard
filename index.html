@@ -244,17 +244,11 @@
           <input type="file" id="fileUploadInput" multiple accept=".xlsx, .xls" class="hidden">
         </label>
 
-        <!-- Botón de Depuración y Borrado de Datos (Sólo visible para SUPER_ADMIN) -->
-        <button onclick="openPurgeDataModal()" id="btnOpenPurgeData" class="hidden flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 text-xs font-bold transition active:scale-95 shadow-sm" title="Depurar y Borrar Datos">
-          <i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-600"></i>
-          <span class="hidden md:inline">Borrado de Datos</span>
-        </button>
-
         <!-- Admin Portal Trigger Button (Visible para SUPER_ADMIN y ADMIN) -->
-        <button onclick="openAdminModal()" id="btnOpenAdmin" class="hidden flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold shadow-sm transition active:scale-95">
-          <i data-lucide="shield" class="w-3.5 h-3.5 text-[#ff6600]"></i>
-          <span class="hidden md:inline">Panel Admin</span>
-          <span class="text-[10px] bg-[#ff6600] px-1.5 py-0.2 rounded-full font-mono text-white" id="usersCountBadge">1</span>
+        <button onclick="openAdminModal('users')" id="btnOpenAdmin" class="hidden flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold shadow-sm transition active:scale-95 border border-slate-700">
+          <i data-lucide="shield" class="w-4 h-4 text-[#ff6600]"></i>
+          <span class="hidden md:inline font-sans font-bold">Panel Admin</span>
+          <span class="text-[10px] bg-[#ff6600] px-2 py-0.5 rounded-full font-mono font-black text-white" id="usersCountBadge">1</span>
         </button>
 
         <!-- Current User Profile & Sign Out Dropdown -->
@@ -286,6 +280,18 @@
                 </div>
                 <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
               </div>
+            </div>
+
+            <!-- Accesos rápidos directos para Super Admin dentro del perfil -->
+            <div id="superAdminShortcuts" class="pt-1 border-t border-slate-100 space-y-1">
+              <button onclick="toggleUserDropdown(); openAdminModal('users')" class="w-full flex items-center gap-2 p-2 rounded-xl hover:bg-slate-50 text-slate-700 font-semibold text-[11px] transition">
+                <i data-lucide="users" class="w-3.5 h-3.5 text-[#ff6600]"></i>
+                <span>Gestionar Usuarios</span>
+              </button>
+              <button onclick="toggleUserDropdown(); openAdminModal('purge')" class="w-full flex items-center gap-2 p-2 rounded-xl hover:bg-rose-50 text-rose-700 font-semibold text-[11px] transition">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-600"></i>
+                <span>Borrado & Depuración de Datos</span>
+              </button>
             </div>
 
             <div class="pt-2 border-t border-slate-100">
@@ -748,146 +754,314 @@
 
   </main>
 
-  <!-- Admin Modal: User Management & Platform Permissions -->
-  <div id="adminModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-    <div class="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden border border-slate-200 shadow-2xl flex flex-col">
+  <!-- ==================== PANEL DE ADMINISTRACIÓN INTEGRADO (TABBED ADMIN CENTER) ==================== -->
+  <div id="adminModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/75 backdrop-blur-md">
+    <div class="bg-white rounded-3xl max-w-5xl w-full max-h-[94vh] flex flex-col border border-slate-200 shadow-2xl overflow-hidden transition-all">
       
-      <!-- Modal Header -->
-      <div class="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50/80">
+      <!-- Modal Header con Pestañas -->
+      <div class="px-5 sm:px-7 pt-5 pb-3 border-b border-slate-200 bg-slate-50/90 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-black text-[#ff6600] flex items-center justify-center font-bold">
+          <div class="w-10 h-10 rounded-2xl bg-slate-900 text-[#ff6600] flex items-center justify-center font-bold shadow-md shrink-0">
             <i data-lucide="shield" class="w-5 h-5"></i>
           </div>
           <div>
-            <h3 class="font-extrabold text-base text-slate-900">Panel de Administración de Usuarios</h3>
-            <p class="text-xs text-slate-500">Gestión de accesos, credenciales y permisos por rol corporativo</p>
+            <div class="flex items-center gap-2">
+              <h3 class="font-black text-base sm:text-lg text-slate-900 tracking-tight">Panel de Administración Milenium</h3>
+              <span id="adminSuperBadge" class="hidden text-[10px] px-2 py-0.5 rounded-full font-mono font-black bg-black text-[#ff6600] border border-slate-800">SUPER ADMIN</span>
+            </div>
+            <p class="text-xs text-slate-500 font-medium">Control de accesos, credenciales y depuración en tiempo real</p>
           </div>
         </div>
-        <button onclick="closeAdminModal()" class="p-2 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition">
+
+        <button onclick="closeAdminModal()" class="self-end sm:self-center p-2 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-white border border-transparent hover:border-slate-200 transition">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
-      <!-- Modal Body (Two-column layout: Form + User List) -->
-      <div class="p-6 overflow-y-auto flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        <!-- Form: Create / Edit User (5 cols) -->
-        <div class="lg:col-span-5 bg-slate-50/70 p-5 rounded-2xl border border-slate-200 space-y-4">
-          <div class="flex items-center justify-between">
-            <h4 class="font-extrabold text-xs uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-              <i data-lucide="user-plus" class="w-4 h-4 text-[#ff6600]"></i>
-              <span id="formUserTitle">Dar de Alta Usuario</span>
-            </h4>
-            <span class="text-[10px] text-slate-400 font-mono">Control de Acceso</span>
+      <!-- Barra de Pestañas de Navegación del Panel Admin -->
+      <div class="px-5 sm:px-7 py-2.5 bg-slate-100/70 border-b border-slate-200 flex flex-wrap items-center gap-2 text-xs">
+        <button type="button" onclick="switchAdminTab('users')" id="adminTabBtn-users" class="admin-nav-tab flex items-center gap-2 px-4 py-2 rounded-xl font-bold bg-white text-slate-900 shadow-sm border border-slate-200 transition">
+          <i data-lucide="users" class="w-4 h-4 text-[#ff6600]"></i>
+          <span>Gestión de Usuarios</span>
+          <span id="tabUserCounterBadge" class="px-1.5 py-0.2 rounded-full bg-slate-100 text-slate-700 font-mono text-[10px]">1</span>
+        </button>
+        <button type="button" onclick="switchAdminTab('purge')" id="adminTabBtn-purge" class="admin-nav-tab flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-slate-600 hover:text-rose-700 hover:bg-rose-50 transition border border-transparent">
+          <i data-lucide="trash-2" class="w-4 h-4 text-rose-600"></i>
+          <span>Depuración & Borrado de Datos</span>
+          <span class="px-1.5 py-0.2 rounded bg-rose-100 text-rose-700 font-mono text-[9px] font-black uppercase">Exclusivo</span>
+        </button>
+        <button type="button" onclick="switchAdminTab('firebase')" id="adminTabBtn-firebase" class="admin-nav-tab hidden flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-slate-600 hover:text-slate-900 hover:bg-white transition border border-transparent">
+          <i data-lucide="database" class="w-4 h-4 text-[#ff6600]"></i>
+          <span>Estado Firebase Cloud</span>
+        </button>
+      </div>
+
+      <!-- Contenedor Principal con Scroll Limpio (Sin Cortes) -->
+      <div class="flex-1 overflow-y-auto p-5 sm:p-7 space-y-6">
+
+        <!-- ================= PESTAÑA 1: GESTIÓN DE USUARIOS ================= -->
+        <div id="adminPanelSection-users" class="space-y-6">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- Columna Formulario: Alta / Edición de Usuario (5 cols) -->
+            <div class="lg:col-span-5 bg-slate-50/80 p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+              <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+                <h4 class="font-extrabold text-xs uppercase tracking-wider text-slate-800 flex items-center gap-2">
+                  <i data-lucide="user-plus" class="w-4 h-4 text-[#ff6600]"></i>
+                  <span id="formUserTitle">Dar de Alta Usuario</span>
+                </h4>
+                <button type="button" onclick="resetUserForm()" class="text-[11px] font-bold text-slate-500 hover:text-black">
+                  Limpiar
+                </button>
+              </div>
+
+              <form id="userForm" onsubmit="handleUserFormSubmit(event)" class="space-y-3 text-xs">
+                <input type="hidden" id="editUserId" value="">
+
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">Nombre Completo</label>
+                  <input type="text" id="inputUserName" required placeholder="Ej. Lic. Carlos Garza" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-medium focus:outline-none focus:border-[#ff6600]">
+                </div>
+
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">Nombre de Usuario (Para Iniciar Sesión)</label>
+                  <input type="text" id="inputUserLogin" required placeholder="carlos.garza" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-medium focus:outline-none focus:border-[#ff6600]">
+                </div>
+
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">Contraseña de Acceso</label>
+                  <input type="text" id="inputUserPassword" required placeholder="••••••••" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-medium focus:outline-none focus:border-[#ff6600]">
+                  <span class="text-[10px] text-slate-400">Contraseña que usará para ingresar a la plataforma</span>
+                </div>
+
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">Correo Electrónico Corporativo</label>
+                  <input type="email" id="inputUserEmail" required placeholder="carlos.garza@grupomilenium.mx" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-medium focus:outline-none focus:border-[#ff6600]">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">Rol</label>
+                    <select id="inputUserRole" class="w-full bg-white border border-slate-300 rounded-xl px-2.5 py-2 text-slate-900 font-semibold focus:outline-none focus:border-[#ff6600]">
+                      <option value="CEO">👑 CEO / Dirección</option>
+                      <option value="ADMIN">🛡️ Administrador</option>
+                      <option value="OPERADOR">⛽ Operador Carga</option>
+                      <option value="AUDITOR">📊 Auditor Fiscal</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1">Estación</label>
+                    <select id="inputUserStation" class="w-full bg-white border border-slate-300 rounded-xl px-2.5 py-2 text-slate-900 font-semibold focus:outline-none focus:border-[#ff6600]">
+                      <option value="ALL">🌐 Todas (Red)</option>
+                      <option value="GUADALUPE">⛽ Guadalupe</option>
+                      <option value="REYNOSA">⛽ Reynosa</option>
+                      <option value="STO_DOMINGO">⛽ Sto Domingo</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">Estado de la Cuenta</label>
+                  <select id="inputUserStatus" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold focus:outline-none focus:border-[#ff6600]">
+                    <option value="ACTIVO">✅ Activo (Acceso Permitido)</option>
+                    <option value="SUSPENDIDO">⛔ Suspendido (Bloqueado)</option>
+                  </select>
+                </div>
+
+                <div class="pt-2 flex items-center gap-2">
+                  <button type="submit" class="flex-1 py-2.5 rounded-xl orange-glow-btn font-extrabold text-xs active:scale-95 shadow-md flex items-center justify-center gap-2">
+                    <i data-lucide="check" class="w-4 h-4"></i>
+                    <span>Guardar Usuario</span>
+                  </button>
+                  <button type="button" onclick="resetUserForm()" class="px-3.5 py-2.5 rounded-xl bg-white border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-100">
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Columna Lista de Usuarios: Tabla Completa Responsiva (7 cols) -->
+            <div class="lg:col-span-7 space-y-3">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h4 class="font-extrabold text-xs uppercase tracking-wider text-slate-800 flex items-center gap-2">
+                    <i data-lucide="users" class="w-4 h-4 text-[#ff6600]"></i>
+                    Usuarios Registrados en Firestore
+                  </h4>
+                  <p class="text-[11px] text-slate-400">Edita, suspende o elimina usuarios con sincronización en la nube</p>
+                </div>
+                <span class="text-xs font-mono font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200" id="tableUserCount">1 usuario</span>
+              </div>
+
+              <!-- Tabla de Usuarios con Scroll Horizontal y Vertical Independiente -->
+              <div class="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-sm max-h-[460px] overflow-y-auto">
+                <div class="overflow-x-auto min-w-full">
+                  <table class="w-full text-left text-xs">
+                    <thead class="bg-slate-100 text-slate-600 uppercase font-black tracking-wider border-b border-slate-200 sticky top-0 z-10">
+                      <tr>
+                        <th class="py-3 px-3">Usuario / Nombre</th>
+                        <th class="py-3 px-3">Rol</th>
+                        <th class="py-3 px-3">Estación</th>
+                        <th class="py-3 px-3 text-center">Estado</th>
+                        <th class="py-3 px-3 text-center">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody id="adminUserTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium">
+                      <!-- Filas de usuarios renderizadas dinámicamente -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Alerta Informativa de Persistencia -->
+              <div class="p-3 bg-orange-50/70 rounded-xl border border-orange-200 text-[11px] text-slate-700 flex items-start gap-2.5">
+                <i data-lucide="shield-check" class="w-4 h-4 text-[#ff6600] shrink-0 mt-0.5"></i>
+                <p class="leading-relaxed">
+                  <strong>Control Centralizado:</strong> Los cambios de usuarios se sincronizan al instante en el proyecto Firebase <strong>mileniumdbestaciones</strong>. La cuenta de Super Administrador <strong>lnoriega</strong> está protegida contra borrado o bloqueo.
+                </p>
+              </div>
+            </div>
+
           </div>
-
-          <form id="userForm" onsubmit="handleUserFormSubmit(event)" class="space-y-3 text-xs">
-            <input type="hidden" id="editUserId" value="">
-
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Nombre Completo</label>
-              <input type="text" id="inputUserName" required placeholder="Ej. Lic. Carlos Garza" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-medium focus:outline-none focus:border-[#ff6600]">
-            </div>
-
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Nombre de Usuario (Para Iniciar Sesión)</label>
-              <input type="text" id="inputUserLogin" required placeholder="carlos.garza" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-medium focus:outline-none focus:border-[#ff6600]">
-            </div>
-
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Contraseña de Acceso</label>
-              <input type="password" id="inputUserPassword" required placeholder="••••••••" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-medium focus:outline-none focus:border-[#ff6600]">
-              <span class="text-[10px] text-slate-400">Contraseña que usará para ingresar al sistema</span>
-            </div>
-
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Correo Electrónico (Notificaciones)</label>
-              <input type="email" id="inputUserEmail" required placeholder="carlos.garza@grupomilenium.mx" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-medium focus:outline-none focus:border-[#ff6600]">
-            </div>
-
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Rol en la Plataforma</label>
-              <select id="inputUserRole" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold focus:outline-none focus:border-[#ff6600]">
-                <option value="CEO">👑 CEO / Dirección General (Lectura Total & KPIs)</option>
-                <option value="ADMIN">🛡️ Administrador (Gestión Total & Usuarios)</option>
-                <option value="OPERADOR">⛽ Operador de Estación (Carga de Excel)</option>
-                <option value="AUDITOR">📊 Auditor Fiscal / Finanzas (Lectura & Exportación)</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Estación Asignada</label>
-              <select id="inputUserStation" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold focus:outline-none focus:border-[#ff6600]">
-                <option value="ALL">🌐 Todas las Estaciones (Red Global)</option>
-                <option value="GUADALUPE">⛽ Guadalupe</option>
-                <option value="REYNOSA">⛽ Reynosa</option>
-                <option value="STO_DOMINGO">⛽ Sto Domingo</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Estado de la Cuenta</label>
-              <select id="inputUserStatus" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold focus:outline-none focus:border-[#ff6600]">
-                <option value="ACTIVO">✅ Activo (Acceso Permitido)</option>
-                <option value="SUSPENDIDO">⛔ Suspendido (Bloqueado)</option>
-              </select>
-            </div>
-
-            <div class="pt-2 flex items-center gap-2">
-              <button type="submit" class="flex-1 py-2.5 rounded-xl orange-glow-btn font-extrabold text-xs active:scale-95 shadow-sm">
-                Guardar Usuario
-              </button>
-              <button type="button" onclick="resetUserForm()" class="px-3 py-2.5 rounded-xl bg-white border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-100">
-                Limpiar
-              </button>
-            </div>
-          </form>
         </div>
 
-        <!-- User List & Roles Table (7 cols) -->
-        <div class="lg:col-span-7 flex flex-col space-y-3">
-          <div class="flex items-center justify-between">
-            <h4 class="font-extrabold text-xs uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-              <i data-lucide="users" class="w-4 h-4 text-[#ff6600]"></i>
-              Usuarios Registrados en el Sistema
-            </h4>
-            <span class="text-[11px] font-mono text-slate-500 font-semibold" id="tableUserCount">1 usuario</span>
+        <!-- ================= PESTAÑA 2: DEPURACIÓN & BORRADO DE DATOS ================= -->
+        <div id="adminPanelSection-purge" class="hidden space-y-5">
+          
+          <div class="p-4 bg-rose-50 border border-rose-200 rounded-2xl flex items-start justify-between gap-3 text-rose-900">
+            <div class="flex items-start gap-3">
+              <div class="w-9 h-9 rounded-xl bg-rose-600 text-white flex items-center justify-center shrink-0 shadow-sm shadow-rose-600/30">
+                <i data-lucide="trash-2" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h4 class="font-extrabold text-sm text-slate-900">Centro de Depuración y Borrado de Información</h4>
+                <p class="text-[11px] text-rose-700 leading-relaxed mt-0.5">
+                  Esta sección permite eliminar reportes y cortes en la nube de forma granular (por estación, por mes/periodo, por archivo o reset completo). <strong>Requiere rol de Super Administrador</strong>.
+                </p>
+              </div>
+            </div>
+            <span class="text-[10px] px-2.5 py-1 rounded-full font-mono font-bold bg-rose-200/80 text-rose-900 border border-rose-300 shrink-0">SUPER ADMIN</span>
           </div>
 
-          <div class="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-sm flex-1 max-h-96 overflow-y-auto">
-            <table class="w-full text-left text-xs">
-              <thead class="bg-slate-100 text-slate-600 uppercase font-black tracking-wider border-b border-slate-200 sticky top-0">
-                <tr>
-                  <th class="py-2.5 px-3">Usuario</th>
-                  <th class="py-2.5 px-3">Rol</th>
-                  <th class="py-2.5 px-3">Estación</th>
-                  <th class="py-2.5 px-3 text-center">Estado</th>
-                  <th class="py-2.5 px-3 text-center">Acciones</th>
-                </tr>
-              </thead>
-              <tbody id="adminUserTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium">
-                <!-- User rows rendered dynamically -->
-              </tbody>
-            </table>
+          <!-- Selector de Criterio de Eliminación -->
+          <div class="space-y-2">
+            <label class="block font-bold text-slate-800 uppercase tracking-wider text-[11px]">1. Selecciona el Criterio de Borrado:</label>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              <button type="button" onclick="setPurgeMode('ALL')" id="purgeTab-ALL" class="purge-tab-btn p-3 rounded-xl border border-rose-600 bg-rose-600 text-white font-bold text-center transition shadow-sm">
+                <i data-lucide="alert-octagon" class="w-4 h-4 mx-auto mb-1"></i>
+                <span class="block text-xs">Borrar Todo (Reset)</span>
+              </button>
+              <button type="button" onclick="setPurgeMode('STATION')" id="purgeTab-STATION" class="purge-tab-btn p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-center transition">
+                <i data-lucide="fuel" class="w-4 h-4 mx-auto mb-1 text-[#ff6600]"></i>
+                <span class="block text-xs">Por Estación</span>
+              </button>
+              <button type="button" onclick="setPurgeMode('PERIOD')" id="purgeTab-PERIOD" class="purge-tab-btn p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-center transition">
+                <i data-lucide="calendar" class="w-4 h-4 mx-auto mb-1 text-blue-600"></i>
+                <span class="block text-xs">Por Mes / Periodo</span>
+              </button>
+              <button type="button" onclick="setPurgeMode('FILE')" id="purgeTab-FILE" class="purge-tab-btn p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-center transition">
+                <i data-lucide="file-spreadsheet" class="w-4 h-4 mx-auto mb-1 text-emerald-600"></i>
+                <span class="block text-xs">Por Archivo Individual</span>
+              </button>
+            </div>
           </div>
 
-          <div class="p-3 bg-orange-50/60 rounded-xl border border-orange-200 text-[11px] text-slate-600 flex items-start gap-2">
-            <i data-lucide="info" class="w-4 h-4 text-[#ff6600] shrink-0 mt-0.5"></i>
-            <p>
-              <strong>Persistencia Activa:</strong> Los usuarios creados se guardan en Firebase Firestore. Solo los usuarios activos registrados con su usuario y contraseña podrán ingresar a la plataforma.
+          <!-- Vista Dinámica 1: Borrar Todo -->
+          <div id="purgeView-ALL" class="p-4 rounded-2xl bg-rose-50/70 border border-rose-200 space-y-2">
+            <h5 class="font-extrabold text-xs uppercase tracking-wider text-rose-900 flex items-center gap-2">
+              <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-600"></i>
+              Opción A: Reset Total de la Plataforma
+            </h5>
+            <p class="text-xs text-rose-800 leading-relaxed">
+              Eliminará <strong>todas las estaciones, reportes cargados y cortes acumulados</strong> de Firestore. El tablero quedará completamente en ceros y listo para recibir un nuevo ciclo de archivos Excel.
             </p>
+            <div class="pt-2 text-xs font-mono font-bold text-slate-700">
+              Registros activos a eliminar: <span id="purgeAllCountBadge" class="text-rose-600 font-black">0</span>
+            </div>
+          </div>
+
+          <!-- Vista Dinámica 2: Borrar por Estación -->
+          <div id="purgeView-STATION" class="hidden p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+            <label class="block font-bold text-slate-800 text-xs">Selecciona la estación que deseas eliminar:</label>
+            <select id="purgeStationSelect" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold focus:outline-none focus:border-rose-500 text-xs">
+              <!-- Opciones dinámicas -->
+            </select>
+            <p class="text-[11px] text-slate-500">
+              Se eliminarán únicamente los reportes correspondientes a la sucursal elegida, conservando intactas las demás estaciones.
+            </p>
+          </div>
+
+          <!-- Vista Dinámica 3: Borrar por Mes / Periodo -->
+          <div id="purgeView-PERIOD" class="hidden p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+            <label class="block font-bold text-slate-800 text-xs">Selecciona el periodo o mes a depurar:</label>
+            <select id="purgePeriodSelect" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold focus:outline-none focus:border-rose-500 text-xs">
+              <!-- Periodos detectados -->
+            </select>
+            <p class="text-[11px] text-slate-500">
+              Se eliminarán todas las estaciones y cortes que coincidan con la fecha o periodo de corte seleccionado.
+            </p>
+          </div>
+
+          <!-- Vista Dinámica 4: Borrar por Archivo Específico -->
+          <div id="purgeView-FILE" class="hidden p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+            <label class="block font-bold text-slate-800 text-xs">Selecciona el reporte individual a eliminar:</label>
+            <select id="purgeFileSelect" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold focus:outline-none focus:border-rose-500 text-xs">
+              <!-- Lista de archivos -->
+            </select>
+            <p class="text-[11px] text-slate-500">
+              Elimina un corte o archivo particular que haya sido cargado con errores sin afectar el resto del sistema.
+            </p>
+          </div>
+
+          <!-- Confirmación de Seguridad Obligatoria -->
+          <div class="p-4 bg-slate-100 rounded-2xl border border-slate-300 space-y-2">
+            <label class="block font-bold text-slate-800 text-xs">
+              2. Para autorizar la operación, escribe <span class="font-mono text-rose-600 font-black px-1.5 py-0.5 rounded bg-rose-100">BORRAR</span> en el campo:
+            </label>
+            <div class="flex flex-col sm:flex-row gap-2">
+              <input type="text" id="purgeConfirmKeywordInput" placeholder="Escribe BORRAR aquí" class="flex-1 bg-white border border-slate-300 rounded-xl px-3.5 py-2.5 text-slate-900 font-bold focus:outline-none focus:border-rose-600 text-xs uppercase tracking-wider">
+              <button type="button" onclick="executePurgeAction()" class="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs shadow-md shadow-rose-600/30 flex items-center justify-center gap-2 active:scale-95 transition">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                <span>Confirmar y Ejecutar Borrado</span>
+              </button>
+            </div>
+            <p id="purgeValidationMsg" class="hidden text-xs text-rose-600 font-bold flex items-center gap-1.5 pt-1">
+              <i data-lucide="alert-circle" class="w-4 h-4"></i>
+              <span>Debes escribir exactamente la palabra BORRAR para autorizar la eliminación.</span>
+            </p>
+          </div>
+
+        </div>
+
+        <!-- ================= PESTAÑA 3: CONFIGURACIÓN FIREBASE (SUPER ADMIN) ================= -->
+        <div id="adminPanelSection-firebase" class="hidden space-y-4">
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 text-xs">
+            <div class="flex items-center gap-2 text-slate-900 font-extrabold text-sm">
+              <i data-lucide="database" class="w-4 h-4 text-[#ff6600]"></i>
+              <span>Conexión Activa de Firebase Firestore</span>
+            </div>
+            <p class="text-slate-600 leading-relaxed">
+              El panel está sincronizado directamente con el proyecto en la nube <strong>mileniumdbestaciones</strong>. Cualquier nuevo usuario o reporte subido se almacena aquí de forma persistente.
+            </p>
+            <div class="p-3 bg-white rounded-xl border border-slate-200 font-mono text-[11px] text-slate-700 space-y-1">
+              <div><strong>Proyecto:</strong> mileniumdbestaciones</div>
+              <div><strong>Auth Domain:</strong> mileniumdbestaciones.firebaseapp.com</div>
+              <div><strong>Colección Estaciones:</strong> /artifacts/milenium-gas-dashboard/public/data/stations_summary/current</div>
+              <div><strong>Colección Usuarios:</strong> /artifacts/milenium-gas-dashboard/public/data/platform_users/current</div>
+            </div>
           </div>
         </div>
 
       </div>
 
       <!-- Modal Footer -->
-      <div class="p-4 border-t border-slate-200 flex justify-between items-center bg-slate-50">
-        <p class="text-[11px] text-slate-500 font-mono">
-          Ambiente: Multi-Tenant Seguro &bull; Milenium Security Layer
+      <div class="px-5 sm:px-7 py-3.5 border-t border-slate-200 bg-slate-50 flex flex-wrap justify-between items-center gap-2 text-xs">
+        <p class="text-[11px] text-slate-500 font-mono flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 status-pulse"></span> Sincronizado en tiempo real con Firebase
         </p>
-        <button onclick="closeAdminModal()" class="px-4 py-2 bg-slate-900 hover:bg-black text-white font-bold text-xs rounded-xl shadow-sm">
-          Cerrar
+        <button onclick="closeAdminModal()" class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-black text-white font-bold text-xs shadow-sm transition">
+          Cerrar Panel
         </button>
       </div>
 
@@ -1051,195 +1225,98 @@
     };
   </script>
 
-  <!-- ==================== MODAL DE DEPURACIÓN Y BORRADO DE DATOS (EXCLUSIVO SUPER_ADMIN) ==================== -->
-  <div id="purgeDataModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
-    <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-hidden border border-slate-200 shadow-2xl flex flex-col">
-      
-      <!-- Modal Header -->
-      <div class="p-5 sm:p-6 border-b border-slate-200 flex items-center justify-between bg-rose-50/60">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-rose-600 text-white flex items-center justify-center shadow-md shadow-rose-600/20">
-            <i data-lucide="trash-2" class="w-5 h-5"></i>
-          </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <h3 class="font-extrabold text-base text-slate-900">Depuración y Borrado de Información</h3>
-              <span class="text-[10px] px-2 py-0.5 rounded-full font-mono font-bold bg-rose-100 text-rose-700 border border-rose-200">SUPER ADMIN</span>
-            </div>
-            <p class="text-xs text-slate-500">Gestión granular de eliminación con sincronización inmediata en Firebase</p>
-          </div>
-        </div>
-        <button onclick="closePurgeDataModal()" class="p-2 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-white transition">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-
-      <!-- Modal Body -->
-      <div class="p-6 overflow-y-auto flex-1 space-y-5 text-xs">
-        
-        <!-- Alerta de Advertencia -->
-        <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-2.5 text-amber-900">
-          <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600 shrink-0 mt-0.5"></i>
-          <p class="text-[11px] leading-relaxed">
-            <strong>Atención:</strong> Las operaciones de borrado son irreversibles. Al confirmar, los registros seleccionados se eliminarán inmediatamente de esta pantalla y de la base de datos de <strong>Firebase Firestore</strong> en todos los dispositivos conectados.
-          </p>
-        </div>
-
-        <!-- Selector de Tipo de Borrado -->
-        <div class="space-y-2">
-          <label class="block font-bold text-slate-800 uppercase tracking-wider text-[11px]">Selecciona el Criterio de Borrado:</label>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            <button type="button" onclick="setPurgeMode('ALL')" id="purgeTab-ALL" class="purge-tab-btn p-2.5 rounded-xl border border-rose-600 bg-rose-600 text-white font-bold text-center transition">
-              <i data-lucide="alert-octagon" class="w-4 h-4 mx-auto mb-1"></i>
-              <span>Borrar Todo</span>
-            </button>
-            <button type="button" onclick="setPurgeMode('STATION')" id="purgeTab-STATION" class="purge-tab-btn p-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-center transition">
-              <i data-lucide="fuel" class="w-4 h-4 mx-auto mb-1 text-[#ff6600]"></i>
-              <span>Por Estación</span>
-            </button>
-            <button type="button" onclick="setPurgeMode('PERIOD')" id="purgeTab-PERIOD" class="purge-tab-btn p-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-center transition">
-              <i data-lucide="calendar" class="w-4 h-4 mx-auto mb-1 text-blue-600"></i>
-              <span>Por Mes / Periodo</span>
-            </button>
-            <button type="button" onclick="setPurgeMode('FILE')" id="purgeTab-FILE" class="purge-tab-btn p-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-center transition">
-              <i data-lucide="file-spreadsheet" class="w-4 h-4 mx-auto mb-1 text-emerald-600"></i>
-              <span>Por Archivo</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Vista Dinámica 1: Borrar Todo -->
-        <div id="purgeView-ALL" class="p-4 rounded-2xl bg-rose-50/70 border border-rose-200 space-y-2">
-          <h4 class="font-extrabold text-sm text-rose-900 flex items-center gap-2">
-            <i data-lucide="trash" class="w-4 h-4 text-rose-600"></i>
-            Reset Completo de Toda la Información
-          </h4>
-          <p class="text-[11px] text-rose-700 leading-relaxed">
-            Esta opción eliminará <strong>todas las estaciones, reportes cargados y cortes acumulados</strong>. El tablero quedará completamente en ceros y listo para recibir un nuevo ciclo de archivos Excel.
-          </p>
-          <div class="pt-2 text-[11px] font-mono font-bold text-slate-600">
-            Estaciones actuales en la nube: <span id="purgeAllCountBadge" class="text-rose-600 font-black">0</span>
-          </div>
-        </div>
-
-        <!-- Vista Dinámica 2: Borrar por Estación -->
-        <div id="purgeView-STATION" class="hidden p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-          <div>
-            <label class="block font-bold text-slate-800 mb-1">Selecciona la estación que deseas eliminar:</label>
-            <select id="purgeStationSelect" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold focus:outline-none focus:border-rose-500">
-              <!-- Opciones dinámicas -->
-            </select>
-          </div>
-          <p class="text-[11px] text-slate-500">
-            Se eliminarán únicamente los reportes correspondientes a la sucursal elegida, conservando intactas las demás estaciones.
-          </p>
-        </div>
-
-        <!-- Vista Dinámica 3: Borrar por Mes / Periodo -->
-        <div id="purgeView-PERIOD" class="hidden p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-          <div>
-            <label class="block font-bold text-slate-800 mb-1">Selecciona el periodo o mes a depurar:</label>
-            <select id="purgePeriodSelect" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold focus:outline-none focus:border-rose-500">
-              <!-- Periodos detectados -->
-            </select>
-          </div>
-          <p class="text-[11px] text-slate-500">
-            Se eliminarán todas las estaciones y cortes que coincidan con la fecha o periodo de corte seleccionado.
-          </p>
-        </div>
-
-        <!-- Vista Dinámica 4: Borrar por Archivo Específico -->
-        <div id="purgeView-FILE" class="hidden p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-          <div>
-            <label class="block font-bold text-slate-800 mb-1">Selecciona el reporte individual a eliminar:</label>
-            <select id="purgeFileSelect" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold focus:outline-none focus:border-rose-500">
-              <!-- Lista de archivos -->
-            </select>
-          </div>
-          <p class="text-[11px] text-slate-500">
-            Elimina un corte o archivo particular que haya sido cargado con errores sin afectar el resto del sistema.
-          </p>
-        </div>
-
-        <!-- Campo de Confirmación de Seguridad -->
-        <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
-          <label class="block font-bold text-slate-700 text-[11px]">
-            Para autorizar la operación, escribe <span class="font-mono text-rose-600 font-extrabold">BORRAR</span> en el campo:
-          </label>
-          <input type="text" id="purgeConfirmKeywordInput" placeholder="Escribe BORRAR" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-bold focus:outline-none focus:border-rose-600 text-xs">
-          <p id="purgeValidationMsg" class="hidden text-[11px] text-rose-600 font-semibold flex items-center gap-1">
-            <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i>
-            <span>Debes escribir la palabra exacta BORRAR para confirmar.</span>
-          </p>
-        </div>
-
-      </div>
-
-      <!-- Modal Footer -->
-      <div class="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
-        <button type="button" onclick="closePurgeDataModal()" class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-100 transition">
-          Cancelar
-        </button>
-        <button type="button" onclick="executePurgeAction()" class="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs shadow-md shadow-rose-600/30 flex items-center gap-2 active:scale-95 transition">
-          <i data-lucide="trash-2" class="w-4 h-4"></i>
-          <span>Confirmar y Ejecutar Borrado</span>
-        </button>
-      </div>
-
-    </div>
-  </div>
-
+  <!-- ==================== LÓGICA DEL PANEL ADMIN Y DEPURACIÓN ==================== -->
   <script>
-    // Variable para controlar el criterio de borrado activo
+    // Control de pestañas del Panel Admin
+    let currentAdminTab = 'users';
     let currentPurgeMode = 'ALL';
 
-    function openPurgeDataModal() {
-      if (!window.activeUser || window.activeUser.rol !== 'SUPER_ADMIN') {
-        showBanner("⛔ Acceso restringido. Esta función es de uso exclusivo del Super Administrador.");
+    function openAdminModal(tabName = 'users') {
+      if (!window.activeUser || (window.activeUser.rol !== 'SUPER_ADMIN' && window.activeUser.rol !== 'ADMIN')) {
+        showBanner("⛔ Acceso reservado exclusivamente para administradores.");
         return;
       }
 
-      const modal = document.getElementById('purgeDataModal');
-      const confirmInput = document.getElementById('purgeConfirmKeywordInput');
-      const valMsg = document.getElementById('purgeValidationMsg');
-      if (confirmInput) confirmInput.value = '';
-      if (valMsg) valMsg.classList.add('hidden');
+      const modal = document.getElementById('adminModal');
+      const isSuper = window.activeUser.rol === 'SUPER_ADMIN';
 
-      // Actualizar opciones de borrado
+      // Mostrar/ocultar elementos según sea Super Admin o Admin
+      const superBadge = document.getElementById('adminSuperBadge');
+      if (superBadge) superBadge.classList.toggle('hidden', !isSuper);
+
+      const purgeTabBtn = document.getElementById('adminTabBtn-purge');
+      if (purgeTabBtn) purgeTabBtn.classList.toggle('hidden', !isSuper);
+
+      const firebaseTabBtn = document.getElementById('adminTabBtn-firebase');
+      if (firebaseTabBtn) firebaseTabBtn.classList.toggle('hidden', !isSuper);
+
+      // Si no es super admin y pide purge, enviarlo a users
+      const targetTab = (!isSuper && tabName === 'purge') ? 'users' : tabName;
+
+      switchAdminTab(targetTab);
       populatePurgeSelectors();
-      setPurgeMode('ALL');
+      renderAdminUsersTable();
 
       modal.classList.remove('hidden');
-      lucide.createIcons();
+      if (window.lucide) lucide.createIcons();
     }
 
-    function closePurgeDataModal() {
-      const modal = document.getElementById('purgeDataModal');
+    function closeAdminModal() {
+      const modal = document.getElementById('adminModal');
       if (modal) modal.classList.add('hidden');
+      resetUserForm();
+    }
+
+    function switchAdminTab(tab) {
+      currentAdminTab = tab;
+      const tabs = ['users', 'purge', 'firebase'];
+
+      tabs.forEach(t => {
+        const btn = document.getElementById(`adminTabBtn-${t}`);
+        const sec = document.getElementById(`adminPanelSection-${t}`);
+
+        if (btn) {
+          if (t === tab) {
+            btn.className = t === 'purge' 
+              ? 'admin-nav-tab flex items-center gap-2 px-4 py-2 rounded-xl font-bold bg-rose-600 text-white shadow-sm transition border border-rose-600'
+              : 'admin-nav-tab flex items-center gap-2 px-4 py-2 rounded-xl font-bold bg-white text-slate-900 shadow-sm border border-slate-200 transition';
+          } else {
+            btn.className = t === 'purge'
+              ? 'admin-nav-tab flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-slate-600 hover:text-rose-700 hover:bg-rose-50 transition border border-transparent'
+              : 'admin-nav-tab flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-slate-600 hover:text-slate-900 hover:bg-white transition border border-transparent';
+          }
+        }
+
+        if (sec) {
+          sec.classList.toggle('hidden', t !== tab);
+        }
+      });
+
+      if (window.lucide) lucide.createIcons();
     }
 
     function setPurgeMode(mode) {
       currentPurgeMode = mode;
-      // Actualizar pestañas
       document.querySelectorAll('.purge-tab-btn').forEach(b => {
-        b.className = 'purge-tab-btn p-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-center transition';
+        b.className = 'purge-tab-btn p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-center transition';
       });
       const activeBtn = document.getElementById(`purgeTab-${mode}`);
       if (activeBtn) {
-        activeBtn.className = 'purge-tab-btn p-2.5 rounded-xl border border-rose-600 bg-rose-600 text-white font-bold text-center transition';
+        activeBtn.className = 'purge-tab-btn p-3 rounded-xl border border-rose-600 bg-rose-600 text-white font-bold text-center transition shadow-sm';
       }
 
-      // Ocultar todas las vistas y mostrar la seleccionada
       ['ALL', 'STATION', 'PERIOD', 'FILE'].forEach(m => {
         const v = document.getElementById(`purgeView-${m}`);
         if (v) v.classList.toggle('hidden', m !== mode);
       });
+
+      if (window.lucide) lucide.createIcons();
     }
 
     function populatePurgeSelectors() {
       const stations = window.currentStations || [];
       const allCountBadge = document.getElementById('purgeAllCountBadge');
-      if (allCountBadge) allCountBadge.textContent = `${stations.length} registro(s)`;
+      if (allCountBadge) allCountBadge.textContent = `${stations.length} estación(es) activa(s)`;
 
       // 1. Selector de Estaciones
       const stSelect = document.getElementById('purgeStationSelect');
@@ -1251,7 +1328,7 @@
           stations.forEach(s => {
             const opt = document.createElement('option');
             opt.value = s.id;
-            opt.textContent = `⛽ ${s.nombre} (${formatCurrency(s.ventaTotal)})`;
+            opt.textContent = `⛽ ${s.nombre} (${formatCurrency(s.ventaTotal)} - ${formatNumber(s.litros)} L)`;
             stSelect.appendChild(opt);
           });
         }
@@ -1282,7 +1359,7 @@
         if (stations.length === 0) {
           fileSelect.innerHTML = '<option value="">No hay archivos disponibles</option>';
         } else {
-          stations.forEach((s, idx) => {
+          stations.forEach((s) => {
             const fileName = s.sourceFileName || `reporte_${s.id.toLowerCase()}.xlsx`;
             const opt = document.createElement('option');
             opt.value = s.id;
@@ -1338,30 +1415,37 @@
         await window.saveStationsToCloud(window.currentStations);
       }
 
+      // Limpiar input de confirmación
+      document.getElementById('purgeConfirmKeywordInput').value = '';
+
       // Cerrar modal y refrescar la vista
-      closePurgeDataModal();
+      closeAdminModal();
       populateStationSelect();
       updateDashboard();
       showBanner(`🗑️ <strong>Depuración completada:</strong> ${deletedDescription}`);
     }
 
-    // Asegurar que el borrado de usuarios persista en Firestore
-    const originalDeleteUser = window.deleteUser;
+    // Eliminación de usuarios persistente en Firebase
     window.deleteUser = function(id) {
-      if (!window.activeUser || window.activeUser.rol !== 'SUPER_ADMIN') {
-        showBanner("⛔ Sólo el Super Administrador puede eliminar usuarios.");
+      if (!window.activeUser || (window.activeUser.rol !== 'SUPER_ADMIN' && window.activeUser.rol !== 'ADMIN')) {
+        showBanner("⛔ Se requiere permiso administrativo para dar de baja usuarios.");
         return;
       }
 
       const target = window.platformUsers.find(x => x.id === id);
-      if (target?.rol === 'SUPER_ADMIN' || target?.id === ROOT_SUPER_ADMIN.id) {
+      if (!target) return;
+
+      if (target.rol === 'SUPER_ADMIN' || target.id === ROOT_SUPER_ADMIN.id || target.username === ROOT_SUPER_ADMIN.username) {
         showBanner("⛔ La cuenta de Super Administrador (lnoriega) está protegida y no puede ser eliminada.");
         return;
       }
 
-      const userName = target?.nombre || target?.username || 'Usuario';
+      const userName = target.nombre || target.username || 'Usuario';
+      
+      // Eliminar del estado local
       window.platformUsers = window.platformUsers.filter(x => x.id !== id);
 
+      // Persistir en Firebase Firestore
       if (window.saveUsersToCloud) {
         const usersToSave = window.platformUsers.filter(u => u.id !== ROOT_SUPER_ADMIN.id);
         window.saveUsersToCloud(usersToSave);
@@ -1651,13 +1735,10 @@
         adminBtn.classList.add('hidden');
       }
 
-      // Configuración Firebase visible EXCLUSIVAMENTE para SUPER_ADMIN
-      if (u.rol === 'SUPER_ADMIN') {
-        firebaseBtn.classList.remove('hidden');
-        firebaseSep.classList.remove('hidden');
-      } else {
-        firebaseBtn.classList.add('hidden');
-        firebaseSep.classList.add('hidden');
+      // Accesos directos de Super Admin dentro del perfil
+      const saShortcuts = document.getElementById('superAdminShortcuts');
+      if (saShortcuts) {
+        saShortcuts.classList.toggle('hidden', u.rol !== 'SUPER_ADMIN');
       }
 
       updateDashboard();
@@ -1666,24 +1747,6 @@
     function toggleUserDropdown() {
       const dd = document.getElementById('userDropdown');
       dd.classList.toggle('hidden');
-    }
-
-    // Modal Admin open/close
-    function openAdminModal() {
-      if (!window.activeUser || (window.activeUser.rol !== 'SUPER_ADMIN' && window.activeUser.rol !== 'ADMIN')) {
-        showBanner("⛔ Acceso reservado exclusivamente para administradores.");
-        return;
-      }
-      const modal = document.getElementById('adminModal');
-      modal.classList.remove('hidden');
-      renderAdminUsersTable();
-      lucide.createIcons();
-    }
-
-    function closeAdminModal() {
-      const modal = document.getElementById('adminModal');
-      modal.classList.add('hidden');
-      resetUserForm();
     }
 
     function resetUserForm() {
@@ -1796,69 +1859,69 @@
       }
     }
 
-    function deleteUser(id) {
-      const target = window.platformUsers.find(x => x.id === id);
-      if (target?.rol === 'SUPER_ADMIN') {
-        showBanner("⛔ La cuenta de Super Administrador no puede ser eliminada.");
-        return;
-      }
-      window.platformUsers = window.platformUsers.filter(x => x.id !== id);
-      if (window.saveUsersToCloud) {
-        const usersToSave = window.platformUsers.filter(u => u.id !== ROOT_SUPER_ADMIN.id);
-        window.saveUsersToCloud(usersToSave);
-      }
-      renderAdminUsersTable();
-      document.getElementById('usersCountBadge').textContent = window.platformUsers.length;
-      showBanner("Usuario eliminado de la plataforma.");
-    }
-
     function renderAdminUsersTable() {
       const tbody = document.getElementById('adminUserTableBody');
       const countEl = document.getElementById('tableUserCount');
+      const tabBadge = document.getElementById('tabUserCounterBadge');
       if (!tbody) return;
       tbody.innerHTML = '';
-      if (countEl) countEl.textContent = `${window.platformUsers.length} usuario(s) configurado(s)`;
+
+      const count = window.platformUsers.length;
+      if (countEl) countEl.textContent = `${count} usuario(s)`;
+      if (tabBadge) tabBadge.textContent = count;
 
       window.platformUsers.forEach(u => {
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-50 transition";
         const badgeColor = u.estado === 'ACTIVO' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200';
-        const isSuperAdmin = u.rol === 'SUPER_ADMIN';
+        const isSuperAdmin = u.rol === 'SUPER_ADMIN' || u.username === ROOT_SUPER_ADMIN.username;
+        
         tr.innerHTML = `
-          <td class="py-2.5 px-3">
-            <p class="font-bold text-slate-900 flex items-center gap-1.5">
-              ${isSuperAdmin ? '<i data-lucide="crown" class="w-3.5 h-3.5 text-[#ff6600]"></i>' : ''}
-              ${u.nombre}
-            </p>
-            <p class="text-[10px] text-slate-400 font-mono">Usuario: <strong class="text-slate-700">${u.username || u.email}</strong> &bull; ${u.email}</p>
+          <td class="py-3 px-3">
+            <div class="flex items-center gap-2">
+              <span class="w-7 h-7 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                ${(u.nombre || 'U').charAt(0).toUpperCase()}
+              </span>
+              <div>
+                <p class="font-bold text-slate-900 flex items-center gap-1.5 leading-tight">
+                  ${isSuperAdmin ? '<i data-lucide="crown" class="w-3.5 h-3.5 text-[#ff6600]"></i>' : ''}
+                  <span>${u.nombre}</span>
+                </p>
+                <p class="text-[10px] text-slate-400 font-mono mt-0.5">
+                  User: <strong class="text-slate-700">${u.username || u.email}</strong> &bull; ${u.email}
+                </p>
+              </div>
+            </div>
           </td>
-          <td class="py-2.5 px-3">
-            <span class="font-mono text-[10px] font-black px-2 py-0.5 rounded ${isSuperAdmin ? 'bg-black text-[#ff6600]' : 'bg-slate-100 text-slate-800'}">
+          <td class="py-3 px-3">
+            <span class="font-mono text-[10px] font-black px-2.5 py-1 rounded-md ${isSuperAdmin ? 'bg-black text-[#ff6600]' : 'bg-slate-100 text-slate-800'}">
               ${u.rol}
             </span>
           </td>
-          <td class="py-2.5 px-3 font-mono text-[11px] text-slate-600">
-            ${u.estacion === 'ALL' ? '🌐 Todas' : '⛽ ' + u.estacion}
+          <td class="py-3 px-3 font-mono text-[11px] text-slate-600">
+            ${u.estacion === 'ALL' ? '🌐 Red Global' : '⛽ ' + u.estacion}
           </td>
-          <td class="py-2.5 px-3 text-center">
+          <td class="py-3 px-3 text-center">
             <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${badgeColor}">
               ${u.estado}
             </span>
           </td>
-          <td class="py-2.5 px-3 text-center">
+          <td class="py-3 px-3 text-center">
             <div class="flex items-center justify-center gap-1">
-              <button onclick="editUser('${u.id}')" title="Editar" class="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-black">
-                <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+              <button onclick="editUser('${u.id}')" title="Editar Credenciales" class="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600 hover:text-black transition">
+                <i data-lucide="edit-3" class="w-4 h-4"></i>
               </button>
               ${!isSuperAdmin ? `
-                <button onclick="toggleUserStatus('${u.id}')" title="${u.estado === 'ACTIVO' ? 'Suspender' : 'Activar'}" class="p-1.5 rounded-lg hover:bg-amber-50 text-slate-400 hover:text-amber-600">
-                  <i data-lucide="${u.estado === 'ACTIVO' ? 'lock' : 'unlock'}" class="w-3.5 h-3.5"></i>
+                <button onclick="toggleUserStatus('${u.id}')" title="${u.estado === 'ACTIVO' ? 'Suspender acceso' : 'Activar acceso'}" class="p-1.5 rounded-lg hover:bg-amber-50 text-slate-400 hover:text-amber-600 transition">
+                  <i data-lucide="${u.estado === 'ACTIVO' ? 'lock' : 'unlock'}" class="w-4 h-4"></i>
                 </button>
-                <button onclick="deleteUser('${u.id}')" title="Eliminar" class="p-1.5 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600">
-                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                <button onclick="deleteUser('${u.id}')" title="Eliminar Usuario de Firebase" class="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 transition">
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
                 </button>
               ` : `
-                <span class="p-1.5 text-slate-300" title="Protegido"><i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-500"></i></span>
+                <span class="p-1.5 text-slate-300" title="Cuenta Maestra Protegida">
+                  <i data-lucide="shield-check" class="w-4 h-4 text-emerald-500"></i>
+                </span>
               `}
             </div>
           </td>
