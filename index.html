@@ -132,24 +132,79 @@
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-[#ff6600] selection:text-white">
 
+  <!-- ==================== PANTALLA DE ACCESO OBLIGATORIA (LOGIN PORTAL) ==================== -->
+  <div id="loginScreen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
+    <div class="bg-white rounded-3xl max-w-md w-full border border-slate-200 shadow-2xl p-7 sm:p-9 space-y-6 text-center">
+      
+      <!-- Brand in Login Screen -->
+      <div class="space-y-3">
+        <div class="w-20 h-20 mx-auto rounded-2xl bg-white p-2 border border-slate-200 shadow-md flex items-center justify-center overflow-hidden">
+          <img src="https://i.ibb.co/yB6VkSvx/Logo-Milenium.png" alt="Milenium Logo" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='https://placehold.co/120x120/ffffff/ff6600?text=MILENIUM';">
+        </div>
+        <div>
+          <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight uppercase">
+            Milenium <span class="text-[#ff6600]">Business Panel</span>
+          </h2>
+          <p class="text-xs text-slate-500 mt-1 font-medium">Acceso Corporativo Exclusivo para Dirección y Operaciones</p>
+        </div>
+      </div>
+
+      <!-- Login Form -->
+      <form id="mainLoginForm" onsubmit="handleUserLogin(event)" class="space-y-4 text-left text-xs">
+        <div>
+          <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1.5 text-[11px]">Usuario</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+              <i data-lucide="user" class="w-4 h-4"></i>
+            </span>
+            <input type="text" id="loginUserInput" required placeholder="Usuario" class="w-full pl-10 pr-3 py-3 bg-slate-50 border border-slate-200 rounded-xl font-medium text-slate-900 focus:outline-none focus:border-[#ff6600] focus:bg-white text-xs transition">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1.5 text-[11px]">Contraseña</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+              <i data-lucide="lock" class="w-4 h-4"></i>
+            </span>
+            <input type="password" id="loginPassInput" required placeholder="••••••••" class="w-full pl-10 pr-3 py-3 bg-slate-50 border border-slate-200 rounded-xl font-medium text-slate-900 focus:outline-none focus:border-[#ff6600] focus:bg-white text-xs transition">
+          </div>
+        </div>
+
+        <div id="loginErrorMsg" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-2">
+          <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i>
+          <span id="loginErrorText">Credenciales incorrectas.</span>
+        </div>
+
+        <button type="submit" class="w-full py-3.5 rounded-xl orange-glow-btn font-extrabold text-sm active:scale-95 shadow-md flex items-center justify-center gap-2">
+          <span>Ingresar a la Plataforma</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </button>
+      </form>
+
+      <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+        <span>Seguridad Firebase</span>
+        <span class="flex items-center gap-1.5 text-emerald-600 font-sans font-medium">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 status-pulse"></span> Sistema Activo
+        </span>
+      </div>
+
+    </div>
+  </div>
+
   <!-- Top Navigation Header -->
   <header class="sticky top-0 z-40 milenium-glass border-b border-slate-200/90 px-4 sm:px-8 py-3.5 transition-all">
     <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
       
       <!-- Brand & Status -->
       <div class="flex items-center gap-3.5">
-        <div class="relative flex items-center justify-center w-11 h-11 rounded-xl bg-black p-[2px] shadow-sm">
-          <div class="w-full h-full bg-[#ff6600] rounded-[9px] flex items-center justify-center text-white">
-            <i data-lucide="fuel" class="w-6 h-6 stroke-[2.3]"></i>
-          </div>
+        <div class="relative flex items-center justify-center w-11 h-11 rounded-xl bg-white p-1 border border-slate-200 shadow-sm overflow-hidden">
+          <img src="https://i.ibb.co/yB6VkSvx/Logo-Milenium.png" alt="Milenium Logo" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='https://placehold.co/80x80/ffffff/ff6600?text=M';">
         </div>
         <div>
           <div class="flex items-center gap-2">
             <span class="font-black text-lg sm:text-xl tracking-tight text-slate-900 uppercase font-sans">
               Milenium <span class="text-[#ff6600]">Business Panel</span>
-            </span>
-            <span class="text-[10px] font-black px-2 py-0.5 rounded-full badge-orange uppercase tracking-wider hidden sm:inline-block">
-              CEO Executive
             </span>
           </div>
           <p class="text-[11px] text-slate-500 font-medium flex items-center gap-1.5" id="headerSubtitle">
@@ -183,22 +238,22 @@
           <input type="file" id="fileUploadInput" multiple accept=".xlsx, .xls" class="hidden">
         </label>
 
-        <!-- Admin Portal Trigger Button -->
-        <button onclick="openAdminModal()" id="btnOpenAdmin" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold shadow-sm transition active:scale-95">
+        <!-- Admin Portal Trigger Button (Visible para SUPER_ADMIN y ADMIN) -->
+        <button onclick="openAdminModal()" id="btnOpenAdmin" class="hidden flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold shadow-sm transition active:scale-95">
           <i data-lucide="shield" class="w-3.5 h-3.5 text-[#ff6600]"></i>
           <span class="hidden md:inline">Panel Admin</span>
-          <span class="text-[10px] bg-[#ff6600] px-1.5 py-0.2 rounded-full font-mono text-white" id="usersCountBadge">4</span>
+          <span class="text-[10px] bg-[#ff6600] px-1.5 py-0.2 rounded-full font-mono text-white" id="usersCountBadge">1</span>
         </button>
 
-        <!-- Current User Profile & Role Switcher -->
+        <!-- Current User Profile & Sign Out Dropdown -->
         <div class="relative">
           <button onclick="toggleUserDropdown()" id="userProfileBtn" class="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-slate-300 text-xs text-slate-800 shadow-sm transition">
             <div class="w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-[11px]" id="userAvatar">
-              L
+              U
             </div>
             <div class="text-left hidden sm:block">
-              <p class="font-bold text-[11px] leading-tight" id="userNameLabel">Super Admin (lnoriega)</p>
-              <p class="text-[9px] text-[#ff6600] font-mono leading-none font-bold" id="userRoleLabel">SUPER_ADMIN</p>
+              <p class="font-bold text-[11px] leading-tight" id="userNameLabel">Cargando...</p>
+              <p class="text-[9px] text-[#ff6600] font-mono leading-none font-bold" id="userRoleLabel">AUTENTICANDO</p>
             </div>
             <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400"></i>
           </button>
@@ -206,15 +261,26 @@
           <!-- User dropdown menu -->
           <div id="userDropdown" class="hidden absolute right-0 mt-2 w-64 bg-white border border-slate-200 rounded-2xl shadow-xl p-3 z-50 space-y-2 text-xs">
             <div class="border-b border-slate-100 pb-2">
-              <p class="font-bold text-slate-900" id="ddUserName">Super Administrador</p>
-              <p class="text-[11px] text-slate-500 font-mono" id="ddUserEmail">lnoriega@grupomilenium.mx</p>
+              <p class="font-bold text-slate-900" id="ddUserName">Usuario</p>
+              <p class="text-[11px] text-slate-500 font-mono" id="ddUserEmail">email@grupomilenium.mx</p>
             </div>
-            <div class="flex items-center justify-between">
-              <p class="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Cambiar Perfil de Sesión:</p>
-              <button onclick="openSuperAdminAuthModal()" class="text-[10px] text-[#ff6600] font-bold hover:underline">Login Clave</button>
+            
+            <div class="py-1">
+              <p class="text-[10px] font-bold uppercase text-slate-400 tracking-wider mb-1">Sesión Activa:</p>
+              <div class="p-2 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between">
+                <div>
+                  <span class="block font-bold text-[11px] text-slate-800" id="sessionRoleBadge">SUPER_ADMIN</span>
+                  <span class="block text-[10px] text-slate-400 font-mono" id="sessionStationBadge">Red Global</span>
+                </div>
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              </div>
             </div>
-            <div class="space-y-1" id="roleSwitchList">
-              <!-- Dynamically populated from active users -->
+
+            <div class="pt-2 border-t border-slate-100">
+              <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 p-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold transition">
+                <i data-lucide="log-out" class="w-3.5 h-3.5 text-rose-600"></i>
+                <span>Cerrar Sesión</span>
+              </button>
             </div>
           </div>
         </div>
@@ -237,15 +303,12 @@
         <div class="p-1 rounded-full bg-[#ff6600]/15 text-[#ff6600]">
           <i data-lucide="shield-check" class="w-4 h-4"></i>
         </div>
-        <p class="text-slate-800" id="bannerMessage">
-          Sincronizado con la nube: <strong>Guadalupe, Reynosa, Sto Domingo</strong> (Septiembre 2026).
+        <p class="font-medium text-slate-700" id="bannerMessage">
+          Panel Corporativo sincronizado con estaciones: <strong>GUADALUPE, REYNOSA, STO DOMINGO</strong>.
         </p>
       </div>
-      <div class="flex items-center gap-3">
-        <span class="font-mono text-[11px] text-slate-500 font-semibold" id="lastUpdatedBadge">Almacenado & Global</span>
-        <button onclick="document.getElementById('statusBanner').classList.add('hidden')" class="text-slate-400 hover:text-slate-700">
-          <i data-lucide="x" class="w-3.5 h-3.5"></i>
-        </button>
+      <div class="flex items-center gap-2">
+        <span class="text-[10px] font-mono bg-orange-100 text-[#ea580c] px-2.5 py-0.5 rounded-md font-bold" id="lastUpdatedBadge">En Tiempo Real</span>
       </div>
     </div>
 
@@ -715,7 +778,18 @@
             </div>
 
             <div>
-              <label class="block font-bold text-slate-700 mb-1">Correo Electrónico (Acceso)</label>
+              <label class="block font-bold text-slate-700 mb-1">Nombre de Usuario (Para Iniciar Sesión)</label>
+              <input type="text" id="inputUserLogin" required placeholder="carlos.garza" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-medium focus:outline-none focus:border-[#ff6600]">
+            </div>
+
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Contraseña de Acceso</label>
+              <input type="password" id="inputUserPassword" required placeholder="••••••••" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-medium focus:outline-none focus:border-[#ff6600]">
+              <span class="text-[10px] text-slate-400">Contraseña que usará para ingresar al sistema</span>
+            </div>
+
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Correo Electrónico (Notificaciones)</label>
               <input type="email" id="inputUserEmail" required placeholder="carlos.garza@grupomilenium.mx" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-medium focus:outline-none focus:border-[#ff6600]">
             </div>
 
@@ -765,7 +839,7 @@
               <i data-lucide="users" class="w-4 h-4 text-[#ff6600]"></i>
               Usuarios Registrados en el Sistema
             </h4>
-            <span class="text-[11px] font-mono text-slate-500 font-semibold" id="tableUserCount">3 usuarios</span>
+            <span class="text-[11px] font-mono text-slate-500 font-semibold" id="tableUserCount">1 usuario</span>
           </div>
 
           <div class="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-sm flex-1 max-h-96 overflow-y-auto">
@@ -788,7 +862,7 @@
           <div class="p-3 bg-orange-50/60 rounded-xl border border-orange-200 text-[11px] text-slate-600 flex items-start gap-2">
             <i data-lucide="info" class="w-4 h-4 text-[#ff6600] shrink-0 mt-0.5"></i>
             <p>
-              <strong>Persistencia Activa:</strong> Los usuarios y sus privilegios se guardan automáticamente en la nube. Los cambios surten efecto de manera inmediata en todos los accesos del CEO y los supervisores.
+              <strong>Persistencia Activa:</strong> Los usuarios creados se guardan en Firebase Firestore. Solo los usuarios activos registrados con su usuario y contraseña podrán ingresar a la plataforma.
             </p>
           </div>
         </div>
@@ -828,41 +902,6 @@
       </div>
     </div>
   </footer>
-
-  <!-- Modal: Super Admin Authentication Challenge -->
-  <div id="superAdminAuthModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-    <div class="bg-white rounded-3xl max-w-sm w-full overflow-hidden border border-slate-200 shadow-2xl p-6 space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-lg bg-black text-[#ff6600] flex items-center justify-center font-bold">
-            <i data-lucide="lock" class="w-4 h-4"></i>
-          </div>
-          <div>
-            <h4 class="font-bold text-sm text-slate-900">Acceso Super Admin</h4>
-            <p class="text-[10px] text-slate-400 font-mono">Autenticación de seguridad</p>
-          </div>
-        </div>
-        <button onclick="closeSuperAdminAuthModal()" class="text-slate-400 hover:text-slate-700">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
-      </div>
-
-      <form onsubmit="handleSuperAdminAuth(event)" class="space-y-3 text-xs">
-        <div>
-          <label class="block font-bold text-slate-700 mb-1">Usuario</label>
-          <input type="text" id="authInputUser" required placeholder="lnoriega" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 font-mono text-slate-900 focus:outline-none focus:border-[#ff6600]">
-        </div>
-        <div>
-          <label class="block font-bold text-slate-700 mb-1">Contraseña</label>
-          <input type="password" id="authInputPass" required placeholder="••••••••" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 font-mono text-slate-900 focus:outline-none focus:border-[#ff6600]">
-        </div>
-        <p id="authErrorMsg" class="hidden text-rose-600 text-[11px] font-bold"></p>
-        <button type="submit" class="w-full py-2.5 rounded-xl orange-glow-btn font-extrabold text-xs active:scale-95 shadow-sm">
-          Iniciar Sesión Super Admin
-        </button>
-      </form>
-    </div>
-  </div>
 
   <!-- Modal: Configuración de Credenciales Firebase (Sólo visible para SUPER_ADMIN) -->
   <div id="firebaseConfigModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
@@ -909,8 +948,8 @@
   <!-- Firebase SDK Modules for Cloud Persistence -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // Application ID configuration
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'milenium-gas-dashboard';
@@ -983,8 +1022,8 @@
           listenToCloudStations();
           listenToCloudUsers();
         } else {
-          console.warn("Sin configuración de Firebase activa en este entorno. Corriendo en modo reactivo.");
-          markCloudStatus(true, "Modo Local Listo (Configura Firebase para multi-dispositivo)");
+          console.warn("Sin configuración de Firebase activa en este entorno.");
+          markCloudStatus(true, "Modo Local");
         }
       } catch (err) {
         console.error("Error al inicializar Firebase Firestore:", err);
@@ -1022,6 +1061,7 @@
       if (!db || !auth?.currentUser) return;
       try {
         const usersDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'platform_users', 'current');
+        // Almacenar sólo usuarios adicionales para no exponer el Super Admin
         await setDoc(usersDocRef, {
           users: usersList,
           updatedAt: new Date().toISOString()
@@ -1058,12 +1098,9 @@
       usersUnsub = onSnapshot(usersDocRef, (snap) => {
         if (snap.exists()) {
           const data = snap.data();
-          if (data && Array.isArray(data.users) && data.users.length > 0) {
+          if (data && Array.isArray(data.users)) {
             window.receiveRemoteUsers(data.users);
           }
-        } else {
-          // Push initial default users
-          window.saveUsersToCloud(window.platformUsers);
         }
       }, (err) => {
         console.warn("Fallo en snapshot de usuarios:", err);
@@ -1186,55 +1223,23 @@
       }
     ];
 
-    // Default Platform Users with SUPER_ADMIN (lnoriega / Mg-2026*)
-    const DEFAULT_USERS = [
-      {
-        id: "usr_superadmin",
-        username: "lnoriega",
-        passwordHash: "Mg-2026*", // Clave de acceso configurada
-        nombre: "Super Admin (lnoriega)",
-        email: "lnoriega@grupomilenium.mx",
-        rol: "SUPER_ADMIN",
-        estacion: "ALL",
-        estado: "ACTIVO",
-        creadoEl: "2026-09-01"
-      },
-      {
-        id: "usr_ceo",
-        username: "ceo",
-        nombre: "CEO Director General",
-        email: "ceo@grupomilenium.mx",
-        rol: "CEO",
-        estacion: "ALL",
-        estado: "ACTIVO",
-        creadoEl: "2026-09-01"
-      },
-      {
-        id: "usr_admin",
-        username: "admin",
-        nombre: "Ing. Roberto M. (Administrador)",
-        email: "admin@grupomilenium.mx",
-        rol: "ADMIN",
-        estacion: "ALL",
-        estado: "ACTIVO",
-        creadoEl: "2026-09-01"
-      },
-      {
-        id: "usr_operador_gpe",
-        username: "operador_gpe",
-        nombre: "Gerente Guadalupe",
-        email: "estacion.guadalupe@grupomilenium.mx",
-        rol: "OPERADOR",
-        estacion: "GUADALUPE",
-        estado: "ACTIVO",
-        creadoEl: "2026-09-02"
-      }
-    ];
+    // ROOT SUPER ADMIN (Único usuario maestro por defecto, sin usuarios ficticios)
+    const ROOT_SUPER_ADMIN = {
+      id: "usr_root_superadmin",
+      username: "lnoriega",
+      password: "Mg-2026*",
+      nombre: "Super Admin (lnoriega)",
+      email: "lnoriega@grupomilenium.mx",
+      rol: "SUPER_ADMIN",
+      estacion: "ALL",
+      estado: "ACTIVO",
+      creadoEl: "2026-09-01"
+    };
 
-    // State variables
+    // State variables (Ningún usuario pre-logueado por defecto)
     window.currentStations = [...DEFAULT_DATASETS];
-    window.platformUsers = [...DEFAULT_USERS];
-    window.activeUser = window.platformUsers[0]; // Inicia como Super Admin (lnoriega)
+    window.platformUsers = [ROOT_SUPER_ADMIN];
+    window.activeUser = null; // No hay usuario autenticado al cargar
     let currentPeriodFilter = 'MENSUAL'; // 'DIARIO' | 'SEMANAL' | 'MENSUAL'
     let processedFileHashes = new Set();
 
@@ -1255,9 +1260,21 @@
       });
       populateStationSelect();
       updateDashboard();
-      renderUserSwitcher();
-      renderAdminUsersTable();
-      applyUserRoleRestrictions();
+      
+      // Comprobar si ya existe una sesión guardada en sessionStorage (mantiene sesión activa en F5)
+      const savedSession = sessionStorage.getItem('milenium_active_session');
+      if (savedSession) {
+        try {
+          const userObj = JSON.parse(savedSession);
+          authenticateUser(userObj);
+          return;
+        } catch(e) {
+          sessionStorage.removeItem('milenium_active_session');
+        }
+      }
+
+      // Si no hay sesión, mostrar pantalla obligatoria de login
+      showLoginScreen();
     }
 
     // Remote update callbacks
@@ -1266,18 +1283,19 @@
       window.currentStations = remoteList;
       populateStationSelect();
       updateDashboard();
-      showBanner(`Datos sincronizados en tiempo real desde Firebase mileniumdbestaciones (${updatedAt ? new Date(updatedAt).toLocaleTimeString() : 'reciente'}).`);
+      if (window.activeUser) {
+        showBanner(`Datos sincronizados en tiempo real desde Firebase (${updatedAt ? new Date(updatedAt).toLocaleTimeString() : 'reciente'}).`);
+      }
     };
 
     window.receiveRemoteUsers = function(remoteUsers) {
-      if (!Array.isArray(remoteUsers) || remoteUsers.length === 0) return;
-      // Asegurar que el superadmin permanezca siempre intacto
-      const superAdminUser = window.platformUsers.find(u => u.rol === 'SUPER_ADMIN') || DEFAULT_USERS[0];
-      const mergedUsers = [superAdminUser, ...remoteUsers.filter(u => u.rol !== 'SUPER_ADMIN')];
-      window.platformUsers = mergedUsers;
-      renderUserSwitcher();
+      if (!Array.isArray(remoteUsers)) return;
+      // Mantener al superadmin intacto y fusionar con los usuarios reales de Firestore
+      const filteredRemote = remoteUsers.filter(u => u.username !== ROOT_SUPER_ADMIN.username && u.rol !== 'SUPER_ADMIN');
+      window.platformUsers = [ROOT_SUPER_ADMIN, ...filteredRemote];
       renderAdminUsersTable();
-      document.getElementById('usersCountBadge').textContent = window.platformUsers.length;
+      const badge = document.getElementById('usersCountBadge');
+      if (badge) badge.textContent = window.platformUsers.length;
     };
 
     function syncFromCloud() {
@@ -1290,9 +1308,83 @@
       }, 700);
     }
 
+    // ==================== GESTIÓN DE ACCESO Y AUTENTICACIÓN ====================
+    function showLoginScreen() {
+      const loginModal = document.getElementById('loginScreen');
+      if (loginModal) loginModal.classList.remove('hidden');
+
+      const userInput = document.getElementById('loginUserInput');
+      const passInput = document.getElementById('loginPassInput');
+      if (userInput) userInput.value = '';
+      if (passInput) passInput.value = '';
+
+      const errBox = document.getElementById('loginErrorMsg');
+      if (errBox) errBox.classList.add('hidden');
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function handleUserLogin(e) {
+      if (e) e.preventDefault();
+      const userElem = document.getElementById('loginUserInput');
+      const passElem = document.getElementById('loginPassInput');
+      const errBox = document.getElementById('loginErrorMsg');
+      const errTxt = document.getElementById('loginErrorText');
+
+      const userInput = userElem ? userElem.value.trim().toLowerCase() : '';
+      const passInput = passElem ? passElem.value.trim() : '';
+
+      // Buscar usuario coincidente por username o email
+      const matched = window.platformUsers.find(u => 
+        (u.username && u.username.toLowerCase() === userInput) || 
+        (u.email && u.email.toLowerCase() === userInput)
+      );
+
+      if (!matched) {
+        if (errTxt) errTxt.textContent = "Usuario no registrado en el sistema.";
+        if (errBox) errBox.classList.remove('hidden');
+        return;
+      }
+
+      if (matched.estado === 'SUSPENDIDO') {
+        if (errTxt) errTxt.textContent = "Tu cuenta se encuentra suspendida. Contacta a Dirección.";
+        if (errBox) errBox.classList.remove('hidden');
+        return;
+      }
+
+      if (matched.password !== passInput) {
+        if (errTxt) errTxt.textContent = "Contraseña incorrecta. Inténtalo de nuevo.";
+        if (errBox) errBox.classList.remove('hidden');
+        return;
+      }
+
+      // Login exitoso
+      if (errBox) errBox.classList.add('hidden');
+      authenticateUser(matched);
+      sessionStorage.setItem('milenium_active_session', JSON.stringify(matched));
+      showBanner(`Bienvenido(a), <strong>${matched.nombre}</strong> (${matched.rol}).`);
+    }
+
+    function authenticateUser(userObj) {
+      window.activeUser = userObj;
+      const loginModal = document.getElementById('loginScreen');
+      if (loginModal) loginModal.classList.add('hidden');
+      applyUserRoleRestrictions();
+    }
+
+    function handleLogout() {
+      window.activeUser = null;
+      sessionStorage.removeItem('milenium_active_session');
+      const dd = document.getElementById('userDropdown');
+      if (dd) dd.classList.add('hidden');
+      showLoginScreen();
+    }
+
     // User Roles & Access Control
     function applyUserRoleRestrictions() {
       const u = window.activeUser;
+      if (!u) return;
+
       const uploadBtn = document.getElementById('uploadBtnLabel');
       const dropZone = document.getElementById('dropZoneContainer');
       const adminBtn = document.getElementById('btnOpenAdmin');
@@ -1306,6 +1398,8 @@
 
       document.getElementById('ddUserName').textContent = u.nombre;
       document.getElementById('ddUserEmail').textContent = u.email;
+      document.getElementById('sessionRoleBadge').textContent = u.rol;
+      document.getElementById('sessionStationBadge').textContent = u.estacion === 'ALL' ? 'Red Completa' : 'Estación ' + u.estacion;
 
       // Restrict station select if bound to a single station
       const stSelect = document.getElementById('stationSelect');
@@ -1316,12 +1410,17 @@
         stSelect.disabled = false;
       }
 
-      // Upload controls
-      uploadBtn.classList.remove('hidden');
-      dropZone.classList.remove('hidden');
+      // Upload controls visibility
+      if (u.rol === 'OPERADOR' || u.rol === 'ADMIN' || u.rol === 'SUPER_ADMIN') {
+        uploadBtn.classList.remove('hidden');
+        dropZone.classList.remove('hidden');
+      } else {
+        uploadBtn.classList.add('hidden');
+        dropZone.classList.add('hidden');
+      }
 
-      // Admin button visible only to ADMIN, SUPER_ADMIN and CEO
-      if (u.rol === 'SUPER_ADMIN' || u.rol === 'ADMIN' || u.rol === 'CEO') {
+      // Admin button visible only to ADMIN and SUPER_ADMIN
+      if (u.rol === 'SUPER_ADMIN' || u.rol === 'ADMIN') {
         adminBtn.classList.remove('hidden');
       } else {
         adminBtn.classList.add('hidden');
@@ -1344,84 +1443,12 @@
       dd.classList.toggle('hidden');
     }
 
-    function renderUserSwitcher() {
-      const list = document.getElementById('roleSwitchList');
-      if (!list) return;
-      list.innerHTML = '';
-
-      window.platformUsers.forEach(u => {
-        const isCurrent = u.id === window.activeUser.id;
-        const btn = document.createElement('button');
-        btn.className = `w-full text-left p-2 rounded-xl flex items-center justify-between transition ${isCurrent ? 'bg-orange-50 text-[#ff6600] font-bold border border-orange-200' : 'hover:bg-slate-50 text-slate-700'}`;
-        btn.onclick = () => {
-          if (u.rol === 'SUPER_ADMIN') {
-            openSuperAdminAuthModal();
-          } else {
-            switchActiveUser(u.id);
-          }
-        };
-        btn.innerHTML = `
-          <div>
-            <p class="font-bold text-[11px]">${u.nombre}</p>
-            <p class="text-[9px] text-slate-400 font-mono">${u.rol} &bull; ${u.estacion === 'ALL' ? 'Red Completa' : u.estacion}</p>
-          </div>
-          ${isCurrent ? '<i data-lucide="check" class="w-3.5 h-3.5 text-[#ff6600]"></i>' : ''}
-        `;
-        list.appendChild(btn);
-      });
-      lucide.createIcons();
-    }
-
-    function switchActiveUser(userId) {
-      const found = window.platformUsers.find(u => u.id === userId);
-      if (found) {
-        if (found.estado === 'SUSPENDIDO') {
-          showBanner("⛔ Esta cuenta se encuentra suspendida. Contacte al administrador.");
-          return;
-        }
-        window.activeUser = found;
-        document.getElementById('userDropdown').classList.add('hidden');
-        applyUserRoleRestrictions();
-        renderUserSwitcher();
-        showBanner(`Sesión cambiada a: <strong>${found.nombre}</strong> (${found.rol}).`);
-      }
-    }
-
-    // Modal Super Admin Authentication
-    function openSuperAdminAuthModal() {
-      document.getElementById('userDropdown').classList.add('hidden');
-      document.getElementById('superAdminAuthModal').classList.remove('hidden');
-      document.getElementById('authErrorMsg').classList.add('hidden');
-      document.getElementById('authInputUser').value = 'lnoriega';
-      document.getElementById('authInputPass').value = '';
-      lucide.createIcons();
-    }
-
-    function closeSuperAdminAuthModal() {
-      document.getElementById('superAdminAuthModal').classList.add('hidden');
-    }
-
-    function handleSuperAdminAuth(e) {
-      e.preventDefault();
-      const user = document.getElementById('authInputUser').value.trim();
-      const pass = document.getElementById('authInputPass').value.trim();
-      const errBox = document.getElementById('authErrorMsg');
-
-      if (user === 'lnoriega' && pass === 'Mg-2026*') {
-        const superAdminUser = window.platformUsers.find(u => u.rol === 'SUPER_ADMIN') || DEFAULT_USERS[0];
-        window.activeUser = superAdminUser;
-        closeSuperAdminAuthModal();
-        applyUserRoleRestrictions();
-        renderUserSwitcher();
-        showBanner("👑 <strong>Super Administrador Autenticado:</strong> Panel de Firebase y control de usuarios desbloqueados.");
-      } else {
-        errBox.textContent = 'Usuario o contraseña de Super Admin incorrectos.';
-        errBox.classList.remove('hidden');
-      }
-    }
-
     // Modal Admin open/close
     function openAdminModal() {
+      if (!window.activeUser || (window.activeUser.rol !== 'SUPER_ADMIN' && window.activeUser.rol !== 'ADMIN')) {
+        showBanner("⛔ Acceso reservado exclusivamente para administradores.");
+        return;
+      }
       const modal = document.getElementById('adminModal');
       modal.classList.remove('hidden');
       renderAdminUsersTable();
@@ -1444,12 +1471,14 @@
       e.preventDefault();
       const id = document.getElementById('editUserId').value;
       const nombre = document.getElementById('inputUserName').value.trim();
+      const username = document.getElementById('inputUserLogin').value.trim();
+      const password = document.getElementById('inputUserPassword').value.trim();
       const email = document.getElementById('inputUserEmail').value.trim();
       const rol = document.getElementById('inputUserRole').value;
       const estacion = document.getElementById('inputUserStation').value;
       const estado = document.getElementById('inputUserStatus').value;
 
-      if (!nombre || !email) return;
+      if (!nombre || !username || !password || !email) return;
 
       if (id) {
         // Edit existing
@@ -1462,6 +1491,8 @@
           window.platformUsers[idx] = {
             ...window.platformUsers[idx],
             nombre,
+            username,
+            password,
             email,
             rol,
             estacion,
@@ -1470,10 +1501,18 @@
           showBanner(`Usuario <strong>${nombre}</strong> actualizado correctamente.`);
         }
       } else {
-        // Create new
+        // Validar que no exista el username
+        if (window.platformUsers.some(u => u.username && u.username.toLowerCase() === username.toLowerCase())) {
+          showBanner("⚠️ El nombre de usuario ya está registrado. Elige otro.");
+          return;
+        }
+
+        // Create new user
         const newUser = {
           id: 'usr_' + Date.now(),
           nombre,
+          username,
+          password,
           email,
           rol,
           estacion,
@@ -1484,14 +1523,14 @@
         showBanner(`Nuevo usuario <strong>${nombre}</strong> dado de alta con éxito.`);
       }
 
-      // Save to cloud
+      // Save to cloud (Guardar usuarios dinámicos en Firestore)
       if (window.saveUsersToCloud) {
-        window.saveUsersToCloud(window.platformUsers);
+        const usersToSave = window.platformUsers.filter(u => u.id !== ROOT_SUPER_ADMIN.id);
+        window.saveUsersToCloud(usersToSave);
       }
 
       resetUserForm();
       renderAdminUsersTable();
-      renderUserSwitcher();
       document.getElementById('usersCountBadge').textContent = window.platformUsers.length;
       lucide.createIcons();
     }
@@ -1505,6 +1544,8 @@
       }
       document.getElementById('editUserId').value = u.id;
       document.getElementById('inputUserName').value = u.nombre;
+      document.getElementById('inputUserLogin').value = u.username || '';
+      document.getElementById('inputUserPassword').value = u.password || '';
       document.getElementById('inputUserEmail').value = u.email;
       document.getElementById('inputUserRole').value = u.rol;
       document.getElementById('inputUserStation').value = u.estacion;
@@ -1521,9 +1562,11 @@
         }
         const current = window.platformUsers[idx].estado;
         window.platformUsers[idx].estado = current === 'ACTIVO' ? 'SUSPENDIDO' : 'ACTIVO';
-        if (window.saveUsersToCloud) window.saveUsersToCloud(window.platformUsers);
+        if (window.saveUsersToCloud) {
+          const usersToSave = window.platformUsers.filter(u => u.id !== ROOT_SUPER_ADMIN.id);
+          window.saveUsersToCloud(usersToSave);
+        }
         renderAdminUsersTable();
-        renderUserSwitcher();
         showBanner(`Estado de usuario cambiado a <strong>${window.platformUsers[idx].estado}</strong>.`);
       }
     }
@@ -1534,14 +1577,12 @@
         showBanner("⛔ La cuenta de Super Administrador no puede ser eliminada.");
         return;
       }
-      if (window.platformUsers.length <= 1) {
-        showBanner("Debe existir al menos un usuario administrador en la plataforma.");
-        return;
-      }
       window.platformUsers = window.platformUsers.filter(x => x.id !== id);
-      if (window.saveUsersToCloud) window.saveUsersToCloud(window.platformUsers);
+      if (window.saveUsersToCloud) {
+        const usersToSave = window.platformUsers.filter(u => u.id !== ROOT_SUPER_ADMIN.id);
+        window.saveUsersToCloud(usersToSave);
+      }
       renderAdminUsersTable();
-      renderUserSwitcher();
       document.getElementById('usersCountBadge').textContent = window.platformUsers.length;
       showBanner("Usuario eliminado de la plataforma.");
     }
@@ -1564,7 +1605,7 @@
               ${isSuperAdmin ? '<i data-lucide="crown" class="w-3.5 h-3.5 text-[#ff6600]"></i>' : ''}
               ${u.nombre}
             </p>
-            <p class="text-[10px] text-slate-400 font-mono">${u.email}</p>
+            <p class="text-[10px] text-slate-400 font-mono">Usuario: <strong class="text-slate-700">${u.username || u.email}</strong> &bull; ${u.email}</p>
           </td>
           <td class="py-2.5 px-3">
             <span class="font-mono text-[10px] font-black px-2 py-0.5 rounded ${isSuperAdmin ? 'bg-black text-[#ff6600]' : 'bg-slate-100 text-slate-800'}">
