@@ -244,6 +244,12 @@
           <input type="file" id="fileUploadInput" multiple accept=".xlsx, .xls" class="hidden">
         </label>
 
+        <!-- Botón de Depuración y Borrado de Datos (Sólo visible para SUPER_ADMIN) -->
+        <button onclick="openPurgeDataModal()" id="btnOpenPurgeData" class="hidden flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 text-xs font-bold transition active:scale-95 shadow-sm" title="Depurar y Borrar Datos">
+          <i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-600"></i>
+          <span class="hidden md:inline">Borrado de Datos</span>
+        </button>
+
         <!-- Admin Portal Trigger Button (Visible para SUPER_ADMIN y ADMIN) -->
         <button onclick="openAdminModal()" id="btnOpenAdmin" class="hidden flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold shadow-sm transition active:scale-95">
           <i data-lucide="shield" class="w-3.5 h-3.5 text-[#ff6600]"></i>
@@ -954,15 +960,14 @@
   <!-- Firebase SDK Modules for Cloud Persistence -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // Application ID configuration
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'milenium-gas-dashboard';
-    window.appId = appId;
 
-    // Configuración directa de tu proyecto en Firebase
-    const DIRECT_FIREBASE_CONFIG = {
+    // Firebase Configuration for mileniumdbestaciones
+    const firebaseConfig = {
       apiKey: "AIzaSyAMc39xwB34CBaKz4qYjgTYeJXCYKIy4MY",
       authDomain: "mileniumdbestaciones.firebaseapp.com",
       projectId: "mileniumdbestaciones",
@@ -972,187 +977,401 @@
     };
 
     let app = null;
-    let db = null;
     let auth = null;
-    let currentAuthUser = null;
-    let stationsUnsub = null;
-    let usersUnsub = null;
+    let db = null;
 
-    // Resolve Firebase configuration
-    function getResolvedFirebaseConfig() {
-      if (typeof __firebase_config !== 'undefined' && __firebase_config) {
-        try {
-          return typeof __firebase_config === 'string' ? JSON.parse(__firebase_config) : __firebase_config;
-        } catch(e) {
-          console.warn("Error parsing environment __firebase_config:", e);
-        }
-      }
-      const stored = window.sessionStorage?.getItem('milenium_custom_firebase_config') || window.localStorage?.getItem('milenium_custom_firebase_config');
-      if (stored) {
-        try {
-          return JSON.parse(stored);
-        } catch(e) {
-          console.warn("Error parsing stored firebase config:", e);
-        }
-      }
-      return DIRECT_FIREBASE_CONFIG;
+    try {
+      app = initializeApp(firebaseConfig);
+      auth = getAuth(app);
+      db = getFirestore(app);
+
+      // Sign in anonymously to comply with Firestore security rules
+      signInAnonymously(auth).then(() => {
+        setupFirestoreListeners();
+      }).catch(err => {
+        console.warn("Firebase Auth fallback:", err);
+        setupFirestoreListeners();
+      });
+    } catch (err) {
+      console.error("Error al inicializar Firebase:", err);
     }
 
-    // Cloud connection initialization
-    async function initCloudEngine(customConfig = null) {
-      try {
-        const configToUse = customConfig || getResolvedFirebaseConfig();
+    function setupFirestoreListeners() {
+      if (!db) return;
 
-        if (configToUse && configToUse.apiKey && configToUse.projectId) {
-          app = initializeApp(configToUse);
-          db = getFirestore(app);
-          auth = getAuth(app);
-
-          // Authenticate: Custom token priority, otherwise anonymous authentication
-          if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-            await signInWithCustomToken(auth, __initial_auth_token);
-          } else {
-            await signInAnonymously(auth);
+      // Realtime listener for stations summary
+      const stationsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'stations_summary', 'current');
+      onSnapshot(stationsDocRef, (snap) => {
+        if (snap.exists()) {
+          const data = snap.data();
+          if (Array.isArray(data.stations)) {
+            window.receiveRemoteStations(data.stations, data.updatedAt);
           }
-
-          currentAuthUser = auth.currentUser;
-          console.log("Firebase conectado exitosamente a mileniumdbestaciones. UID:", currentAuthUser?.uid);
-
-          markCloudStatus(true, `Firebase Conectado (${configToUse.projectId})`);
-
-          // Unsubscribe previous listeners if reconnecting
-          if (stationsUnsub) stationsUnsub();
-          if (usersUnsub) usersUnsub();
-
-          // Listen for remote real-time updates for stations & users using strict paths
-          listenToCloudStations();
-          listenToCloudUsers();
-        } else {
-          console.warn("Sin configuración de Firebase activa en este entorno.");
-          markCloudStatus(true, "Modo Local");
         }
-      } catch (err) {
-        console.error("Error al inicializar Firebase Firestore:", err);
-        markCloudStatus(false, "Firebase Conectando...");
-      }
+      }, (err) => console.warn("Stations listener note:", err));
+
+      // Realtime listener for platform users
+      const usersDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'platform_users', 'current');
+      onSnapshot(usersDocRef, (snap) => {
+        if (snap.exists()) {
+          const data = snap.data();
+          if (Array.isArray(data.users)) {
+            window.receiveRemoteUsers(data.users);
+          }
+        }
+      }, (err) => console.warn("Users listener note:", err));
     }
 
-    function markCloudStatus(isOnline, text) {
-      const dot = document.getElementById('cloudStatusDot');
-      const label = document.getElementById('cloudStatusText');
-      if (dot && label) {
-        dot.className = isOnline ? "w-1.5 h-1.5 rounded-full bg-emerald-500 status-pulse" : "w-1.5 h-1.5 rounded-full bg-amber-500";
-        label.textContent = text || (isOnline ? "Nube Firebase Sincronizada" : "Sin Conexión Remota");
-      }
-    }
-
-    // Save stations to Firestore (Strict path: /artifacts/{appId}/public/data/stations_summary/current)
+    // Save stations to Firestore
     window.saveStationsToCloud = async function(stationsList) {
-      if (!db || !auth?.currentUser) return;
+      if (!db) return;
       try {
-        const publicDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'stations_summary', 'current');
-        await setDoc(publicDocRef, {
+        const stationsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'stations_summary', 'current');
+        await setDoc(stationsDocRef, {
           stations: stationsList,
-          updatedAt: new Date().toISOString(),
-          updatedBy: window.activeUser?.email || 'despachador'
+          updatedAt: new Date().toISOString()
         }, { merge: true });
-        markCloudStatus(true, "Datos Guardados en mileniumdbestaciones");
-      } catch (e) {
-        console.error("Error al guardar estaciones en Firestore:", e);
+      } catch (err) {
+        console.error("Error al guardar estaciones en Firestore:", err);
       }
     };
 
-    // Save users to Firestore (Strict path: /artifacts/{appId}/public/data/platform_users/current)
+    // Save users to Firestore
     window.saveUsersToCloud = async function(usersList) {
-      if (!db || !auth?.currentUser) return;
+      if (!db) return;
       try {
         const usersDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'platform_users', 'current');
-        // Almacenar sólo usuarios adicionales para no exponer el Super Admin
         await setDoc(usersDocRef, {
           users: usersList,
           updatedAt: new Date().toISOString()
         }, { merge: true });
-        markCloudStatus(true, "Usuarios Sincronizados en Firestore");
-      } catch (e) {
-        console.error("Error al guardar usuarios en Firestore:", e);
+      } catch (err) {
+        console.error("Error al guardar usuarios en Firestore:", err);
       }
     };
+  </script>
 
-    // Listen for stations real-time updates
-    function listenToCloudStations() {
-      if (!db || !auth?.currentUser) return;
-      const publicDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'stations_summary', 'current');
-      stationsUnsub = onSnapshot(publicDocRef, (snap) => {
-        if (snap.exists()) {
-          const data = snap.data();
-          if (data && Array.isArray(data.stations) && data.stations.length > 0) {
-            window.receiveRemoteStations(data.stations, data.updatedAt);
-          }
-        } else {
-          // Push initial defaults if Firestore document is not yet initialized
-          window.saveStationsToCloud(window.currentStations);
-        }
-      }, (err) => {
-        console.warn("Fallo en snapshot de estaciones:", err);
-      });
-    }
+  <!-- ==================== MODAL DE DEPURACIÓN Y BORRADO DE DATOS (EXCLUSIVO SUPER_ADMIN) ==================== -->
+  <div id="purgeDataModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-hidden border border-slate-200 shadow-2xl flex flex-col">
+      
+      <!-- Modal Header -->
+      <div class="p-5 sm:p-6 border-b border-slate-200 flex items-center justify-between bg-rose-50/60">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-rose-600 text-white flex items-center justify-center shadow-md shadow-rose-600/20">
+            <i data-lucide="trash-2" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="font-extrabold text-base text-slate-900">Depuración y Borrado de Información</h3>
+              <span class="text-[10px] px-2 py-0.5 rounded-full font-mono font-bold bg-rose-100 text-rose-700 border border-rose-200">SUPER ADMIN</span>
+            </div>
+            <p class="text-xs text-slate-500">Gestión granular de eliminación con sincronización inmediata en Firebase</p>
+          </div>
+        </div>
+        <button onclick="closePurgeDataModal()" class="p-2 rounded-xl text-slate-400 hover:text-slate-800 hover:bg-white transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
 
-    // Listen for users real-time updates
-    function listenToCloudUsers() {
-      if (!db || !auth?.currentUser) return;
-      const usersDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'platform_users', 'current');
-      usersUnsub = onSnapshot(usersDocRef, (snap) => {
-        if (snap.exists()) {
-          const data = snap.data();
-          if (data && Array.isArray(data.users)) {
-            window.receiveRemoteUsers(data.users);
-          }
-        }
-      }, (err) => {
-        console.warn("Fallo en snapshot de usuarios:", err);
-      });
-    }
+      <!-- Modal Body -->
+      <div class="p-6 overflow-y-auto flex-1 space-y-5 text-xs">
+        
+        <!-- Alerta de Advertencia -->
+        <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-2.5 text-amber-900">
+          <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600 shrink-0 mt-0.5"></i>
+          <p class="text-[11px] leading-relaxed">
+            <strong>Atención:</strong> Las operaciones de borrado son irreversibles. Al confirmar, los registros seleccionados se eliminarán inmediatamente de esta pantalla y de la base de datos de <strong>Firebase Firestore</strong> en todos los dispositivos conectados.
+          </p>
+        </div>
 
-    // Modal control for Firebase credentials (Exclusive to SUPER_ADMIN)
-    window.openFirebaseConfigModal = function() {
-      if (window.activeUser?.rol !== 'SUPER_ADMIN') {
-        window.showBanner("⛔ Acceso restringido. Sólo el Super Administrador puede ver esta configuración.");
+        <!-- Selector de Tipo de Borrado -->
+        <div class="space-y-2">
+          <label class="block font-bold text-slate-800 uppercase tracking-wider text-[11px]">Selecciona el Criterio de Borrado:</label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <button type="button" onclick="setPurgeMode('ALL')" id="purgeTab-ALL" class="purge-tab-btn p-2.5 rounded-xl border border-rose-600 bg-rose-600 text-white font-bold text-center transition">
+              <i data-lucide="alert-octagon" class="w-4 h-4 mx-auto mb-1"></i>
+              <span>Borrar Todo</span>
+            </button>
+            <button type="button" onclick="setPurgeMode('STATION')" id="purgeTab-STATION" class="purge-tab-btn p-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-center transition">
+              <i data-lucide="fuel" class="w-4 h-4 mx-auto mb-1 text-[#ff6600]"></i>
+              <span>Por Estación</span>
+            </button>
+            <button type="button" onclick="setPurgeMode('PERIOD')" id="purgeTab-PERIOD" class="purge-tab-btn p-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-center transition">
+              <i data-lucide="calendar" class="w-4 h-4 mx-auto mb-1 text-blue-600"></i>
+              <span>Por Mes / Periodo</span>
+            </button>
+            <button type="button" onclick="setPurgeMode('FILE')" id="purgeTab-FILE" class="purge-tab-btn p-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-center transition">
+              <i data-lucide="file-spreadsheet" class="w-4 h-4 mx-auto mb-1 text-emerald-600"></i>
+              <span>Por Archivo</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Vista Dinámica 1: Borrar Todo -->
+        <div id="purgeView-ALL" class="p-4 rounded-2xl bg-rose-50/70 border border-rose-200 space-y-2">
+          <h4 class="font-extrabold text-sm text-rose-900 flex items-center gap-2">
+            <i data-lucide="trash" class="w-4 h-4 text-rose-600"></i>
+            Reset Completo de Toda la Información
+          </h4>
+          <p class="text-[11px] text-rose-700 leading-relaxed">
+            Esta opción eliminará <strong>todas las estaciones, reportes cargados y cortes acumulados</strong>. El tablero quedará completamente en ceros y listo para recibir un nuevo ciclo de archivos Excel.
+          </p>
+          <div class="pt-2 text-[11px] font-mono font-bold text-slate-600">
+            Estaciones actuales en la nube: <span id="purgeAllCountBadge" class="text-rose-600 font-black">0</span>
+          </div>
+        </div>
+
+        <!-- Vista Dinámica 2: Borrar por Estación -->
+        <div id="purgeView-STATION" class="hidden p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+          <div>
+            <label class="block font-bold text-slate-800 mb-1">Selecciona la estación que deseas eliminar:</label>
+            <select id="purgeStationSelect" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold focus:outline-none focus:border-rose-500">
+              <!-- Opciones dinámicas -->
+            </select>
+          </div>
+          <p class="text-[11px] text-slate-500">
+            Se eliminarán únicamente los reportes correspondientes a la sucursal elegida, conservando intactas las demás estaciones.
+          </p>
+        </div>
+
+        <!-- Vista Dinámica 3: Borrar por Mes / Periodo -->
+        <div id="purgeView-PERIOD" class="hidden p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+          <div>
+            <label class="block font-bold text-slate-800 mb-1">Selecciona el periodo o mes a depurar:</label>
+            <select id="purgePeriodSelect" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold focus:outline-none focus:border-rose-500">
+              <!-- Periodos detectados -->
+            </select>
+          </div>
+          <p class="text-[11px] text-slate-500">
+            Se eliminarán todas las estaciones y cortes que coincidan con la fecha o periodo de corte seleccionado.
+          </p>
+        </div>
+
+        <!-- Vista Dinámica 4: Borrar por Archivo Específico -->
+        <div id="purgeView-FILE" class="hidden p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+          <div>
+            <label class="block font-bold text-slate-800 mb-1">Selecciona el reporte individual a eliminar:</label>
+            <select id="purgeFileSelect" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-semibold focus:outline-none focus:border-rose-500">
+              <!-- Lista de archivos -->
+            </select>
+          </div>
+          <p class="text-[11px] text-slate-500">
+            Elimina un corte o archivo particular que haya sido cargado con errores sin afectar el resto del sistema.
+          </p>
+        </div>
+
+        <!-- Campo de Confirmación de Seguridad -->
+        <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+          <label class="block font-bold text-slate-700 text-[11px]">
+            Para autorizar la operación, escribe <span class="font-mono text-rose-600 font-extrabold">BORRAR</span> en el campo:
+          </label>
+          <input type="text" id="purgeConfirmKeywordInput" placeholder="Escribe BORRAR" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-bold focus:outline-none focus:border-rose-600 text-xs">
+          <p id="purgeValidationMsg" class="hidden text-[11px] text-rose-600 font-semibold flex items-center gap-1">
+            <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i>
+            <span>Debes escribir la palabra exacta BORRAR para confirmar.</span>
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
+        <button type="button" onclick="closePurgeDataModal()" class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-100 transition">
+          Cancelar
+        </button>
+        <button type="button" onclick="executePurgeAction()" class="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs shadow-md shadow-rose-600/30 flex items-center gap-2 active:scale-95 transition">
+          <i data-lucide="trash-2" class="w-4 h-4"></i>
+          <span>Confirmar y Ejecutar Borrado</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Variable para controlar el criterio de borrado activo
+    let currentPurgeMode = 'ALL';
+
+    function openPurgeDataModal() {
+      if (!window.activeUser || window.activeUser.rol !== 'SUPER_ADMIN') {
+        showBanner("⛔ Acceso restringido. Esta función es de uso exclusivo del Super Administrador.");
         return;
       }
-      const modal = document.getElementById('firebaseConfigModal');
-      const cfgArea = document.getElementById('firebaseConfigInput');
-      const resolved = getResolvedFirebaseConfig();
-      if (resolved && cfgArea) {
-        cfgArea.value = JSON.stringify(resolved, null, 2);
-      }
+
+      const modal = document.getElementById('purgeDataModal');
+      const confirmInput = document.getElementById('purgeConfirmKeywordInput');
+      const valMsg = document.getElementById('purgeValidationMsg');
+      if (confirmInput) confirmInput.value = '';
+      if (valMsg) valMsg.classList.add('hidden');
+
+      // Actualizar opciones de borrado
+      populatePurgeSelectors();
+      setPurgeMode('ALL');
+
       modal.classList.remove('hidden');
       lucide.createIcons();
-    };
+    }
 
-    window.closeFirebaseConfigModal = function() {
-      document.getElementById('firebaseConfigModal').classList.add('hidden');
-    };
+    function closePurgeDataModal() {
+      const modal = document.getElementById('purgeDataModal');
+      if (modal) modal.classList.add('hidden');
+    }
 
-    window.applyCustomFirebaseConfig = async function() {
-      const raw = document.getElementById('firebaseConfigInput').value.trim();
-      if (!raw) return;
-      try {
-        const parsed = JSON.parse(raw);
-        if (!parsed.apiKey || !parsed.projectId) {
-          window.showBanner("⚠️ La configuración debe contener al menos 'apiKey' y 'projectId'.");
-          return;
-        }
-        window.sessionStorage?.setItem('milenium_custom_firebase_config', JSON.stringify(parsed));
-        window.closeFirebaseConfigModal();
-        window.showBanner(`Conectando a Firebase: <strong>${parsed.projectId}</strong>...`);
-        await initCloudEngine(parsed);
-      } catch (e) {
-        window.showBanner("❌ Formato JSON inválido en la configuración de Firebase.");
+    function setPurgeMode(mode) {
+      currentPurgeMode = mode;
+      // Actualizar pestañas
+      document.querySelectorAll('.purge-tab-btn').forEach(b => {
+        b.className = 'purge-tab-btn p-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-center transition';
+      });
+      const activeBtn = document.getElementById(`purgeTab-${mode}`);
+      if (activeBtn) {
+        activeBtn.className = 'purge-tab-btn p-2.5 rounded-xl border border-rose-600 bg-rose-600 text-white font-bold text-center transition';
       }
-    };
 
-    // Initialize Firebase Engine
-    initCloudEngine();
+      // Ocultar todas las vistas y mostrar la seleccionada
+      ['ALL', 'STATION', 'PERIOD', 'FILE'].forEach(m => {
+        const v = document.getElementById(`purgeView-${m}`);
+        if (v) v.classList.toggle('hidden', m !== mode);
+      });
+    }
+
+    function populatePurgeSelectors() {
+      const stations = window.currentStations || [];
+      const allCountBadge = document.getElementById('purgeAllCountBadge');
+      if (allCountBadge) allCountBadge.textContent = `${stations.length} registro(s)`;
+
+      // 1. Selector de Estaciones
+      const stSelect = document.getElementById('purgeStationSelect');
+      if (stSelect) {
+        stSelect.innerHTML = '';
+        if (stations.length === 0) {
+          stSelect.innerHTML = '<option value="">No hay estaciones cargadas</option>';
+        } else {
+          stations.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.id;
+            opt.textContent = `⛽ ${s.nombre} (${formatCurrency(s.ventaTotal)})`;
+            stSelect.appendChild(opt);
+          });
+        }
+      }
+
+      // 2. Selector de Periodos / Meses
+      const periodSelect = document.getElementById('purgePeriodSelect');
+      if (periodSelect) {
+        periodSelect.innerHTML = '';
+        const uniquePeriods = [...new Set(stations.map(s => s.periodo).filter(Boolean))];
+        if (uniquePeriods.length === 0) {
+          periodSelect.innerHTML = '<option value="">No hay periodos disponibles</option>';
+        } else {
+          uniquePeriods.forEach(p => {
+            const countInPeriod = stations.filter(s => s.periodo === p).length;
+            const opt = document.createElement('option');
+            opt.value = p;
+            opt.textContent = `📅 ${p} (${countInPeriod} estación/es)`;
+            periodSelect.appendChild(opt);
+          });
+        }
+      }
+
+      // 3. Selector de Archivos individuales
+      const fileSelect = document.getElementById('purgeFileSelect');
+      if (fileSelect) {
+        fileSelect.innerHTML = '';
+        if (stations.length === 0) {
+          fileSelect.innerHTML = '<option value="">No hay archivos disponibles</option>';
+        } else {
+          stations.forEach((s, idx) => {
+            const fileName = s.sourceFileName || `reporte_${s.id.toLowerCase()}.xlsx`;
+            const opt = document.createElement('option');
+            opt.value = s.id;
+            opt.textContent = `📄 ${fileName} - ${s.nombre} (${formatNumber(s.litros)} L)`;
+            fileSelect.appendChild(opt);
+          });
+        }
+      }
+    }
+
+    async function executePurgeAction() {
+      if (!window.activeUser || window.activeUser.rol !== 'SUPER_ADMIN') {
+        showBanner("⛔ Operación denegada. Se requiere rol de Super Administrador.");
+        return;
+      }
+
+      const confirmKeyword = document.getElementById('purgeConfirmKeywordInput').value.trim().toUpperCase();
+      const valMsg = document.getElementById('purgeValidationMsg');
+
+      if (confirmKeyword !== 'BORRAR') {
+        if (valMsg) valMsg.classList.remove('hidden');
+        return;
+      }
+
+      if (valMsg) valMsg.classList.add('hidden');
+
+      let deletedDescription = '';
+      const prevCount = window.currentStations.length;
+
+      if (currentPurgeMode === 'ALL') {
+        window.currentStations = [];
+        processedFileHashes.clear();
+        deletedDescription = `Se vaciaron todas las estaciones (${prevCount} registros). El panel quedó en ceros.`;
+      } else if (currentPurgeMode === 'STATION') {
+        const targetId = document.getElementById('purgeStationSelect').value;
+        const targetName = window.currentStations.find(s => s.id === targetId)?.nombre || targetId;
+        window.currentStations = window.currentStations.filter(s => s.id !== targetId);
+        deletedDescription = `Se eliminó la estación <strong>${targetName}</strong> de la base de datos.`;
+      } else if (currentPurgeMode === 'PERIOD') {
+        const targetPeriod = document.getElementById('purgePeriodSelect').value;
+        window.currentStations = window.currentStations.filter(s => s.periodo !== targetPeriod);
+        deletedDescription = `Se eliminaron todos los registros correspondientes al periodo <strong>${targetPeriod}</strong>.`;
+      } else if (currentPurgeMode === 'FILE') {
+        const targetId = document.getElementById('purgeFileSelect').value;
+        const targetItem = window.currentStations.find(s => s.id === targetId);
+        const fileName = targetItem?.sourceFileName || targetItem?.nombre || targetId;
+        window.currentStations = window.currentStations.filter(s => s.id !== targetId);
+        deletedDescription = `Se eliminó el archivo <strong>${fileName}</strong> del sistema.`;
+      }
+
+      // Persistir de inmediato en Firebase Firestore
+      if (window.saveStationsToCloud) {
+        await window.saveStationsToCloud(window.currentStations);
+      }
+
+      // Cerrar modal y refrescar la vista
+      closePurgeDataModal();
+      populateStationSelect();
+      updateDashboard();
+      showBanner(`🗑️ <strong>Depuración completada:</strong> ${deletedDescription}`);
+    }
+
+    // Asegurar que el borrado de usuarios persista en Firestore
+    const originalDeleteUser = window.deleteUser;
+    window.deleteUser = function(id) {
+      if (!window.activeUser || window.activeUser.rol !== 'SUPER_ADMIN') {
+        showBanner("⛔ Sólo el Super Administrador puede eliminar usuarios.");
+        return;
+      }
+
+      const target = window.platformUsers.find(x => x.id === id);
+      if (target?.rol === 'SUPER_ADMIN' || target?.id === ROOT_SUPER_ADMIN.id) {
+        showBanner("⛔ La cuenta de Super Administrador (lnoriega) está protegida y no puede ser eliminada.");
+        return;
+      }
+
+      const userName = target?.nombre || target?.username || 'Usuario';
+      window.platformUsers = window.platformUsers.filter(x => x.id !== id);
+
+      if (window.saveUsersToCloud) {
+        const usersToSave = window.platformUsers.filter(u => u.id !== ROOT_SUPER_ADMIN.id);
+        window.saveUsersToCloud(usersToSave);
+      }
+
+      renderAdminUsersTable();
+      const badge = document.getElementById('usersCountBadge');
+      if (badge) badge.textContent = window.platformUsers.length;
+      showBanner(`Usuario <strong>${userName}</strong> eliminado de la plataforma y de Firebase.`);
+    };
   </script>
 
   <script>
