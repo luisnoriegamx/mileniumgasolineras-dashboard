@@ -2,55 +2,56 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   
   <!-- Anti-caching tags to ensure immediate updates on Vercel and browsers -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  
-  <title>Milenium Business Panel | Control Operativo & Ventas</title>
-  
-  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  
-  <!-- Tailwind CSS CDN -->
+
+  <!-- PWA & Mobile Web App Capabilities -->
+  <meta name="theme-color" content="#ff6600">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Milenium Panel">
+  <link rel="apple-touch-icon" href="https://i.ibb.co/yB6VkSvx/Logo-Milenium.png">
+
+  <title>Milenium Business Panel</title>
+
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <!-- SheetJS (Excel Parser) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  
-  <!-- Chart.js 4.4 CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <!-- html2pdf.js for Executive PDF Reports -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
   <script>
     tailwind.config = {
       theme: {
         extend: {
           fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
             mono: ['"JetBrains Mono"', 'monospace'],
           },
           colors: {
             milenium: {
-              white: '#ffffff',
-              canvas: '#f8fafc',
-              card: '#ffffff',
-              border: '#e2e8f0',
-              'border-subtle': '#f1f5f9',
-              black: '#09090b',
-              ink: '#18181b',
-              muted: '#71717a',
               orange: '#ff6600',
-              'orange-dark': '#e05900',
-              'orange-light': '#ff7a1a',
-              'orange-soft': '#fff7ed',
-              'orange-glow': 'rgba(255, 102, 0, 0.18)',
+              orangeDark: '#e05900',
+              orangeLight: '#fff2e8',
+              black: '#09090b',
             }
           }
         }
@@ -131,6 +132,13 @@
     .status-pulse {
       animation: orange-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
+
+    /* Print and PDF generation styles */
+    @media print {
+      body { background: #ffffff !important; }
+      header, footer, #dropZoneContainer, .no-print { display: none !important; }
+      .milenium-card { box-shadow: none !important; border: 1px solid #cbd5e1 !important; }
+    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-[#ff6600] selection:text-white">
@@ -196,7 +204,7 @@
   </div>
 
   <!-- Top Navigation Header -->
-  <header class="sticky top-0 z-40 milenium-glass border-b border-slate-200/90 px-4 sm:px-8 py-3.5 transition-all">
+  <header class="sticky top-0 z-40 milenium-glass border-b border-slate-200/90 px-4 sm:px-8 py-3.5 transition-all no-print">
     <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
       
       <!-- Brand & Status -->
@@ -217,7 +225,7 @@
         </div>
       </div>
 
-      <!-- Actions, Role Badges & Admin Trigger -->
+      <!-- Actions, Role Badges & Controls -->
       <div class="flex items-center flex-wrap gap-2.5">
         
         <!-- Frequency Selector (Diario / Semanal / Mensual) -->
@@ -233,8 +241,14 @@
           </button>
         </div>
 
+        <!-- Botón Exportar PDF Ejecutivo -->
+        <button onclick="generateExecutivePDF()" title="Descargar Resumen Ejecutivo en PDF" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-slate-300 hover:border-[#ff6600] text-slate-800 hover:text-[#ff6600] text-xs font-bold shadow-sm transition active:scale-95">
+          <i data-lucide="file-text" class="w-4 h-4 text-[#ff6600]"></i>
+          <span class="hidden sm:inline">Reporte PDF</span>
+        </button>
+
         <!-- Import Button (Controlled by role) -->
-        <label id="uploadBtnLabel" class="cursor-pointer group flex items-center gap-2 px-4 py-2 rounded-xl orange-glow-btn text-xs sm:text-sm font-bold active:scale-95">
+        <label id="uploadBtnLabel" class="cursor-pointer group flex items-center gap-2 px-4 py-2 rounded-xl orange-glow-btn text-xs sm:text-sm font-bold active:scale-95 shadow-sm">
           <i data-lucide="upload" class="w-4 h-4 transition-transform group-hover:-translate-y-0.5 stroke-[2.5]"></i>
           <span class="hidden sm:inline">Cargar Reportes</span>
           <span class="sm:hidden">Cargar</span>
@@ -285,6 +299,10 @@
                 <i data-lucide="users" class="w-3.5 h-3.5 text-[#ff6600]"></i>
                 <span>Gestionar Usuarios</span>
               </button>
+              <button onclick="toggleUserDropdown(); openAdminModal('targets')" class="w-full flex items-center gap-2 p-2 rounded-xl hover:bg-slate-50 text-slate-700 font-semibold text-[11px] transition">
+                <i data-lucide="target" class="w-3.5 h-3.5 text-[#ff6600]"></i>
+                <span>Configurar Metas de Venta</span>
+              </button>
               <button onclick="toggleUserDropdown(); openAdminModal('purge')" class="w-full flex items-center gap-2 p-2 rounded-xl hover:bg-rose-50 text-rose-700 font-semibold text-[11px] transition">
                 <i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-600"></i>
                 <span>Borrado & Depuración de Datos</span>
@@ -310,16 +328,16 @@
   </header>
 
   <!-- Main Container -->
-  <main class="flex-1 max-w-7xl mx-auto w-full p-4 sm:p-6 lg:p-8 space-y-6">
+  <main id="executiveReportContainer" class="flex-1 max-w-7xl mx-auto w-full p-4 sm:p-6 lg:p-8 space-y-6">
 
     <!-- Status Notification Banner -->
-    <div id="statusBanner" class="bg-white p-3.5 rounded-2xl flex flex-wrap items-center justify-between gap-3 text-xs border border-orange-200 shadow-sm bg-gradient-to-r from-orange-50/60 to-white">
+    <div id="statusBanner" class="bg-white p-3.5 rounded-2xl flex flex-wrap items-center justify-between gap-3 text-xs border border-orange-200 shadow-sm bg-gradient-to-r from-orange-50/60 to-white no-print">
       <div class="flex items-center gap-2.5">
         <div class="p-1 rounded-full bg-[#ff6600]/15 text-[#ff6600]">
           <i data-lucide="shield-check" class="w-4 h-4"></i>
         </div>
         <p class="font-medium text-slate-700" id="bannerMessage">
-          Panel Corporativo sincronizado con estaciones: <strong>GUADALUPE, REYNOSA, STO DOMINGO</strong>.
+          Panel Corporativo sincronizado con Firebase Firestore.
         </p>
       </div>
       <div class="flex items-center gap-2">
@@ -328,7 +346,7 @@
     </div>
 
     <!-- Duplicate Detection & Ingestion Audit Toast -->
-    <div id="ingestionAlert" class="hidden p-4 rounded-2xl bg-white border border-slate-200 shadow-lg text-xs space-y-2 transition-all">
+    <div id="ingestionAlert" class="hidden p-4 rounded-2xl bg-white border border-slate-200 shadow-lg text-xs space-y-2 transition-all no-print">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <span class="p-1.5 rounded-lg bg-orange-100 text-[#ff6600]" id="ingestionIconBox">
@@ -345,34 +363,52 @@
       </div>
     </div>
 
-    <!-- Filter & Station + Month / Period Selector Bar (EXACT REQUESTED POSITION) -->
-    <div class="bg-white p-4 rounded-2xl flex flex-wrap items-center justify-between gap-4 border border-slate-200 shadow-sm">
-      <div class="flex flex-wrap items-center gap-4 w-full lg:w-auto">
+    <!-- Filter & Station + Month / Period + Rango de Fechas Personalizado -->
+    <div class="bg-white p-4 rounded-2xl flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 border border-slate-200 shadow-sm no-print">
+      <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
         
         <!-- Filter 1: Estación -->
-        <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+        <div class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-500">
           <i data-lucide="filter" class="w-4 h-4 text-[#ff6600]"></i>
           <span>Estación:</span>
-          <select id="stationSelect" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 text-slate-900 text-xs sm:text-sm font-bold rounded-xl px-4 py-2 focus:outline-none focus:border-[#ff6600] cursor-pointer min-w-[240px] shadow-sm ml-1">
+          <select id="stationSelect" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 text-slate-900 text-xs sm:text-sm font-bold rounded-xl px-3 py-2 focus:outline-none focus:border-[#ff6600] cursor-pointer min-w-[210px] shadow-sm ml-1">
             <option value="ALL">🌐 Red Milenium (Consolidado Total)</option>
           </select>
         </div>
 
-        <!-- Filter 2: Mes / Periodo (DIRECTLY NEXT TO STATION) -->
-        <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-500">
+        <!-- Filter 2: Mes / Periodo Predefinido -->
+        <div class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-500">
           <i data-lucide="calendar" class="w-4 h-4 text-[#ff6600]"></i>
           <span>Mes / Periodo:</span>
-          <select id="monthPeriodSelect" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 text-slate-900 text-xs sm:text-sm font-bold rounded-xl px-4 py-2 focus:outline-none focus:border-[#ff6600] cursor-pointer min-w-[260px] shadow-sm ml-1">
+          <select id="monthPeriodSelect" onchange="handleMonthPeriodChange()" class="bg-slate-50 border border-slate-300 text-slate-900 text-xs sm:text-sm font-bold rounded-xl px-3 py-2 focus:outline-none focus:border-[#ff6600] cursor-pointer min-w-[220px] shadow-sm ml-1">
             <option value="ALL">📅 Todos los Meses (Acumulado Total)</option>
           </select>
         </div>
 
+        <!-- Filter 3: Rango de Fechas Personalizado Visible -->
+        <div class="flex items-center flex-wrap gap-2 bg-slate-50 border border-slate-200 p-1.5 rounded-xl text-xs">
+          <span class="font-bold text-slate-600 uppercase text-[10px] pl-1 flex items-center gap-1">
+            <i data-lucide="clock" class="w-3.5 h-3.5 text-[#ff6600]"></i> Rango:
+          </span>
+          <div class="flex items-center gap-1">
+            <span class="text-slate-400 text-[10px]">Desde</span>
+            <input type="date" id="customStartDate" onchange="handleCustomDateInput()" class="bg-white border border-slate-300 rounded-lg px-2 py-1 text-slate-800 text-xs font-mono font-medium focus:outline-none focus:border-[#ff6600]">
+          </div>
+          <div class="flex items-center gap-1">
+            <span class="text-slate-400 text-[10px]">Hasta</span>
+            <input type="date" id="customEndDate" onchange="handleCustomDateInput()" class="bg-white border border-slate-300 rounded-lg px-2 py-1 text-slate-800 text-xs font-mono font-medium focus:outline-none focus:border-[#ff6600]">
+          </div>
+          <button onclick="clearCustomDateRange()" title="Limpiar rango de fechas" class="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+
       </div>
 
-      <div class="flex items-center gap-3 ml-auto text-xs font-mono text-slate-500">
+      <div class="flex items-center gap-3 lg:ml-auto text-xs font-mono text-slate-500 self-end lg:self-center">
         <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200">
           <span class="w-2 h-2 rounded-full bg-[#ff6600]"></span>
-          <span id="statCountText" class="text-slate-800 font-sans font-semibold">3 Estaciones en Operación</span>
+          <span id="statCountText" class="text-slate-800 font-sans font-semibold">0 Estaciones &bull; 0 Cortes</span>
         </div>
         <div class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200">
           <i data-lucide="cloud" class="w-3.5 h-3.5 text-[#ff6600]"></i>
@@ -381,14 +417,17 @@
       </div>
     </div>
 
-    <!-- 4 High Impact Executive Cards (White cards, Black numbers, Orange accents) -->
+    <!-- 4 High Impact Executive Cards with Month-over-Month (MoM) badges -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       
       <!-- Card 1: Facturación Total Neta -->
       <div class="milenium-card p-5 rounded-2xl relative overflow-hidden group">
         <div class="flex items-start justify-between">
           <div>
-            <p class="text-[11px] font-extrabold uppercase tracking-widest text-slate-500">Facturación Total Neta</p>
+            <div class="flex items-center gap-2">
+              <p class="text-[11px] font-extrabold uppercase tracking-widest text-slate-500">Facturación Total Neta</p>
+              <span id="momRevenueBadge" class="hidden text-[10px] font-mono font-bold px-1.5 py-0.2 rounded">--</span>
+            </div>
             <h3 class="text-2xl sm:text-3xl font-black text-slate-900 mt-2 tracking-tight" id="kpiTotalRevenue">$0.00</h3>
           </div>
           <div class="p-2.5 rounded-xl bg-orange-50 text-[#ff6600] border border-orange-200 group-hover:scale-110 transition duration-200 shadow-sm">
@@ -405,7 +444,10 @@
       <div class="milenium-card p-5 rounded-2xl relative overflow-hidden group">
         <div class="flex items-start justify-between">
           <div>
-            <p class="text-[11px] font-extrabold uppercase tracking-widest text-slate-500">Volumen Despachado</p>
+            <div class="flex items-center gap-2">
+              <p class="text-[11px] font-extrabold uppercase tracking-widest text-slate-500">Volumen Despachado</p>
+              <span id="momVolumeBadge" class="hidden text-[10px] font-mono font-bold px-1.5 py-0.2 rounded">--</span>
+            </div>
             <h3 class="text-2xl sm:text-3xl font-black text-slate-900 mt-2 tracking-tight" id="kpiTotalLiters">0 L</h3>
           </div>
           <div class="p-2.5 rounded-xl bg-slate-100 text-slate-900 border border-slate-200 group-hover:scale-110 transition duration-200 shadow-sm">
@@ -422,7 +464,10 @@
       <div class="milenium-card p-5 rounded-2xl relative overflow-hidden group">
         <div class="flex items-start justify-between">
           <div>
-            <p class="text-[11px] font-extrabold uppercase tracking-widest text-slate-500">Efectivo Líquido</p>
+            <div class="flex items-center gap-2">
+              <p class="text-[11px] font-extrabold uppercase tracking-widest text-slate-500">Efectivo Líquido</p>
+              <span id="momCashBadge" class="hidden text-[10px] font-mono font-bold px-1.5 py-0.2 rounded">--</span>
+            </div>
             <h3 class="text-2xl sm:text-3xl font-black text-slate-900 mt-2 tracking-tight" id="kpiCash">$0.00</h3>
           </div>
           <div class="p-2.5 rounded-xl bg-orange-50 text-[#ff6600] border border-orange-200 group-hover:scale-110 transition duration-200 shadow-sm">
@@ -454,7 +499,7 @@
 
     </div>
 
-    <!-- Second Row: Advanced CEO Strategic KPIs -->
+    <!-- Second Row: Advanced Strategic KPIs -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
       
       <!-- KPI Strategic 1: Precio Promedio Ponderado por Litro -->
@@ -514,6 +559,72 @@
         <div class="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
           <span class="text-slate-500">Tolerancia operativa:</span>
           <span class="font-mono font-bold text-emerald-600" id="kpiJarreosStatus">En norma (&lt; 0.40%)</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- FEATURE 1 & 3: Proyecciones de Metas y Tendencias Multi-Mes -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <!-- Panel de Metas y Cumplimiento de Ventas -->
+      <div class="milenium-card p-5 rounded-2xl flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <h4 class="font-extrabold text-sm text-slate-900 flex items-center gap-2 uppercase tracking-wide">
+              <i data-lucide="target" class="w-4 h-4 text-[#ff6600]"></i>
+              Metas de Venta & Proyección
+            </h4>
+            <p class="text-[11px] text-slate-500">Progreso mensual por estación vs objetivo</p>
+          </div>
+          <button onclick="openAdminModal('targets')" class="text-[10px] font-bold text-[#ff6600] hover:underline no-print">
+            Editar Metas
+          </button>
+        </div>
+
+        <div id="targetsProgressContainer" class="space-y-3.5 my-2">
+          <!-- Dynamic progress bars injected here -->
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+          <span>Cumplimiento Global:</span>
+          <span class="font-mono font-black text-slate-900" id="globalTargetPercent">0.0%</span>
+        </div>
+      </div>
+
+      <!-- Gráfico de Tendencias Históricas Multi-Mes (Líneas Magna, Premium, Diesel) -->
+      <div class="milenium-card p-5 rounded-2xl lg:col-span-2 flex flex-col justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+          <div>
+            <h4 class="font-extrabold text-sm text-slate-900 flex items-center gap-2 uppercase tracking-wide">
+              <i data-lucide="line-chart" class="w-4 h-4 text-[#ff6600]"></i>
+              Evolución y Tendencia de Combustibles (Mes a Mes)
+            </h4>
+            <p class="text-[11px] text-slate-500">Histórico de volumen despachado por tipo de combustible</p>
+          </div>
+          <div class="flex items-center gap-3 text-[11px] font-mono">
+            <span class="inline-flex items-center gap-1 text-emerald-600 font-bold">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Magna
+            </span>
+            <span class="inline-flex items-center gap-1 text-rose-600 font-bold">
+              <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Premium
+            </span>
+            <span class="inline-flex items-center gap-1 text-black font-bold">
+              <span class="w-2.5 h-2.5 rounded-full bg-black"></span> Diesel
+            </span>
+          </div>
+        </div>
+
+        <div class="relative h-60 w-full">
+          <canvas id="historicalTrendChart"></canvas>
+        </div>
+
+        <div class="flex items-center justify-between text-xs text-slate-500 pt-3 border-t border-slate-100">
+          <span class="flex items-center gap-1 text-slate-700">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-[#ff6600]"></i> 
+            Tendencia calculada con base en los reportes en Firestore
+          </span>
+          <span class="font-mono text-slate-700 font-bold" id="trendInsightText">Analizando histórico...</span>
         </div>
       </div>
 
@@ -594,6 +705,49 @@
         </div>
       </div>
 
+    </div>
+
+    <!-- FEATURE 4: Semáforo Operativo & Auditoría de Faltantes / Mermas -->
+    <div class="milenium-card rounded-2xl p-5 border border-slate-200">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
+        <div>
+          <h4 class="font-extrabold text-sm text-slate-900 flex items-center gap-2 uppercase tracking-wide">
+            <i data-lucide="shield-alert" class="w-4 h-4 text-[#ff6600]"></i>
+            Semáforo de Auditoría: Control de Mermas, Jarreos y Faltantes
+          </h4>
+          <p class="text-[11px] text-slate-500">Monitoreo de calibración técnica de dispensarios y arqueo de diferencias de caja</p>
+        </div>
+        <div class="flex items-center gap-2 text-xs font-mono">
+          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">
+            &lt; 0.40% Normal
+          </span>
+          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200 font-bold">
+            0.40% - 0.60% Atención
+          </span>
+          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200 font-bold">
+            &gt; 0.60% Alerta
+          </span>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs font-mono">
+          <thead class="bg-slate-50 text-slate-600 uppercase tracking-wider font-extrabold border-b border-slate-200">
+            <tr>
+              <th class="py-2.5 px-3">Estación / Periodo</th>
+              <th class="py-2.5 px-3 text-right">Volumen Despachado</th>
+              <th class="py-2.5 px-3 text-right">Jarreos (Calibración)</th>
+              <th class="py-2.5 px-3 text-center">Ratio de Merma</th>
+              <th class="py-2.5 px-3 text-right text-rose-600">Faltantes Caja</th>
+              <th class="py-2.5 px-3 text-right text-slate-700">Débitos / Ajustes</th>
+              <th class="py-2.5 px-3 text-center">Estado Auditoría</th>
+            </tr>
+          </thead>
+          <tbody id="auditRadarTableBody" class="divide-y divide-slate-100 text-slate-700">
+            <!-- Dynamic audit rows -->
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Second Row: Payment Arqueo & Fiscal Audit (IEPS, IVA, Subtotales) -->
@@ -709,9 +863,9 @@
       </div>
     </div>
 
-    <!-- Detailed Station DataTable -->
+    <!-- Detailed Station DataTable with Dedicated Table Mode Filters -->
     <div class="milenium-card rounded-2xl overflow-hidden border border-slate-200">
-      <div class="p-5 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 bg-slate-50/70">
+      <div class="p-4 sm:p-5 border-b border-slate-200 flex flex-wrap items-center justify-between gap-4 bg-slate-50/70">
         <div>
           <h4 class="font-extrabold text-sm text-slate-900 flex items-center gap-2 uppercase tracking-wide">
             <i data-lucide="layers" class="w-4 h-4 text-[#ff6600]"></i>
@@ -719,7 +873,26 @@
           </h4>
           <p class="text-[11px] text-slate-500">Auditoría por sucursal con métricas de combustibles, aceites y arqueo</p>
         </div>
-        <div class="flex items-center gap-2">
+
+        <div class="flex flex-wrap items-center gap-2.5 no-print">
+          <!-- Table Mode Selector Buttons: Consolidado Total vs Desglose por Mes -->
+          <div class="flex items-center bg-white p-1 rounded-xl border border-slate-300 shadow-sm text-xs font-bold text-slate-600">
+            <button type="button" onclick="setTableMode('CONSOLIDATED')" id="btnTableModeConsolidated" class="px-3 py-1.5 rounded-lg bg-black text-white font-extrabold shadow-sm transition">
+              Consolidado Total (Meses juntos)
+            </button>
+            <button type="button" onclick="setTableMode('BY_MONTH')" id="btnTableModeByMonth" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-black transition">
+              Desglose por Mes
+            </button>
+          </div>
+
+          <!-- Secondary Month Filter for Table (visible in BY_MONTH mode) -->
+          <div id="tableSpecificMonthContainer" class="hidden flex items-center gap-1.5 bg-white border border-slate-300 px-2.5 py-1.5 rounded-xl text-xs">
+            <i data-lucide="calendar" class="w-3.5 h-3.5 text-[#ff6600]"></i>
+            <select id="tableSpecificMonthSelect" onchange="renderTableFromState()" class="bg-transparent font-bold text-slate-800 text-xs focus:outline-none cursor-pointer">
+              <option value="ALL">Todos los Meses</option>
+            </select>
+          </div>
+
           <button onclick="exportCurrentViewCSV()" class="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-100 border border-slate-300 text-xs text-slate-800 font-bold flex items-center gap-2 transition active:scale-95 shadow-sm">
             <i data-lucide="download" class="w-3.5 h-3.5 text-[#ff6600]"></i> Exportar CSV
           </button>
@@ -738,7 +911,7 @@
               <th class="py-3.5 px-4 text-right text-[#ff6600]">Efectivo ($)</th>
               <th class="py-3.5 px-4 text-right">Tarjetas ($)</th>
               <th class="py-3.5 px-4 text-right">Créditos ($)</th>
-              <th class="py-3.5 px-4 text-center">Acciones</th>
+              <th class="py-3.5 px-4 text-center no-print">Acciones</th>
             </tr>
           </thead>
           <tbody id="stationsTableBody" class="divide-y divide-slate-100 text-slate-700 font-mono">
@@ -749,14 +922,14 @@
     </div>
 
     <!-- Drag & Drop Zone for Live Excel Ingestion -->
-    <div id="dropZoneContainer" class="border-2 border-dashed border-slate-300 hover:border-[#ff6600] rounded-2xl p-7 text-center transition-all cursor-pointer bg-white group shadow-sm hover:shadow-md">
+    <div id="dropZoneContainer" class="border-2 border-dashed border-slate-300 hover:border-[#ff6600] rounded-2xl p-7 text-center transition-all cursor-pointer bg-white group shadow-sm hover:shadow-md no-print">
       <div class="max-w-md mx-auto space-y-2.5">
         <div class="w-12 h-12 mx-auto rounded-2xl bg-orange-50 border border-orange-200 flex items-center justify-center text-[#ff6600] group-hover:scale-110 group-hover:border-[#ff6600]/40 transition">
           <i data-lucide="cloud-upload" class="w-6 h-6 stroke-[2]"></i>
         </div>
         <p class="text-sm font-bold text-slate-900">Arrastra nuevos reportes (.xlsx) de estaciones aquí</p>
         <p class="text-xs text-slate-500 leading-relaxed">
-          Detecta automáticamente el encabezado de corte, nombre de estación, rango de fechas del mes, volúmenes de Magna/Diesel/Premium, arqueo de pagos e impuestos sin recargar la página. Los datos se sincronizan con Firebase.
+          Detecta automáticamente encabezados de corte, nombre de sucursal, fechas del periodo, volúmenes de Magna/Diesel/Premium, arqueo de pagos e impuestos sin recargar la página. Sincronizado en tiempo real con Firebase.
         </p>
       </div>
     </div>
@@ -764,7 +937,7 @@
   </main>
 
   <!-- ==================== PANEL DE ADMINISTRACIÓN INTEGRADO (TABBED ADMIN CENTER) ==================== -->
-  <div id="adminModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/75 backdrop-blur-md">
+  <div id="adminModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/75 backdrop-blur-md no-print">
     <div class="bg-white rounded-3xl max-w-5xl w-full max-h-[94vh] flex flex-col border border-slate-200 shadow-2xl overflow-hidden transition-all">
       
       <!-- Modal Header con Pestañas -->
@@ -778,7 +951,7 @@
               <h3 class="font-black text-base sm:text-lg text-slate-900 tracking-tight">Panel de Administración Milenium</h3>
               <span id="adminSuperBadge" class="hidden text-[10px] px-2 py-0.5 rounded-full font-mono font-black bg-black text-[#ff6600] border border-slate-800">SUPER ADMIN</span>
             </div>
-            <p class="text-xs text-slate-500 font-medium">Control de accesos, credenciales y depuración en tiempo real</p>
+            <p class="text-xs text-slate-500 font-medium">Control de accesos, metas comerciales y depuración en tiempo real</p>
           </div>
         </div>
 
@@ -794,14 +967,14 @@
           <span>Gestión de Usuarios</span>
           <span id="tabUserCounterBadge" class="px-1.5 py-0.2 rounded-full bg-slate-100 text-slate-700 font-mono text-[10px]">1</span>
         </button>
+        <button type="button" onclick="switchAdminTab('targets')" id="adminTabBtn-targets" class="admin-nav-tab flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-slate-600 hover:text-slate-900 hover:bg-white transition border border-transparent">
+          <i data-lucide="target" class="w-4 h-4 text-[#ff6600]"></i>
+          <span>Metas Comerciales</span>
+        </button>
         <button type="button" onclick="switchAdminTab('purge')" id="adminTabBtn-purge" class="admin-nav-tab flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-slate-600 hover:text-rose-700 hover:bg-rose-50 transition border border-transparent">
           <i data-lucide="trash-2" class="w-4 h-4 text-rose-600"></i>
           <span>Depuración & Borrado de Datos</span>
           <span class="px-1.5 py-0.2 rounded bg-rose-100 text-rose-700 font-mono text-[9px] font-black uppercase">Exclusivo</span>
-        </button>
-        <button type="button" onclick="switchAdminTab('firebase')" id="adminTabBtn-firebase" class="admin-nav-tab hidden flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-slate-600 hover:text-slate-900 hover:bg-white transition border border-transparent">
-          <i data-lucide="database" class="w-4 h-4 text-[#ff6600]"></i>
-          <span>Estado Firebase Cloud</span>
         </button>
       </div>
 
@@ -935,7 +1108,34 @@
           </div>
         </div>
 
-        <!-- ================= PESTAÑA 2: DEPURACIÓN & BORRADO DE DATOS ================= -->
+        <!-- ================= PESTAÑA 2: CONFIGURACIÓN DE METAS COMERCIALES ================= -->
+        <div id="adminPanelSection-targets" class="hidden space-y-5">
+          <div class="p-4 bg-orange-50/70 border border-orange-200 rounded-2xl flex items-center justify-between gap-3 text-xs">
+            <div class="flex items-center gap-3">
+              <div class="w-9 h-9 rounded-xl bg-[#ff6600] text-white flex items-center justify-center font-bold">
+                <i data-lucide="target" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h4 class="font-extrabold text-sm text-slate-900">Configuración de Objetivos Mensuales de Venta</h4>
+                <p class="text-slate-600 mt-0.5">Define los litros objetivo por estación para medir el desempeño comercial de cada sucursal.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="targetsInputsGrid">
+              <!-- Dynamically populated target inputs per station -->
+            </div>
+            <div class="pt-3 border-t border-slate-100 flex justify-end">
+              <button onclick="saveCustomTargets()" class="px-5 py-2.5 rounded-xl orange-glow-btn font-extrabold text-xs shadow-md active:scale-95 transition flex items-center gap-2">
+                <i data-lucide="save" class="w-4 h-4"></i>
+                <span>Guardar Metas en Firebase</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= PESTAÑA 3: DEPURACIÓN & BORRADO DE DATOS ================= -->
         <div id="adminPanelSection-purge" class="hidden space-y-5">
           
           <div class="p-4 bg-rose-50 border border-rose-200 rounded-2xl flex items-start justify-between gap-3 text-rose-900">
@@ -1043,25 +1243,6 @@
 
         </div>
 
-        <!-- ================= PESTAÑA 3: CONFIGURACIÓN FIREBASE (SUPER ADMIN) ================= -->
-        <div id="adminPanelSection-firebase" class="hidden space-y-4">
-          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 text-xs">
-            <div class="flex items-center gap-2 text-slate-900 font-extrabold text-sm">
-              <i data-lucide="database" class="w-4 h-4 text-[#ff6600]"></i>
-              <span>Conexión Activa de Firebase Firestore</span>
-            </div>
-            <p class="text-slate-600 leading-relaxed">
-              El panel está sincronizado directamente con el proyecto en la nube <strong>mileniumdbestaciones</strong>. Cualquier nuevo usuario o reporte subido se almacena aquí de forma persistente.
-            </p>
-            <div class="p-3 bg-white rounded-xl border border-slate-200 font-mono text-[11px] text-slate-700 space-y-1">
-              <div><strong>Proyecto:</strong> mileniumdbestaciones</div>
-              <div><strong>Auth Domain:</strong> mileniumdbestaciones.firebaseapp.com</div>
-              <div><strong>Colección Estaciones:</strong> /artifacts/milenium-gas-dashboard/public/data/stations_summary/current</div>
-              <div><strong>Colección Usuarios:</strong> /artifacts/milenium-gas-dashboard/public/data/platform_users/current</div>
-            </div>
-          </div>
-        </div>
-
       </div>
 
       <!-- Modal Footer -->
@@ -1078,7 +1259,7 @@
   </div>
 
   <!-- Executive Footer -->
-  <footer class="bg-white border-t border-slate-200 py-4 px-6 text-xs text-slate-500 mt-auto">
+  <footer class="bg-white border-t border-slate-200 py-4 px-6 text-xs text-slate-500 mt-auto no-print">
     <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-3">
       <div class="flex items-center gap-2 font-medium">
         <span class="w-2 h-2 rounded-full bg-[#ff6600]"></span>
@@ -1086,10 +1267,9 @@
         <span class="text-slate-500">Firebase Firestore Cloud Conectado en Tiempo Real</span>
       </div>
       <div class="flex items-center gap-3">
-        <button id="btnOpenFirebaseConfig" onclick="openFirebaseConfigModal()" class="hidden text-slate-500 hover:text-[#ff6600] font-mono text-[11px] flex items-center gap-1 transition">
-          <i data-lucide="database" class="w-3.5 h-3.5 text-[#ff6600]"></i> Configuración Firebase
+        <button onclick="installPWA()" id="btnInstallPwa" class="hidden items-center gap-1.5 px-2.5 py-1 rounded-lg bg-orange-50 text-[#ff6600] border border-orange-200 font-bold hover:bg-orange-100 transition">
+          <i data-lucide="smartphone" class="w-3.5 h-3.5"></i> Instalar App Móvil
         </button>
-        <span id="sepFirebaseConfig" class="hidden text-slate-300">|</span>
         <div class="font-mono text-[11px] text-slate-400">
           Proyecto: <strong class="text-slate-700">mileniumdbestaciones</strong> &bull; Multi-Dispositivo Activo
         </div>
@@ -1097,44 +1277,13 @@
     </div>
   </footer>
 
-  <!-- Modal: Configuración de Credenciales Firebase (Super Admin) -->
-  <div id="firebaseConfigModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-    <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden border border-slate-200 shadow-2xl flex flex-col">
-      <div class="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-        <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-orange-50 text-[#ff6600] border border-orange-200 flex items-center justify-center">
-            <i data-lucide="database" class="w-5 h-5"></i>
-          </div>
-          <div>
-            <h4 class="font-bold text-sm text-slate-900">Configuración de Firebase Firestore (Super Admin)</h4>
-            <p class="text-[11px] text-slate-500">Credenciales activas del proyecto mileniumdbestaciones</p>
-          </div>
-        </div>
-        <button onclick="closeFirebaseConfigModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
-      </div>
-      <div class="p-5 space-y-3 text-xs">
-        <p class="text-slate-600 leading-relaxed">
-          Configuración actual conectada directamente al proyecto <strong>mileniumdbestaciones</strong>:
-        </p>
-        <textarea id="firebaseConfigInput" rows="8" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 font-mono text-[11px] text-slate-800 focus:outline-none focus:border-[#ff6600]"></textarea>
-      </div>
-      <div class="p-4 border-t border-slate-200 bg-slate-50 flex justify-end gap-2">
-        <button onclick="closeFirebaseConfigModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-bold hover:bg-slate-100 transition">
-          Cerrar
-        </button>
-      </div>
-    </div>
-  </div>
-
   <!-- Firebase SDK Modules for Cloud Persistence -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'milenium-gas-dashboard';
+    const appId = 'milenium-gas-dashboard';
 
     const firebaseConfig = {
       apiKey: "AIzaSyAMc39xwB34CBaKz4qYjgTYeJXCYKIy4MY",
@@ -1154,11 +1303,24 @@
       auth = getAuth(app);
       db = getFirestore(app);
 
-      signInAnonymously(auth).then(() => {
-        setupFirestoreListeners();
-      }).catch(err => {
-        console.warn("Firebase Auth fallback:", err);
-        setupFirestoreListeners();
+      onAuthStateChanged(auth, (user) => {
+        const dot = document.getElementById('cloudStatusDot');
+        const text = document.getElementById('cloudStatusText');
+        if (user) {
+          console.log("Firebase Auth conectado exitosamente. UID:", user.uid);
+          if (dot) dot.className = "w-1.5 h-1.5 rounded-full bg-emerald-500 status-pulse";
+          if (text) text.textContent = "Conectado a Firebase (Nube Activa)";
+          setupFirestoreListeners();
+        } else {
+          signInAnonymously(auth).catch(err => {
+            console.error("Error al autenticar con Firebase:", err);
+            if (dot) dot.className = "w-1.5 h-1.5 rounded-full bg-rose-500";
+            if (text) text.textContent = "Error de Auth Firebase (Revisa reglas)";
+            if (window.showBanner) {
+              window.showBanner(`⚠️ <strong>Atención Firebase:</strong> ${err.message || 'Habilita Anonymous Auth en Firebase'}`);
+            }
+          });
+        }
       });
     } catch (err) {
       console.error("Error al inicializar Firebase:", err);
@@ -1172,10 +1334,18 @@
         if (snap.exists()) {
           const data = snap.data();
           if (Array.isArray(data.stations)) {
+            console.log(`📡 Recibidos ${data.stations.length} registros desde Firestore`);
             window.receiveRemoteStations(data.stations, data.updatedAt);
           }
+        } else {
+          console.log("No existe documento previo en Firestore. Base de datos lista para recibir datos.");
         }
-      }, (err) => console.warn("Stations listener note:", err));
+      }, (err) => {
+        console.error("Error en listener de Firestore:", err);
+        if (window.showBanner) {
+          window.showBanner(`⚠️ <strong>Error Firestore:</strong> ${err.code === 'permission-denied' ? 'Permiso denegado. Revisa las reglas en Firebase Console.' : err.message}`);
+        }
+      });
 
       const usersDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'platform_users', 'current');
       onSnapshot(usersDocRef, (snap) => {
@@ -1186,10 +1356,25 @@
           }
         }
       }, (err) => console.warn("Users listener note:", err));
+
+      const targetsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'sales_targets', 'current');
+      onSnapshot(targetsDocRef, (snap) => {
+        if (snap.exists()) {
+          const data = snap.data();
+          if (data.targets && typeof data.targets === 'object') {
+            window.stationSalesTargets = data.targets;
+            localStorage.setItem('milenium_sales_targets', JSON.stringify(data.targets));
+            if (window.updateTargetsUI) window.updateTargetsUI();
+          }
+        }
+      }, (err) => console.warn("Targets listener note:", err));
     }
 
     window.saveStationsToCloud = async function(stationsList) {
-      if (!db) return;
+      if (!db) {
+        console.warn("Base de datos no disponible aún.");
+        return;
+      }
       try {
         const stationsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'stations_summary', 'current');
         await setDoc(stationsDocRef, {
@@ -1199,8 +1384,15 @@
         });
         localStorage.setItem('milenium_cached_stations', JSON.stringify(stationsList));
         localStorage.setItem('milenium_stations_initialized', 'true');
+        console.log(`✅ ¡Éxito! ${stationsList.length} cortes guardados en Firebase Firestore.`);
+        if (window.showBanner) {
+          window.showBanner(`☁️ <strong>Sincronizado con Firebase:</strong> ${stationsList.length} reporte(s) guardados en la nube.`);
+        }
       } catch (err) {
-        console.error("Error al guardar estaciones en Firestore:", err);
+        console.error("Error crítico al guardar estaciones en Firestore:", err);
+        if (window.showBanner) {
+          window.showBanner(`❌ <strong>Error al guardar en Firebase:</strong> ${err.message || err.code}`);
+        }
       }
     };
 
@@ -1218,244 +1410,121 @@
         console.error("Error al guardar usuarios en Firestore:", err);
       }
     };
-  </script>
 
-  <!-- ==================== LÓGICA DEL PANEL ADMIN Y DEPURACIÓN ==================== -->
-  <script>
-    let currentAdminTab = 'users';
-    let currentPurgeMode = 'ALL';
-
-    function openAdminModal(tabName = 'users') {
-      if (!window.activeUser || (window.activeUser.rol !== 'SUPER_ADMIN' && window.activeUser.rol !== 'ADMIN')) {
-        showBanner("⛔ Acceso reservado exclusivamente para administradores.");
-        return;
-      }
-
-      const modal = document.getElementById('adminModal');
-      const isSuper = window.activeUser.rol === 'SUPER_ADMIN';
-
-      const superBadge = document.getElementById('adminSuperBadge');
-      if (superBadge) superBadge.classList.toggle('hidden', !isSuper);
-
-      const purgeTabBtn = document.getElementById('adminTabBtn-purge');
-      if (purgeTabBtn) purgeTabBtn.classList.toggle('hidden', !isSuper);
-
-      const firebaseTabBtn = document.getElementById('adminTabBtn-firebase');
-      if (firebaseTabBtn) firebaseTabBtn.classList.toggle('hidden', !isSuper);
-
-      const targetTab = (!isSuper && tabName === 'purge') ? 'users' : tabName;
-
-      switchAdminTab(targetTab);
-      populatePurgeSelectors();
-      renderAdminUsersTable();
-
-      modal.classList.remove('hidden');
-      if (window.lucide) lucide.createIcons();
-    }
-
-    function closeAdminModal() {
-      const modal = document.getElementById('adminModal');
-      if (modal) modal.classList.add('hidden');
-      resetUserForm();
-    }
-
-    function switchAdminTab(tab) {
-      currentAdminTab = tab;
-      const tabs = ['users', 'purge', 'firebase'];
-
-      tabs.forEach(t => {
-        const btn = document.getElementById(`adminTabBtn-${t}`);
-        const sec = document.getElementById(`adminPanelSection-${t}`);
-
-        if (btn) {
-          if (t === tab) {
-            btn.className = t === 'purge' 
-              ? 'admin-nav-tab flex items-center gap-2 px-4 py-2 rounded-xl font-bold bg-rose-600 text-white shadow-sm transition border border-rose-600'
-              : 'admin-nav-tab flex items-center gap-2 px-4 py-2 rounded-xl font-bold bg-white text-slate-900 shadow-sm border border-slate-200 transition';
-          } else {
-            btn.className = t === 'purge'
-              ? 'admin-nav-tab flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-slate-600 hover:text-rose-700 hover:bg-rose-50 transition border border-transparent'
-              : 'admin-nav-tab flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-slate-600 hover:text-slate-900 hover:bg-white transition border border-transparent';
-          }
+    window.saveTargetsToCloud = async function(targetsObj) {
+      if (!db) return;
+      try {
+        const targetsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'sales_targets', 'current');
+        await setDoc(targetsDocRef, {
+          targets: targetsObj,
+          updatedAt: new Date().toISOString()
+        });
+        localStorage.setItem('milenium_sales_targets', JSON.stringify(targetsObj));
+        if (window.showBanner) {
+          window.showBanner("🎯 Metas comerciales guardadas en Firebase.");
         }
-
-        if (sec) {
-          sec.classList.toggle('hidden', t !== tab);
-        }
-      });
-
-      if (window.lucide) lucide.createIcons();
-    }
-
-    function setPurgeMode(mode) {
-      currentPurgeMode = mode;
-      document.querySelectorAll('.purge-tab-btn').forEach(b => {
-        b.className = 'purge-tab-btn p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-center transition';
-      });
-      const activeBtn = document.getElementById(`purgeTab-${mode}`);
-      if (activeBtn) {
-        activeBtn.className = 'purge-tab-btn p-3 rounded-xl border border-rose-600 bg-rose-600 text-white font-bold text-center transition shadow-sm';
+      } catch (err) {
+        console.error("Error al guardar metas en Firestore:", err);
       }
-
-      ['ALL', 'STATION', 'PERIOD', 'FILE'].forEach(m => {
-        const v = document.getElementById(`purgeView-${m}`);
-        if (v) v.classList.toggle('hidden', m !== mode);
-      });
-
-      if (window.lucide) lucide.createIcons();
-    }
-
-    function populatePurgeSelectors() {
-      const stations = window.currentStations || [];
-      const allCountBadge = document.getElementById('purgeAllCountBadge');
-      if (allCountBadge) allCountBadge.textContent = `${stations.length} corte(s) activo(s)`;
-
-      // 1. Selector de Estaciones
-      const stSelect = document.getElementById('purgeStationSelect');
-      if (stSelect) {
-        stSelect.innerHTML = '';
-        if (stations.length === 0) {
-          stSelect.innerHTML = '<option value="">No hay estaciones cargadas</option>';
-        } else {
-          const uniqueStationIds = [...new Set(stations.map(s => s.stationId || s.id))];
-          uniqueStationIds.forEach(id => {
-            const stObj = stations.find(s => (s.stationId || s.id) === id);
-            const opt = document.createElement('option');
-            opt.value = id;
-            opt.textContent = `⛽ ${stObj ? stObj.nombre : id}`;
-            stSelect.appendChild(opt);
-          });
-        }
-      }
-
-      // 2. Selector de Periodos / Meses
-      const periodSelect = document.getElementById('purgePeriodSelect');
-      if (periodSelect) {
-        periodSelect.innerHTML = '';
-        const uniquePeriods = [...new Set(stations.map(s => s.periodKey || s.periodo).filter(Boolean))];
-        if (uniquePeriods.length === 0) {
-          periodSelect.innerHTML = '<option value="">No hay periodos disponibles</option>';
-        } else {
-          uniquePeriods.forEach(pk => {
-            const match = stations.find(s => (s.periodKey || s.periodo) === pk);
-            const label = match ? (match.monthLabel || match.periodo) : pk;
-            const countInPeriod = stations.filter(s => (s.periodKey || s.periodo) === pk).length;
-            const opt = document.createElement('option');
-            opt.value = pk;
-            opt.textContent = `📅 ${label} (${countInPeriod} corte/s)`;
-            periodSelect.appendChild(opt);
-          });
-        }
-      }
-
-      // 3. Selector de Archivos individuales
-      const fileSelect = document.getElementById('purgeFileSelect');
-      if (fileSelect) {
-        fileSelect.innerHTML = '';
-        if (stations.length === 0) {
-          fileSelect.innerHTML = '<option value="">No hay archivos disponibles</option>';
-        } else {
-          stations.forEach((s) => {
-            const fileName = s.sourceFileName || `reporte_${s.id.toLowerCase()}.xlsx`;
-            const opt = document.createElement('option');
-            opt.value = s.id;
-            opt.textContent = `📄 ${fileName} - ${s.nombre} (${formatNumber(s.litros)} L)`;
-            fileSelect.appendChild(opt);
-          });
-        }
-      }
-    }
-
-    async function executePurgeAction() {
-      if (!window.activeUser || window.activeUser.rol !== 'SUPER_ADMIN') {
-        showBanner("⛔ Operación denegada. Se requiere rol de Super Administrador.");
-        return;
-      }
-
-      const confirmKeyword = document.getElementById('purgeConfirmKeywordInput').value.trim().toUpperCase();
-      const valMsg = document.getElementById('purgeValidationMsg');
-
-      if (confirmKeyword !== 'BORRAR') {
-        if (valMsg) valMsg.classList.remove('hidden');
-        return;
-      }
-
-      if (valMsg) valMsg.classList.add('hidden');
-
-      let deletedDescription = '';
-      const prevCount = window.currentStations.length;
-
-      if (currentPurgeMode === 'ALL') {
-        window.currentStations = [];
-        processedFileHashes.clear();
-        deletedDescription = `Se vaciaron todas las estaciones (${prevCount} registros). El panel quedó en ceros.`;
-      } else if (currentPurgeMode === 'STATION') {
-        const targetId = document.getElementById('purgeStationSelect').value;
-        const targetObj = window.currentStations.find(s => (s.stationId || s.id) === targetId);
-        const targetName = targetObj ? targetObj.nombre : targetId;
-        window.currentStations = window.currentStations.filter(s => (s.stationId || s.id) !== targetId);
-        deletedDescription = `Se eliminaron todos los cortes de la estación <strong>${targetName}</strong>.`;
-      } else if (currentPurgeMode === 'PERIOD') {
-        const targetPeriod = document.getElementById('purgePeriodSelect').value;
-        window.currentStations = window.currentStations.filter(s => (s.periodKey || s.periodo) !== targetPeriod);
-        deletedDescription = `Se eliminaron todos los cortes del periodo <strong>${targetPeriod}</strong>.`;
-      } else if (currentPurgeMode === 'FILE') {
-        const targetId = document.getElementById('purgeFileSelect').value;
-        const targetItem = window.currentStations.find(s => s.id === targetId);
-        const fileName = targetItem?.sourceFileName || targetItem?.nombre || targetId;
-        window.currentStations = window.currentStations.filter(s => s.id !== targetId);
-        deletedDescription = `Se eliminó el archivo <strong>${fileName}</strong> del sistema.`;
-      }
-
-      localStorage.setItem('milenium_cached_stations', JSON.stringify(window.currentStations));
-      localStorage.setItem('milenium_stations_initialized', 'true');
-
-      if (window.saveStationsToCloud) {
-        await window.saveStationsToCloud(window.currentStations);
-      }
-
-      document.getElementById('purgeConfirmKeywordInput').value = '';
-
-      closeAdminModal();
-      populateStationSelect();
-      populateMonthPeriodSelect();
-      updateDashboard();
-      showBanner(`🗑️ <strong>Depuración completada:</strong> ${deletedDescription}`);
-    }
-
-    window.deleteUser = function(id) {
-      if (!window.activeUser || (window.activeUser.rol !== 'SUPER_ADMIN' && window.activeUser.rol !== 'ADMIN')) {
-        showBanner("⛔ Se requiere permiso administrativo para dar de baja usuarios.");
-        return;
-      }
-
-      const target = window.platformUsers.find(x => x.id === id);
-      if (!target) return;
-
-      if (target.rol === 'SUPER_ADMIN' || target.id === ROOT_SUPER_ADMIN.id || target.username === ROOT_SUPER_ADMIN.username) {
-        showBanner("⛔ La cuenta de Super Administrador (lnoriega) está protegida y no puede ser eliminada.");
-        return;
-      }
-
-      const userName = target.nombre || target.username || 'Usuario';
-      
-      window.platformUsers = window.platformUsers.filter(x => x.id !== id);
-      localStorage.setItem('milenium_cached_users', JSON.stringify(window.platformUsers));
-
-      if (window.saveUsersToCloud) {
-        const usersToSave = window.platformUsers.filter(u => u.id !== ROOT_SUPER_ADMIN.id);
-        window.saveUsersToCloud(usersToSave);
-      }
-
-      renderAdminUsersTable();
-      const badge = document.getElementById('usersCountBadge');
-      if (badge) badge.textContent = window.platformUsers.length;
-      showBanner(`Usuario <strong>${userName}</strong> eliminado de la plataforma y de Firebase.`);
     };
   </script>
 
-  <!-- ==================== MOTOR DE DATOS, MESES Y DASHBOARD ==================== -->
+  <!-- ==================== MOTOR DE DATOS, FILTROS Y DASHBOARD ==================== -->
   <script>
+    const ROOT_SUPER_ADMIN = {
+      id: "usr_root_superadmin",
+      username: "lnoriega",
+      password: "Mg-2026*",
+      nombre: "Super Admin (lnoriega)",
+      email: "lnoriega@grupomilenium.mx",
+      rol: "SUPER_ADMIN",
+      estacion: "ALL",
+      estado: "ACTIVO",
+      creadoEl: "2026-09-01"
+    };
+
+    window.currentStations = [];
+    window.platformUsers = [ROOT_SUPER_ADMIN];
+    window.activeUser = null;
+    window.stationSalesTargets = {
+      GUADALUPE: 450000,
+      REYNOSA: 380000,
+      STO_DOMINGO: 290000
+    };
+
+    let currentPeriodFilter = 'MENSUAL';
+    let currentTableMode = 'CONSOLIDATED';
+    let processedFileHashes = new Set();
+    let currentRenderDataset = [];
+    let currentRenderMultiplier = 1;
+
+    let fuelDonutChart = null;
+    let stationsBarChart = null;
+    let paymentPieChart = null;
+    let historicalTrendChart = null;
+
+    const formatCurrency = (val) => '$' + Number(val || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const formatNumber = (val) => Number(val || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    function showBanner(msg) {
+      const banner = document.getElementById('statusBanner');
+      const bannerMsg = document.getElementById('bannerMessage');
+      if (bannerMsg) bannerMsg.innerHTML = msg;
+      if (banner) {
+        banner.classList.remove('hidden');
+        banner.classList.add('ring-2', 'ring-[#ff6600]/40');
+        setTimeout(() => banner.classList.remove('ring-2', 'ring-[#ff6600]/40'), 3500);
+      }
+    }
+
+    // Convert any date format to ISO standard YYYY-MM-DD
+    function parseDateToISO(dateStr, fallbackIso) {
+      if (!dateStr) return fallbackIso;
+      const str = String(dateStr).trim();
+      
+      const numMatch = str.match(/([0-3]?[0-9])[/-]([0-1]?[0-9])[/-](202[0-9])/);
+      if (numMatch) {
+        const day = String(numMatch[1]).padStart(2, '0');
+        const month = String(numMatch[2]).padStart(2, '0');
+        const year = numMatch[3];
+        return `${year}-${month}-${day}`;
+      }
+
+      const monthsMap = {
+        'ENERO': '01', 'JANUARY': '01', 'ENE': '01', 'JAN': '01',
+        'FEBRERO': '02', 'FEBRUARY': '02', 'FEB': '02',
+        'MARZO': '03', 'MARCH': '03', 'MAR': '03',
+        'ABRIL': '04', 'APRIL': '04', 'ABR': '04', 'APR': '04',
+        'MAYO': '05', 'MAY': '05',
+        'JUNIO': '06', 'JUNE': '06', 'JUN': '06',
+        'JULIO': '07', 'JULY': '07', 'JUL': '07',
+        'AGOSTO': '08', 'AUGUST': '08', 'AGO': '08', 'AUG': '08',
+        'SEPTIEMBRE': '09', 'SEPTEMBER': '09', 'SEP': '09',
+        'OCTUBRE': '10', 'OCTOBER': '10', 'OCT': '10',
+        'NOVIEMBRE': '11', 'NOVEMBER': '11', 'NOV': '11',
+        'DICIEMBRE': '12', 'DECEMBER': '12', 'DIC': '12', 'DEC': '12'
+      };
+
+      const upper = str.toUpperCase();
+      let year = '2026';
+      const ym = upper.match(/202[0-9]/);
+      if (ym) year = ym[0];
+
+      let month = '09';
+      for (const [name, num] of Object.entries(monthsMap)) {
+        if (upper.includes(name)) {
+          month = num;
+          break;
+        }
+      }
+
+      let day = '01';
+      const dm = upper.match(/\b([0-3]?[0-9])\b/);
+      if (dm) day = String(dm[1]).padStart(2, '0');
+
+      return `${year}-${month}-${day}`;
+    }
+
     // Intelligent month/period extractor for any date format
     function extractPeriodDetails(rawText, fallbackName = '') {
       const text = `${rawText} ${fallbackName}`.toUpperCase();
@@ -1502,663 +1571,228 @@
         }
       }
 
-      // Check numeric dates like 01/10/2026 or 2026-10-01
-      const numericMatch = text.match(/([0-3]?[0-9])[/-]([0-1]?[0-9])[/-](202[0-9])/);
-      if (numericMatch && (!text.includes('SEPTEMBER') && !text.includes('OCTOBER'))) {
-        const m = String(numericMatch[2]).padStart(2, '0');
-        const monthsByNum = {
-          '01': 'Enero', '02': 'Febrero', '03': 'Marzo', '04': 'Abril',
-          '05': 'Mayo', '06': 'Junio', '07': 'Julio', '08': 'Agosto',
-          '09': 'Septiembre', '10': 'Octubre', '11': 'Noviembre', '12': 'Diciembre'
-        };
-        if (monthsByNum[m]) {
-          detectedMonthNum = m;
-          detectedMonthName = monthsByNum[m];
-          detectedYear = numericMatch[3];
-        }
+      let startIsoDate = `${detectedYear}-${detectedMonthNum}-01`;
+      let endIsoDate = `${detectedYear}-${detectedMonthNum}-30`;
+
+      const matchDelAl = text.match(/DEL\s+(.*?)\s+AL\s+(.*?)(?:\n|$)/i);
+      if (matchDelAl) {
+        startIsoDate = parseDateToISO(matchDelAl[1], `${detectedYear}-${detectedMonthNum}-01`);
+        endIsoDate = parseDateToISO(matchDelAl[2], `${detectedYear}-${detectedMonthNum}-30`);
       }
 
       const periodKey = `${detectedYear}-${detectedMonthNum}`;
       const monthLabel = `${detectedMonthName} ${detectedYear}`;
 
-      return { periodKey, monthLabel };
+      return { periodKey, monthLabel, startIsoDate, endIsoDate };
     }
 
-    // Default Seed Dataset with explicit month labels and IDs
-    const DEFAULT_DATASETS = [
-      {
-        id: "GUADALUPE_2026-09",
-        stationId: "GUADALUPE",
-        nombre: "GUADALUPE",
-        periodKey: "2026-09",
-        monthLabel: "Septiembre 2026",
-        periodo: "01 September 2026 AL 30 September 2026",
-        litros: 306358.86,
-        jarras: 19.53,
-        totalCombustibles: 7726356.30,
-        totalAceites: 3320.00,
-        ventaTotal: 7729676.30,
-        subtotal: 6516848.58,
-        ieps: 170131.94,
-        iva: 1042695.77,
-        efectivo: 2965294.93,
-        tarjetas: 2818464.26,
-        creditos: 1804602.72,
-        debitos: 141346.21,
-        faltantes: 6.36,
-        productos: {
-          MAGNA: { lts: 196531.97, importe: 4729543.37 },
-          DIESEL: { lts: 109826.89, importe: 2996812.92 },
-          PREMIUM: { lts: 0.00, importe: 0.00 }
-        }
-      },
-      {
-        id: "REYNOSA_2026-09",
-        stationId: "REYNOSA",
-        nombre: "REYNOSA",
-        periodKey: "2026-09",
-        monthLabel: "Septiembre 2026",
-        periodo: "01 September 2026 AL 30 September 2026",
-        litros: 206270.56,
-        jarras: 861.61,
-        totalCombustibles: 5434476.56,
-        totalAceites: 23114.00,
-        ventaTotal: 5457590.56,
-        subtotal: 4955223.46,
-        ieps: 105949.23,
-        iva: 396417.88,
-        efectivo: 644410.30,
-        tarjetas: 1951920.18,
-        creditos: 1996161.19,
-        debitos: 865107.83,
-        faltantes: 26.72,
-        productos: {
-          MAGNA: { lts: 36561.61, importe: 840551.32 },
-          DIESEL: { lts: 165241.55, importe: 4468882.55 },
-          PREMIUM: { lts: 4467.41, importe: 125042.69 }
-        }
-      },
-      {
-        id: "STO_DOMINGO_2026-09",
-        stationId: "STO_DOMINGO",
-        nombre: "STO DOMINGO",
-        periodKey: "2026-09",
-        monthLabel: "Septiembre 2026",
-        periodo: "01 September 2026 AL 30 September 2026",
-        litros: 31624.40,
-        jarras: 40.64,
-        totalCombustibles: 762924.63,
-        totalAceites: 3759.00,
-        ventaTotal: 766683.63,
-        subtotal: 644753.78,
-        ieps: 18769.24,
-        iva: 103160.60,
-        efectivo: 439063.31,
-        tarjetas: 327620.31,
-        creditos: 0.00,
-        debitos: 0.00,
-        faltantes: 0.00,
-        productos: {
-          MAGNA: { lts: 31110.69, importe: 747878.12 },
-          DIESEL: { lts: 0.00, importe: 0.00 },
-          PREMIUM: { lts: 513.71, importe: 15046.51 }
-        }
-      }
-    ];
-
-    const ROOT_SUPER_ADMIN = {
-      id: "usr_root_superadmin",
-      username: "lnoriega",
-      password: "Mg-2026*",
-      nombre: "Super Admin (lnoriega)",
-      email: "lnoriega@grupomilenium.mx",
-      rol: "SUPER_ADMIN",
-      estacion: "ALL",
-      estado: "ACTIVO",
-      creadoEl: "2026-09-01"
-    };
-
-    window.currentStations = [];
-    window.platformUsers = [ROOT_SUPER_ADMIN];
-    window.activeUser = null;
-    let currentPeriodFilter = 'MENSUAL';
-    let currentTableMode = 'CONSOLIDATED'; // 'CONSOLIDATED' (meses juntos) or 'BY_MONTH' (desglosado por mes)
-    let processedFileHashes = new Set();
-    let currentRenderDataset = [];
-    let currentRenderMultiplier = 1;
-
-    let fuelDonutChart = null;
-    let stationsBarChart = null;
-    let paymentPieChart = null;
-
-    const formatCurrency = (val) => '$' + Number(val || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    const formatNumber = (val) => Number(val || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-    function initData() {
-      const hasInitMarker = localStorage.getItem('milenium_stations_initialized');
-      const cachedStations = localStorage.getItem('milenium_cached_stations');
-
-      if (cachedStations) {
-        try {
-          window.currentStations = JSON.parse(cachedStations);
-        } catch(e) {
-          window.currentStations = [];
-        }
-      } else if (!hasInitMarker) {
-        window.currentStations = [...DEFAULT_DATASETS];
-      } else {
-        window.currentStations = [];
-      }
-
-      const cachedUsers = localStorage.getItem('milenium_cached_users');
-      if (cachedUsers) {
-        try {
-          const parsedU = JSON.parse(cachedUsers);
-          const filtered = parsedU.filter(u => u.username !== ROOT_SUPER_ADMIN.username && u.rol !== 'SUPER_ADMIN');
-          window.platformUsers = [ROOT_SUPER_ADMIN, ...filtered];
-        } catch(e) {}
-      }
-
-      window.currentStations.forEach(s => {
-        const fp = `${s.id}_${s.periodo}_${Number(s.litros).toFixed(2)}_${Number(s.ventaTotal).toFixed(2)}`;
-        processedFileHashes.add(fp);
-      });
-
-      populateStationSelect();
-      populateMonthPeriodSelect();
-      updateDashboard();
-      
-      const savedSession = sessionStorage.getItem('milenium_active_session');
-      if (savedSession) {
-        try {
-          const userObj = JSON.parse(savedSession);
-          authenticateUser(userObj);
-          return;
-        } catch(e) {
-          sessionStorage.removeItem('milenium_active_session');
-        }
-      }
-
-      showLoginScreen();
-    }
-
-    window.receiveRemoteStations = function(remoteList, updatedAt) {
-      if (!Array.isArray(remoteList)) return;
-      
-      window.currentStations = remoteList;
-      localStorage.setItem('milenium_cached_stations', JSON.stringify(remoteList));
-      localStorage.setItem('milenium_stations_initialized', 'true');
-
-      processedFileHashes.clear();
-      window.currentStations.forEach(s => {
-        const fp = `${s.id}_${s.periodo}_${Number(s.litros).toFixed(2)}_${Number(s.ventaTotal).toFixed(2)}`;
-        processedFileHashes.add(fp);
-      });
-
-      populateStationSelect();
-      populateMonthPeriodSelect();
-      updateDashboard();
-      if (window.activeUser) {
-        showBanner(`Datos sincronizados en tiempo real desde Firebase (${updatedAt ? new Date(updatedAt).toLocaleTimeString() : 'reciente'}).`);
-      }
-    };
-
-    window.receiveRemoteUsers = function(remoteUsers) {
-      if (!Array.isArray(remoteUsers)) return;
-      const filteredRemote = remoteUsers.filter(u => u.username !== ROOT_SUPER_ADMIN.username && u.rol !== 'SUPER_ADMIN');
-      window.platformUsers = [ROOT_SUPER_ADMIN, ...filteredRemote];
-      localStorage.setItem('milenium_cached_users', JSON.stringify(window.platformUsers));
-      renderAdminUsersTable();
-      const badge = document.getElementById('usersCountBadge');
-      if (badge) badge.textContent = window.platformUsers.length;
-    };
-
-    function syncFromCloud() {
-      const icon = document.getElementById('syncSpinIcon');
-      if (icon) icon.classList.add('animate-spin');
-      setTimeout(() => {
-        if (icon) icon.classList.remove('animate-spin');
-        showBanner("Panel sincronizado y actualizado con Firebase mileniumdbestaciones.");
-        updateDashboard();
-      }, 700);
-    }
-
-    function showLoginScreen() {
-      const loginModal = document.getElementById('loginScreen');
-      if (loginModal) loginModal.classList.remove('hidden');
-
-      const userInput = document.getElementById('loginUserInput');
-      const passInput = document.getElementById('loginPassInput');
-      if (userInput) userInput.value = '';
-      if (passInput) passInput.value = '';
-
-      const errBox = document.getElementById('loginErrorMsg');
-      if (errBox) errBox.classList.add('hidden');
-
-      if (window.lucide) lucide.createIcons();
-    }
-
-    function handleUserLogin(e) {
-      if (e) e.preventDefault();
-      const userElem = document.getElementById('loginUserInput');
-      const passElem = document.getElementById('loginPassInput');
-      const errBox = document.getElementById('loginErrorMsg');
-      const errTxt = document.getElementById('loginErrorText');
-
-      const userInput = userElem ? userElem.value.trim().toLowerCase() : '';
-      const passInput = passElem ? passElem.value.trim() : '';
-
-      const matched = window.platformUsers.find(u => 
-        (u.username && u.username.toLowerCase() === userInput) || 
-        (u.email && u.email.toLowerCase() === userInput)
-      );
-
-      if (!matched) {
-        if (errTxt) errTxt.textContent = "Usuario no registrado en el sistema.";
-        if (errBox) errBox.classList.remove('hidden');
-        return;
-      }
-
-      if (matched.estado === 'SUSPENDIDO') {
-        if (errTxt) errTxt.textContent = "Tu cuenta se encuentra suspendida. Contacta a Dirección.";
-        if (errBox) errBox.classList.remove('hidden');
-        return;
-      }
-
-      if (matched.password !== passInput) {
-        if (errTxt) errTxt.textContent = "Contraseña incorrecta. Inténtalo de nuevo.";
-        if (errBox) errBox.classList.remove('hidden');
-        return;
-      }
-
-      if (errBox) errBox.classList.add('hidden');
-      authenticateUser(matched);
-      sessionStorage.setItem('milenium_active_session', JSON.stringify(matched));
-      showBanner(`Bienvenido(a), <strong>${matched.nombre}</strong> (${matched.rol}).`);
-    }
-
-    function authenticateUser(userObj) {
-      window.activeUser = userObj;
-      const loginModal = document.getElementById('loginScreen');
-      if (loginModal) loginModal.classList.add('hidden');
-      applyUserRoleRestrictions();
-    }
-
-    function handleLogout() {
-      window.activeUser = null;
-      sessionStorage.removeItem('milenium_active_session');
-      const dd = document.getElementById('userDropdown');
-      if (dd) dd.classList.add('hidden');
-      showLoginScreen();
-    }
-
-    function applyUserRoleRestrictions() {
-      const u = window.activeUser;
-      if (!u) return;
-
-      const uploadBtn = document.getElementById('uploadBtnLabel');
-      const dropZone = document.getElementById('dropZoneContainer');
-      const adminBtn = document.getElementById('btnOpenAdmin');
-
-      document.getElementById('userNameLabel').textContent = u.nombre;
-      document.getElementById('userRoleLabel').textContent = u.rol === 'CEO' ? 'DIRECCIÓN GENERAL' : u.rol;
-      document.getElementById('userAvatar').textContent = u.nombre.charAt(0).toUpperCase();
-
-      document.getElementById('ddUserName').textContent = u.nombre;
-      document.getElementById('ddUserEmail').textContent = u.email;
-      document.getElementById('sessionRoleBadge').textContent = u.rol;
-      document.getElementById('sessionStationBadge').textContent = u.estacion === 'ALL' ? 'Red Completa' : 'Estación ' + u.estacion;
-
-      const stSelect = document.getElementById('stationSelect');
-      if (u.estacion !== 'ALL') {
-        stSelect.value = u.estacion;
-        stSelect.disabled = true;
-      } else {
-        stSelect.disabled = false;
-      }
-
-      if (u.rol === 'OPERADOR' || u.rol === 'ADMIN' || u.rol === 'SUPER_ADMIN') {
-        uploadBtn.classList.remove('hidden');
-        dropZone.classList.remove('hidden');
-      } else {
-        uploadBtn.classList.add('hidden');
-        dropZone.classList.add('hidden');
-      }
-
-      if (u.rol === 'SUPER_ADMIN' || u.rol === 'ADMIN') {
-        adminBtn.classList.remove('hidden');
-      } else {
-        adminBtn.classList.add('hidden');
-      }
-
-      const saShortcuts = document.getElementById('superAdminShortcuts');
-      if (saShortcuts) {
-        saShortcuts.classList.toggle('hidden', u.rol !== 'SUPER_ADMIN');
-      }
-
-      updateDashboard();
-    }
-
-    function toggleUserDropdown() {
-      const dd = document.getElementById('userDropdown');
-      dd.classList.toggle('hidden');
-    }
-
-    function resetUserForm() {
-      document.getElementById('userForm').reset();
-      document.getElementById('editUserId').value = '';
-      document.getElementById('formUserTitle').textContent = 'Dar de Alta Usuario';
-    }
-
-    function handleUserFormSubmit(e) {
-      e.preventDefault();
-      const id = document.getElementById('editUserId').value;
-      const nombre = document.getElementById('inputUserName').value.trim();
-      const username = document.getElementById('inputUserLogin').value.trim();
-      const password = document.getElementById('inputUserPassword').value.trim();
-      const email = document.getElementById('inputUserEmail').value.trim();
-      const rol = document.getElementById('inputUserRole').value;
-      const estacion = document.getElementById('inputUserStation').value;
-      const estado = document.getElementById('inputUserStatus').value;
-
-      if (!nombre || !username || !password || !email) return;
-
-      if (id) {
-        const idx = window.platformUsers.findIndex(u => u.id === id);
-        if (idx >= 0) {
-          if (window.platformUsers[idx].rol === 'SUPER_ADMIN' && window.activeUser.rol !== 'SUPER_ADMIN') {
-            showBanner("⛔ Sólo el Super Administrador puede modificar esta cuenta.");
-            return;
-          }
-          window.platformUsers[idx] = {
-            ...window.platformUsers[idx],
-            nombre,
-            username,
-            password,
-            email,
-            rol,
-            estacion,
-            estado
-          };
-          showBanner(`Usuario <strong>${nombre}</strong> actualizado correctamente.`);
-        }
-      } else {
-        if (window.platformUsers.some(u => u.username && u.username.toLowerCase() === username.toLowerCase())) {
-          showBanner("⚠️ El nombre de usuario ya está registrado. Elige otro.");
-          return;
-        }
-
-        const newUser = {
-          id: 'usr_' + Date.now(),
-          nombre,
-          username,
-          password,
-          email,
-          rol,
-          estacion,
-          estado,
-          creadoEl: new Date().toISOString().split('T')[0]
-        };
-        window.platformUsers.push(newUser);
-        showBanner(`Nuevo usuario <strong>${nombre}</strong> dado de alta con éxito.`);
-      }
-
-      if (window.saveUsersToCloud) {
-        const usersToSave = window.platformUsers.filter(u => u.id !== ROOT_SUPER_ADMIN.id);
-        window.saveUsersToCloud(usersToSave);
-      }
-
-      resetUserForm();
-      renderAdminUsersTable();
-      document.getElementById('usersCountBadge').textContent = window.platformUsers.length;
-      lucide.createIcons();
-    }
-
-    function editUser(id) {
-      const u = window.platformUsers.find(x => x.id === id);
-      if (!u) return;
-      if (u.rol === 'SUPER_ADMIN' && window.activeUser.rol !== 'SUPER_ADMIN') {
-        showBanner("⛔ Esta cuenta está protegida por seguridad directiva.");
-        return;
-      }
-      document.getElementById('editUserId').value = u.id;
-      document.getElementById('inputUserName').value = u.nombre;
-      document.getElementById('inputUserLogin').value = u.username || '';
-      document.getElementById('inputUserPassword').value = u.password || '';
-      document.getElementById('inputUserEmail').value = u.email;
-      document.getElementById('inputUserRole').value = u.rol;
-      document.getElementById('inputUserStation').value = u.estacion;
-      document.getElementById('inputUserStatus').value = u.estado;
-      document.getElementById('formUserTitle').textContent = 'Modificar Usuario: ' + u.nombre;
-    }
-
-    function toggleUserStatus(id) {
-      const idx = window.platformUsers.findIndex(x => x.id === id);
-      if (idx >= 0) {
-        if (window.platformUsers[idx].rol === 'SUPER_ADMIN') {
-          showBanner("⛔ No es posible suspender la cuenta de Super Administrador.");
-          return;
-        }
-        const current = window.platformUsers[idx].estado;
-        window.platformUsers[idx].estado = current === 'ACTIVO' ? 'SUSPENDIDO' : 'ACTIVO';
-        if (window.saveUsersToCloud) {
-          const usersToSave = window.platformUsers.filter(u => u.id !== ROOT_SUPER_ADMIN.id);
-          window.saveUsersToCloud(usersToSave);
-        }
-        renderAdminUsersTable();
-        showBanner(`Estado de usuario cambiado a <strong>${window.platformUsers[idx].estado}</strong>.`);
-      }
-    }
-
-    function renderAdminUsersTable() {
-      const tbody = document.getElementById('adminUserTableBody');
-      const countEl = document.getElementById('tableUserCount');
-      const tabBadge = document.getElementById('tabUserCounterBadge');
-      if (!tbody) return;
-      tbody.innerHTML = '';
-
-      const count = window.platformUsers.length;
-      if (countEl) countEl.textContent = `${count} usuario(s)`;
-      if (tabBadge) tabBadge.textContent = count;
-
-      window.platformUsers.forEach(u => {
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-50 transition";
-        const badgeColor = u.estado === 'ACTIVO' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200';
-        const isSuperAdmin = u.rol === 'SUPER_ADMIN' || u.username === ROOT_SUPER_ADMIN.username;
-        
-        tr.innerHTML = `
-          <td class="py-3 px-3">
-            <div class="flex items-center gap-2">
-              <span class="w-7 h-7 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold text-xs shrink-0">
-                ${(u.nombre || 'U').charAt(0).toUpperCase()}
-              </span>
-              <div>
-                <p class="font-bold text-slate-900 flex items-center gap-1.5 leading-tight">
-                  ${isSuperAdmin ? '<i data-lucide="crown" class="w-3.5 h-3.5 text-[#ff6600]"></i>' : ''}
-                  <span>${u.nombre}</span>
-                </p>
-                <p class="text-[10px] text-slate-400 font-mono mt-0.5">
-                  User: <strong class="text-slate-700">${u.username || u.email}</strong> &bull; ${u.email}
-                </p>
-              </div>
-            </div>
-          </td>
-          <td class="py-3 px-3">
-            <span class="font-mono text-[10px] font-black px-2.5 py-1 rounded-md ${isSuperAdmin ? 'bg-black text-[#ff6600]' : 'bg-slate-100 text-slate-800'}">
-              ${u.rol}
-            </span>
-          </td>
-          <td class="py-3 px-3 font-mono text-[11px] text-slate-600">
-            ${u.estacion === 'ALL' ? '🌐 Red Global' : '⛽ ' + u.estacion}
-          </td>
-          <td class="py-3 px-3 text-center">
-            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${badgeColor}">
-              ${u.estado}
-            </span>
-          </td>
-          <td class="py-3 px-3 text-center">
-            <div class="flex items-center justify-center gap-1">
-              <button onclick="editUser('${u.id}')" title="Editar Credenciales" class="p-1.5 rounded-lg hover:bg-slate-100 text-slate-600 hover:text-black transition">
-                <i data-lucide="edit-3" class="w-4 h-4"></i>
-              </button>
-              ${!isSuperAdmin ? `
-                <button onclick="toggleUserStatus('${u.id}')" title="${u.estado === 'ACTIVO' ? 'Suspender acceso' : 'Activar acceso'}" class="p-1.5 rounded-lg hover:bg-amber-50 text-slate-400 hover:text-amber-600 transition">
-                  <i data-lucide="${u.estado === 'ACTIVO' ? 'lock' : 'unlock'}" class="w-4 h-4"></i>
-                </button>
-                <button onclick="deleteUser('${u.id}')" title="Eliminar Usuario de Firebase" class="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 transition">
-                  <i data-lucide="trash-2" class="w-4 h-4"></i>
-                </button>
-              ` : `
-                <span class="p-1.5 text-slate-300" title="Cuenta Maestra Protegida">
-                  <i data-lucide="shield-check" class="w-4 h-4 text-emerald-500"></i>
-                </span>
-              `}
-            </div>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-      lucide.createIcons();
-    }
-
-    function showBanner(msg) {
-      const b = document.getElementById('statusBanner');
-      b.classList.remove('hidden');
-      document.getElementById('bannerMessage').innerHTML = msg;
-      document.getElementById('lastUpdatedBadge').textContent = 'Sincronizado';
-    }
-
-    function setPeriodView(mode) {
-      currentPeriodFilter = mode;
-      document.querySelectorAll('.period-btn').forEach(b => {
-        b.className = 'period-btn px-3 py-1.5 rounded-lg text-slate-500 hover:text-black transition';
-      });
-      const activeBtn = document.getElementById(`tab-${mode}`);
-      if (activeBtn) {
-        activeBtn.className = 'period-btn px-3 py-1.5 rounded-lg bg-black text-white font-extrabold shadow-sm transition';
-      }
-      updateDashboard();
-    }
-
-    // Toggle de la tabla: Consolidado (meses juntos) vs Desglose por Mes
-    function setTableMode(mode) {
-      currentTableMode = mode;
-      
-      const btnConsolidated = document.getElementById('tblMode-CONSOLIDATED');
-      const btnByMonth = document.getElementById('tblMode-BY_MONTH');
-      const monthWrap = document.getElementById('tableMonthFilterWrap');
-
-      if (mode === 'CONSOLIDATED') {
-        if (btnConsolidated) btnConsolidated.className = 'px-3 py-1.5 rounded-lg bg-black text-white font-extrabold shadow-sm transition flex items-center gap-1.5';
-        if (btnByMonth) btnByMonth.className = 'px-3 py-1.5 rounded-lg text-slate-500 hover:text-black transition flex items-center gap-1.5';
-        if (monthWrap) monthWrap.classList.add('hidden');
-      } else {
-        if (btnConsolidated) btnConsolidated.className = 'px-3 py-1.5 rounded-lg text-slate-500 hover:text-black transition flex items-center gap-1.5';
-        if (btnByMonth) btnByMonth.className = 'px-3 py-1.5 rounded-lg bg-black text-white font-extrabold shadow-sm transition flex items-center gap-1.5';
-        if (monthWrap) monthWrap.classList.remove('hidden');
-      }
-
-      renderTableFromState();
-      if (window.lucide) lucide.createIcons();
-    }
-
-    function populateTableMonthFilter() {
-      const sel = document.getElementById('tableSpecificMonthSelect');
-      if (!sel) return;
-      const prev = sel.value;
-      sel.innerHTML = '<option value="ALL">📅 Todos los Meses Disponibles</option>';
-
-      const periodMap = new Map();
-      (window.currentStations || []).forEach(s => {
-        const key = s.periodKey || s.periodo;
-        if (!periodMap.has(key)) {
-          periodMap.set(key, s.monthLabel || s.periodo);
-        }
-      });
-
-      const sortedKeys = Array.from(periodMap.keys()).sort().reverse();
-      sortedKeys.forEach(pk => {
-        const label = periodMap.get(pk);
-        const opt = document.createElement('option');
-        opt.value = pk;
-        opt.textContent = `🗓️ ${label}`;
-        sel.appendChild(opt);
-      });
-
-      if ([...sel.options].some(o => o.value === prev)) {
-        sel.value = prev;
-      } else {
-        sel.value = 'ALL';
-      }
-    }
-
-    // Populate Station dropdown by grouping distinct stations
+    // Populate Station Filter Dropdown
     function populateStationSelect() {
-      const sel = document.getElementById('stationSelect');
-      if (!sel) return;
-      const prev = sel.value;
-      sel.innerHTML = '<option value="ALL">🌐 Red Milenium (Consolidado Total)</option>';
-      
-      const uniqueStations = [];
-      const seen = new Set();
-      (window.currentStations || []).forEach(s => {
-        const rawId = s.stationId || s.id.split('_')[0] || s.id;
-        if (!seen.has(rawId)) {
-          seen.add(rawId);
-          uniqueStations.push({ id: rawId, nombre: s.nombre });
+      const select = document.getElementById('stationSelect');
+      if (!select) return;
+
+      const previousValue = select.value;
+      select.innerHTML = '<option value="ALL">🌐 Red Milenium (Consolidado Total)</option>';
+
+      const stations = window.currentStations || [];
+      const addedIds = new Set();
+
+      stations.forEach(st => {
+        const stationKey = st.stationId || (st.id ? st.id.split('_')[0] : '') || st.nombre;
+        if (stationKey && !addedIds.has(stationKey)) {
+          addedIds.add(stationKey);
+          const opt = document.createElement('option');
+          opt.value = stationKey;
+          opt.textContent = `⛽ ${st.nombre}`;
+          select.appendChild(opt);
         }
       });
 
-      uniqueStations.forEach(s => {
-        const opt = document.createElement('option');
-        opt.value = s.id;
-        opt.textContent = `⛽ ${s.nombre}`;
-        sel.appendChild(opt);
-      });
-
-      if ([...sel.options].some(o => o.value === prev)) {
-        sel.value = prev;
-      } else {
-        sel.value = 'ALL';
+      if (previousValue && Array.from(select.options).some(o => o.value === previousValue)) {
+        select.value = previousValue;
       }
     }
 
-    // Populate Month / Period selector based on extracted periods
+    // Populate Month/Period Filter Dropdown
     function populateMonthPeriodSelect() {
-      const sel = document.getElementById('monthPeriodSelect');
-      if (!sel) return;
-      const prev = sel.value;
-      sel.innerHTML = '<option value="ALL">📅 Todos los Meses (Acumulado Total)</option>';
+      const select = document.getElementById('monthPeriodSelect');
+      if (!select) return;
 
+      const previousValue = select.value;
+      select.innerHTML = '<option value="ALL">📅 Todos los Meses (Acumulado Total)</option>';
+
+      const stations = window.currentStations || [];
       const periodMap = new Map();
-      (window.currentStations || []).forEach(s => {
-        const key = s.periodKey || s.periodo;
-        if (!periodMap.has(key)) {
-          periodMap.set(key, s.monthLabel || s.periodo);
+
+      stations.forEach(st => {
+        const pKey = st.periodKey || st.periodo;
+        if (pKey && !periodMap.has(pKey)) {
+          periodMap.set(pKey, {
+            key: pKey,
+            label: st.monthLabel || st.periodo || pKey
+          });
         }
       });
 
-      // Sort chronological descending
-      const sortedKeys = Array.from(periodMap.keys()).sort().reverse();
+      Array.from(periodMap.values())
+        .sort((a, b) => b.key.localeCompare(a.key))
+        .forEach(p => {
+          const opt = document.createElement('option');
+          opt.value = p.key;
+          opt.textContent = `🗓️ ${p.label}`;
+          select.appendChild(opt);
+        });
 
-      sortedKeys.forEach(pk => {
-        const label = periodMap.get(pk);
-        const opt = document.createElement('option');
-        opt.value = pk;
-        opt.textContent = `🗓️ ${label}`;
-        sel.appendChild(opt);
+      if (previousValue && Array.from(select.options).some(o => o.value === previousValue)) {
+        select.value = previousValue;
+      }
+    }
+
+    // Populate Secondary Month Filter inside Detailed Table
+    function populateTableMonthFilter() {
+      const select = document.getElementById('tableSpecificMonthSelect');
+      if (!select) return;
+
+      const previousValue = select.value;
+      select.innerHTML = '<option value="ALL">Todos los Meses</option>';
+
+      const stations = window.currentStations || [];
+      const periodMap = new Map();
+
+      stations.forEach(st => {
+        const pKey = st.periodKey || st.periodo;
+        if (pKey && !periodMap.has(pKey)) {
+          periodMap.set(pKey, st.monthLabel || st.periodo || pKey);
+        }
       });
 
-      if ([...sel.options].some(o => o.value === prev)) {
-        sel.value = prev;
-      } else {
-        sel.value = 'ALL';
+      Array.from(periodMap.entries()).forEach(([key, label]) => {
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.textContent = label;
+        select.appendChild(opt);
+      });
+
+      if (previousValue && Array.from(select.options).some(o => o.value === previousValue)) {
+        select.value = previousValue;
       }
     }
 
     function applyFilters() {
       updateDashboard();
+    }
+
+    function handleMonthPeriodChange() {
+      const monthSel = document.getElementById('monthPeriodSelect');
+      if (monthSel && monthSel.value !== 'ALL') {
+        const d1 = document.getElementById('customStartDate');
+        const d2 = document.getElementById('customEndDate');
+        if (d1) d1.value = '';
+        if (d2) d2.value = '';
+      }
+      applyFilters();
+    }
+
+    function handleCustomDateInput() {
+      const monthSel = document.getElementById('monthPeriodSelect');
+      if (monthSel) monthSel.value = 'ALL';
+      applyFilters();
+    }
+
+    function clearCustomDateRange() {
+      const d1 = document.getElementById('customStartDate');
+      const d2 = document.getElementById('customEndDate');
+      if (d1) d1.value = '';
+      if (d2) d2.value = '';
+      const monthSel = document.getElementById('monthPeriodSelect');
+      if (monthSel) monthSel.value = 'ALL';
+      applyFilters();
+    }
+
+    function setPeriodView(view) {
+      currentPeriodFilter = view;
+      ['DIARIO', 'SEMANAL', 'MENSUAL'].forEach(v => {
+        const btn = document.getElementById(`tab-${v}`);
+        if (btn) {
+          if (v === view) {
+            btn.className = "period-btn px-3 py-1.5 rounded-lg bg-black text-white font-extrabold shadow-sm transition";
+          } else {
+            btn.className = "period-btn px-3 py-1.5 rounded-lg text-slate-500 hover:text-black transition";
+          }
+        }
+      });
+      updateDashboard();
+    }
+
+    function setTableMode(mode) {
+      currentTableMode = mode;
+      const btnConsolidated = document.getElementById('btnTableModeConsolidated');
+      const btnByMonth = document.getElementById('btnTableModeByMonth');
+      const monthContainer = document.getElementById('tableSpecificMonthContainer');
+
+      if (mode === 'CONSOLIDATED') {
+        if (btnConsolidated) btnConsolidated.className = "px-3 py-1.5 rounded-lg bg-black text-white font-extrabold shadow-sm transition";
+        if (btnByMonth) btnByMonth.className = "px-3 py-1.5 rounded-lg text-slate-600 hover:text-black transition";
+        if (monthContainer) monthContainer.classList.add('hidden');
+      } else {
+        if (btnConsolidated) btnConsolidated.className = "px-3 py-1.5 rounded-lg text-slate-600 hover:text-black transition";
+        if (btnByMonth) btnByMonth.className = "px-3 py-1.5 rounded-lg bg-black text-white font-extrabold shadow-sm transition";
+        if (monthContainer) monthContainer.classList.remove('hidden');
+      }
+
+      renderTableFromState();
+    }
+
+    // FEATURE 1: Month-Over-Month (MoM) calculation logic
+    function computeMoM(currentRev, currentVol, currentCash, selectedPeriod) {
+      const allStations = window.currentStations || [];
+      const revBadge = document.getElementById('momRevenueBadge');
+      const volBadge = document.getElementById('momVolumeBadge');
+      const cashBadge = document.getElementById('momCashBadge');
+
+      if (!revBadge || !volBadge || !cashBadge) return;
+
+      if (selectedPeriod === 'ALL' || !selectedPeriod) {
+        revBadge.classList.add('hidden');
+        volBadge.classList.add('hidden');
+        cashBadge.classList.add('hidden');
+        return;
+      }
+
+      // Find previous chronological month in dataset
+      const periods = [...new Set(allStations.map(s => s.periodKey).filter(Boolean))].sort();
+      const currentIndex = periods.indexOf(selectedPeriod);
+
+      if (currentIndex > 0) {
+        const prevPeriodKey = periods[currentIndex - 1];
+        const prevStations = allStations.filter(s => s.periodKey === prevPeriodKey);
+        
+        const prevRev = prevStations.reduce((acc, s) => acc + (Number(s.ventaTotal) || 0), 0);
+        const prevVol = prevStations.reduce((acc, s) => acc + (Number(s.litros) || 0), 0);
+        const prevCash = prevStations.reduce((acc, s) => acc + (Number(s.efectivo) || 0), 0);
+
+        renderMoMBadge(revBadge, currentRev, prevRev);
+        renderMoMBadge(volBadge, currentVol, prevVol);
+        renderMoMBadge(cashBadge, currentCash, prevCash);
+      } else {
+        revBadge.classList.add('hidden');
+        volBadge.classList.add('hidden');
+        cashBadge.classList.add('hidden');
+      }
+    }
+
+    function renderMoMBadge(el, cur, prev) {
+      if (!prev || prev <= 0) {
+        el.classList.add('hidden');
+        return;
+      }
+      const pct = (((cur - prev) / prev) * 100).toFixed(1);
+      const isPositive = Number(pct) >= 0;
+      el.textContent = `${isPositive ? '+' : ''}${pct}% MoM`;
+      el.className = isPositive 
+        ? 'text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800'
+        : 'text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-rose-100 text-rose-800';
+      el.classList.remove('hidden');
     }
 
     function updateDashboard() {
@@ -2167,18 +1801,46 @@
       const selectedStation = stationSel ? stationSel.value : 'ALL';
       const selectedPeriod = monthSel ? monthSel.value : 'ALL';
 
+      const customStart = document.getElementById('customStartDate')?.value || '';
+      const customEnd = document.getElementById('customEndDate')?.value || '';
+
       let dataset = window.currentStations || [];
       
+      // Filtro 1: Por Estación
       if (selectedStation !== 'ALL') {
-        dataset = dataset.filter(s => (s.stationId || s.id.split('_')[0] || s.id) === selectedStation);
+        dataset = dataset.filter(s => (s.stationId || (s.id ? s.id.split('_')[0] : '') || s.id) === selectedStation);
       }
       
-      if (selectedPeriod !== 'ALL') {
+      // Filtro 2: Por Rango de Fechas Personalizado
+      if (customStart || customEnd) {
+        dataset = dataset.filter(s => {
+          const itemStart = s.startIsoDate || (s.periodKey ? `${s.periodKey}-01` : '1970-01-01');
+          const itemEnd = s.endIsoDate || (s.periodKey ? `${s.periodKey}-30` : '2099-12-31');
+          
+          if (customStart && customEnd) {
+            return (itemStart <= customEnd) && (itemEnd >= customStart);
+          } else if (customStart) {
+            return itemEnd >= customStart;
+          } else if (customEnd) {
+            return itemStart <= customEnd;
+          }
+          return true;
+        });
+      } 
+      // Filtro 3: Por Mes Preseleccionado
+      else if (selectedPeriod !== 'ALL') {
         dataset = dataset.filter(s => (s.periodKey || s.periodo) === selectedPeriod);
       }
 
       let multiplier = 1;
-      let periodLabel = selectedPeriod === 'ALL' ? "Todos los Meses Acumulados" : (dataset[0]?.monthLabel || selectedPeriod);
+      let periodLabel = "Todos los Meses Acumulados";
+
+      if (customStart || customEnd) {
+        periodLabel = `Rango: ${customStart || 'Inicio'} al ${customEnd || 'Presente'}`;
+      } else if (selectedPeriod !== 'ALL') {
+        periodLabel = dataset[0]?.monthLabel || selectedPeriod;
+      }
+
       if (currentPeriodFilter === 'DIARIO') {
         multiplier = 1 / 30;
         periodLabel += " (Ritmo Estimado Diario)";
@@ -2192,7 +1854,7 @@
 
       const statCountText = document.getElementById('statCountText');
       if (statCountText) {
-        const uniqueStationsInFiltered = new Set(dataset.map(s => s.stationId || s.id.split('_')[0] || s.id)).size;
+        const uniqueStationsInFiltered = new Set(dataset.map(s => s.stationId || (s.id ? s.id.split('_')[0] : '') || s.id)).size;
         statCountText.textContent = `${uniqueStationsInFiltered} Estación(es) &bull; ${dataset.length} Corte(s)`;
       }
 
@@ -2215,30 +1877,30 @@
       };
 
       dataset.forEach(st => {
-        totRevenue += (st.ventaTotal * multiplier);
-        totFuelRev += (st.totalCombustibles * multiplier);
-        totLiters += (st.litros * multiplier);
-        totJarras += (st.jarras * multiplier);
-        totCash += (st.efectivo * multiplier);
-        totCards += (st.tarjetas * multiplier);
-        totCredits += (st.creditos * multiplier);
-        totOils += (st.totalAceites * multiplier);
-        totSubtotal += (st.subtotal * multiplier);
-        totIEPS += (st.ieps * multiplier);
-        totIVA += (st.iva * multiplier);
+        totRevenue += (Number(st.ventaTotal || 0) * multiplier);
+        totFuelRev += (Number(st.totalCombustibles || 0) * multiplier);
+        totLiters += (Number(st.litros || 0) * multiplier);
+        totJarras += (Number(st.jarras || 0) * multiplier);
+        totCash += (Number(st.efectivo || 0) * multiplier);
+        totCards += (Number(st.tarjetas || 0) * multiplier);
+        totCredits += (Number(st.creditos || 0) * multiplier);
+        totOils += (Number(st.totalAceites || 0) * multiplier);
+        totSubtotal += (Number(st.subtotal || 0) * multiplier);
+        totIEPS += (Number(st.ieps || 0) * multiplier);
+        totIVA += (Number(st.iva || 0) * multiplier);
 
         if (st.productos) {
           if (st.productos.MAGNA) {
-            prodTotals.MAGNA.lts += (st.productos.MAGNA.lts * multiplier);
-            prodTotals.MAGNA.importe += (st.productos.MAGNA.importe * multiplier);
+            prodTotals.MAGNA.lts += (Number(st.productos.MAGNA.lts || 0) * multiplier);
+            prodTotals.MAGNA.importe += (Number(st.productos.MAGNA.importe || 0) * multiplier);
           }
           if (st.productos.PREMIUM) {
-            prodTotals.PREMIUM.lts += (st.productos.PREMIUM.lts * multiplier);
-            prodTotals.PREMIUM.importe += (st.productos.PREMIUM.importe * multiplier);
+            prodTotals.PREMIUM.lts += (Number(st.productos.PREMIUM.lts || 0) * multiplier);
+            prodTotals.PREMIUM.importe += (Number(st.productos.PREMIUM.importe || 0) * multiplier);
           }
           if (st.productos.DIESEL) {
-            prodTotals.DIESEL.lts += (st.productos.DIESEL.lts * multiplier);
-            prodTotals.DIESEL.importe += (st.productos.DIESEL.importe * multiplier);
+            prodTotals.DIESEL.lts += (Number(st.productos.DIESEL.lts || 0) * multiplier);
+            prodTotals.DIESEL.importe += (Number(st.productos.DIESEL.importe || 0) * multiplier);
           }
         }
       });
@@ -2302,8 +1964,8 @@
       document.getElementById('creditBreakdownVal').textContent = formatCurrency(totCredits);
 
       if (dataset.length > 0) {
-        const topSt = [...dataset].sort((a,b) => b.ventaTotal - a.ventaTotal)[0];
-        document.getElementById('topStationNote').textContent = `Líder: ${topSt.nombre} (${formatCurrency(topSt.ventaTotal * multiplier)})`;
+        const topSt = [...dataset].sort((a,b) => (b.ventaTotal || 0) - (a.ventaTotal || 0))[0];
+        document.getElementById('topStationNote').textContent = `Líder: ${topSt.nombre} (${formatCurrency((topSt.ventaTotal || 0) * multiplier)})`;
       } else {
         document.getElementById('topStationNote').textContent = `Sin datos disponibles`;
       }
@@ -2311,15 +1973,294 @@
       currentRenderDataset = dataset;
       currentRenderMultiplier = multiplier;
 
+      computeMoM(totRevenue, totLiters, totCash, selectedPeriod);
       populateTableMonthFilter();
       renderLeaderboard(dataset, multiplier);
       renderFuelDonut(prodTotals);
       renderStationsBar(dataset, multiplier);
       renderPaymentPie(totCash, totCards, totCredits);
       renderTableFromState();
+      renderAuditRadar(dataset);
+      renderHistoricalTrends();
+      updateTargetsUI(dataset);
 
-      lucide.createIcons();
+      if (window.lucide) lucide.createIcons();
     }
+
+    // FEATURE 1: Render historical multi-month volume trends
+    function renderHistoricalTrends() {
+      const canvas = document.getElementById('historicalTrendChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (historicalTrendChart) historicalTrendChart.destroy();
+
+      const stations = window.currentStations || [];
+      const periodMap = new Map();
+
+      stations.forEach(s => {
+        const pk = s.periodKey;
+        if (!pk) return;
+        if (!periodMap.has(pk)) {
+          periodMap.set(pk, {
+            label: s.monthLabel || pk,
+            magna: 0,
+            premium: 0,
+            diesel: 0
+          });
+        }
+        const cur = periodMap.get(pk);
+        if (s.productos) {
+          cur.magna += Number(s.productos.MAGNA?.lts || 0);
+          cur.premium += Number(s.productos.PREMIUM?.lts || 0);
+          cur.diesel += Number(s.productos.DIESEL?.lts || 0);
+        }
+      });
+
+      const sortedKeys = Array.from(periodMap.keys()).sort();
+      const labels = sortedKeys.map(k => periodMap.get(k).label);
+      const dataMagna = sortedKeys.map(k => periodMap.get(k).magna);
+      const dataPremium = sortedKeys.map(k => periodMap.get(k).premium);
+      const dataDiesel = sortedKeys.map(k => periodMap.get(k).diesel);
+
+      const insightText = document.getElementById('trendInsightText');
+      if (sortedKeys.length >= 2) {
+        const last = sortedKeys[sortedKeys.length - 1];
+        const prev = sortedKeys[sortedKeys.length - 2];
+        const lastTot = (periodMap.get(last).magna + periodMap.get(last).premium + periodMap.get(last).diesel);
+        const prevTot = (periodMap.get(prev).magna + periodMap.get(prev).premium + periodMap.get(prev).diesel);
+        const diffPct = (((lastTot - prevTot) / (prevTot || 1)) * 100).toFixed(1);
+        if (insightText) {
+          insightText.innerHTML = `Variación neta ${periodMap.get(last).label}: <strong class="${diffPct >= 0 ? 'text-emerald-600' : 'text-rose-600'}">${diffPct >= 0 ? '+' : ''}${diffPct}%</strong>`;
+        }
+      } else if (insightText) {
+        insightText.textContent = `${sortedKeys.length} mes(es) histórico(s) cargado(s)`;
+      }
+
+      historicalTrendChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels.length ? labels : ['Sin datos'],
+          datasets: [
+            {
+              label: 'Magna',
+              data: dataMagna.length ? dataMagna : [0],
+              borderColor: '#10b981',
+              backgroundColor: 'rgba(16, 185, 129, 0.08)',
+              fill: true,
+              tension: 0.35,
+              borderWidth: 2.5
+            },
+            {
+              label: 'Premium',
+              data: dataPremium.length ? dataPremium : [0],
+              borderColor: '#ef4444',
+              backgroundColor: 'rgba(239, 68, 68, 0.06)',
+              fill: true,
+              tension: 0.35,
+              borderWidth: 2.5
+            },
+            {
+              label: 'Diesel',
+              data: dataDiesel.length ? dataDiesel : [0],
+              borderColor: '#09090b',
+              backgroundColor: 'rgba(9, 9, 11, 0.04)',
+              fill: true,
+              tension: 0.35,
+              borderWidth: 2.5
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#09090b',
+              borderColor: '#ff6600',
+              borderWidth: 1,
+              titleColor: '#ffffff',
+              bodyColor: '#ffffff',
+              callbacks: {
+                label: (ctx) => ` ${ctx.dataset.label}: ${formatNumber(ctx.raw)} L`
+              }
+            }
+          },
+          scales: {
+            y: {
+              grid: { color: 'rgba(0,0,0,0.05)' },
+              ticks: {
+                callback: (v) => (v >= 1000 ? (v/1000).toFixed(0) + 'k L' : v + ' L')
+              }
+            },
+            x: {
+              grid: { display: false }
+            }
+          }
+        }
+      });
+    }
+
+    // FEATURE 3: Targets and Sales Goals
+    window.updateTargetsUI = function(dataset = currentRenderDataset) {
+      const container = document.getElementById('targetsProgressContainer');
+      const globalEl = document.getElementById('globalTargetPercent');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const targets = window.stationSalesTargets || {
+        GUADALUPE: 450000,
+        REYNOSA: 380000,
+        STO_DOMINGO: 290000
+      };
+
+      const stMap = new Map();
+      let grandActual = 0;
+      let grandTarget = 0;
+
+      dataset.forEach(s => {
+        const id = s.stationId || (s.id ? s.id.split('_')[0] : '') || s.id;
+        stMap.set(id, (stMap.get(id) || 0) + (Number(s.litros) || 0));
+        grandActual += (Number(s.litros) || 0);
+      });
+
+      const stationsList = Object.keys(targets);
+      stationsList.forEach(stKey => {
+        const actual = stMap.get(stKey) || 0;
+        const target = targets[stKey] || 350000;
+        grandTarget += target;
+        const pct = Math.min(100, ((actual / target) * 100)).toFixed(1);
+
+        let barColor = 'bg-[#ff6600]';
+        if (pct >= 100) barColor = 'bg-emerald-500';
+        else if (pct < 60) barColor = 'bg-amber-500';
+
+        const row = document.createElement('div');
+        row.className = 'space-y-1';
+        row.innerHTML = `
+          <div class="flex justify-between items-center text-xs">
+            <span class="font-bold text-slate-800">${stKey}</span>
+            <span class="font-mono text-slate-500">${formatNumber(actual)} / ${formatNumber(target)} L (${pct}%)</span>
+          </div>
+          <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+            <div class="${barColor} h-full transition-all duration-500" style="width: ${pct}%"></div>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+
+      if (globalEl) {
+        const globalPct = grandTarget > 0 ? ((grandActual / grandTarget) * 100).toFixed(1) : '0.0';
+        globalEl.textContent = `${globalPct}% (${formatNumber(grandActual)} / ${formatNumber(grandTarget)} L)`;
+      }
+
+      // Populate Inputs in Admin targets tab
+      const inputsGrid = document.getElementById('targetsInputsGrid');
+      if (inputsGrid) {
+        inputsGrid.innerHTML = '';
+        stationsList.forEach(stKey => {
+          const div = document.createElement('div');
+          div.innerHTML = `
+            <label class="block font-bold text-slate-700 text-xs mb-1">Meta para ${stKey} (Litros):</label>
+            <input type="number" id="targetInput_${stKey}" value="${targets[stKey]}" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-mono font-bold text-xs focus:outline-none focus:border-[#ff6600]">
+          `;
+          inputsGrid.appendChild(div);
+        });
+      }
+    };
+
+    window.saveCustomTargets = function() {
+      const targets = window.stationSalesTargets || {};
+      Object.keys(targets).forEach(stKey => {
+        const el = document.getElementById(`targetInput_${stKey}`);
+        if (el) targets[stKey] = Number(el.value) || targets[stKey];
+      });
+      if (window.saveTargetsToCloud) {
+        window.saveTargetsToCloud(targets);
+      }
+      updateTargetsUI();
+      closeAdminModal();
+    };
+
+    // FEATURE 4: Semáforo Operativo (Mermas, Jarreos, Faltantes)
+    function renderAuditRadar(dataset) {
+      const tbody = document.getElementById('auditRadarTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (!dataset || dataset.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-5 text-slate-400">Sin datos operativos para auditar en este periodo.</td></tr>`;
+        return;
+      }
+
+      dataset.forEach(s => {
+        const liters = Number(s.litros) || 0;
+        const jarras = Number(s.jarras) || 0;
+        const ratio = liters > 0 ? ((jarras / liters) * 100) : 0;
+        const faltantes = Number(s.faltantes) || 0;
+        const debitos = Number(s.debitos) || 0;
+
+        let statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">NORMAL</span>`;
+        if (ratio > 0.60 || faltantes > 2000) {
+          statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-700">AUDITORÍA URGENTE</span>`;
+        } else if (ratio > 0.40 || faltantes > 0) {
+          statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700">EN OBSERVACIÓN</span>`;
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition";
+        tr.innerHTML = `
+          <td class="py-2.5 px-3">
+            <span class="font-bold text-slate-900">${s.nombre}</span>
+            <span class="block text-[10px] text-slate-400">${s.monthLabel || s.periodo}</span>
+          </td>
+          <td class="py-2.5 px-3 text-right font-bold text-slate-800">${formatNumber(liters)} L</td>
+          <td class="py-2.5 px-3 text-right text-slate-600">${formatNumber(jarras)} L</td>
+          <td class="py-2.5 px-3 text-center font-bold ${ratio > 0.40 ? 'text-rose-600' : 'text-emerald-600'}">${ratio.toFixed(3)}%</td>
+          <td class="py-2.5 px-3 text-right font-black ${faltantes > 0 ? 'text-rose-600' : 'text-slate-400'}">${formatCurrency(faltantes)}</td>
+          <td class="py-2.5 px-3 text-right text-slate-600">${formatCurrency(debitos)}</td>
+          <td class="py-2.5 px-3 text-center">${statusBadge}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // FEATURE 2: Generador de Reporte Ejecutivo en PDF
+    window.generateExecutivePDF = function() {
+      const element = document.getElementById('executiveReportContainer');
+      const opt = {
+        margin: [8, 8, 8, 8],
+        filename: `Milenium_Reporte_Ejecutivo_${new Date().toISOString().slice(0,10)}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      showBanner("Generando Reporte Ejecutivo en PDF para Dirección...");
+      html2pdf().set(opt).from(element).save().then(() => {
+        showBanner("✅ PDF descargado exitosamente.");
+      });
+    };
+
+    // FEATURE 5: PWA Installation Support
+    let deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const btn = document.getElementById('btnInstallPwa');
+      if (btn) btn.classList.remove('hidden');
+    });
+
+    window.installPWA = function() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(() => {
+          deferredPrompt = null;
+          const btn = document.getElementById('btnInstallPwa');
+          if (btn) btn.classList.add('hidden');
+        });
+      }
+    };
 
     function renderLeaderboard(dataset, multiplier) {
       const container = document.getElementById('leaderboardCardsContainer');
@@ -2331,17 +2272,16 @@
         return;
       }
 
-      // Group by distinct station and aggregate totals
       const stMap = new Map();
       let grandTotalRevenue = 0;
 
       dataset.forEach(s => {
-        const rawId = s.stationId || s.id.split('_')[0] || s.id;
-        const name = s.nombre.replace(/EST ISIGAS/gi, 'GUADALUPE').replace(/ISIGAS/gi, 'GUADALUPE').trim();
-        const sales = (s.ventaTotal || 0) * multiplier;
-        const liters = (s.litros || 0) * multiplier;
-        const cash = (s.efectivo || 0) * multiplier;
-        const oils = (s.totalAceites || 0) * multiplier;
+        const rawId = s.stationId || (s.id ? s.id.split('_')[0] : '') || s.id;
+        const name = (s.nombre || 'ESTACION').replace(/EST ISIGAS/gi, 'GUADALUPE').replace(/ISIGAS/gi, 'GUADALUPE').trim();
+        const sales = (Number(s.ventaTotal) || 0) * multiplier;
+        const liters = (Number(s.litros) || 0) * multiplier;
+        const cash = (Number(s.efectivo) || 0) * multiplier;
+        const oils = (Number(s.totalAceites) || 0) * multiplier;
 
         grandTotalRevenue += sales;
 
@@ -2416,7 +2356,9 @@
     }
 
     function renderFuelDonut(prodTotals) {
-      const ctx = document.getElementById('fuelDonutChart').getContext('2d');
+      const canvas = document.getElementById('fuelDonutChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
       if (fuelDonutChart) fuelDonutChart.destroy();
 
       fuelDonutChart = new Chart(ctx, {
@@ -2455,19 +2397,20 @@
     }
 
     function renderStationsBar(dataset, multiplier) {
-      const ctx = document.getElementById('stationsBarChart').getContext('2d');
+      const canvas = document.getElementById('stationsBarChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
       if (stationsBarChart) stationsBarChart.destroy();
 
-      // Aggregate by distinct station
       const stMap = new Map();
       dataset.forEach(s => {
-        const name = s.nombre.replace(/EST ISIGAS/gi, 'GUADALUPE').replace(/ISIGAS/gi, 'GUADALUPE').trim();
+        const name = (s.nombre || 'ESTACION').replace(/EST ISIGAS/gi, 'GUADALUPE').replace(/ISIGAS/gi, 'GUADALUPE').trim();
         if (!stMap.has(name)) {
           stMap.set(name, { sales: 0, liters: 0 });
         }
         const cur = stMap.get(name);
-        cur.sales += (s.ventaTotal * multiplier);
-        cur.liters += (s.litros * multiplier);
+        cur.sales += (Number(s.ventaTotal || 0) * multiplier);
+        cur.liters += (Number(s.litros || 0) * multiplier);
       });
 
       const labels = Array.from(stMap.keys());
@@ -2540,7 +2483,9 @@
     }
 
     function renderPaymentPie(cash, cards, credits) {
-      const ctx = document.getElementById('paymentPieChart').getContext('2d');
+      const canvas = document.getElementById('paymentPieChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
       if (paymentPieChart) paymentPieChart.destroy();
 
       paymentPieChart = new Chart(ctx, {
@@ -2584,11 +2529,10 @@
       }
 
       if (currentTableMode === 'CONSOLIDATED') {
-        // MODO 1: CONSOLIDADO (Suma todos los meses por cada estación)
         const consolidatedMap = new Map();
 
         dataset.forEach(st => {
-          const key = st.stationId || st.nombre;
+          const key = st.stationId || (st.id ? st.id.split('_')[0] : '') || st.nombre;
           if (!consolidatedMap.has(key)) {
             consolidatedMap.set(key, {
               stationId: key,
@@ -2608,13 +2552,13 @@
           const item = consolidatedMap.get(key);
           item.cortesCount += 1;
           if (st.monthLabel) item.monthsList.add(st.monthLabel);
-          item.litros += (st.litros * multiplier);
-          item.totalCombustibles += (st.totalCombustibles * multiplier);
-          item.totalAceites += (st.totalAceites * multiplier);
-          item.ventaTotal += (st.ventaTotal * multiplier);
-          item.efectivo += (st.efectivo * multiplier);
-          item.tarjetas += (st.tarjetas * multiplier);
-          item.creditos += (st.creditos * multiplier);
+          item.litros += (Number(st.litros || 0) * multiplier);
+          item.totalCombustibles += (Number(st.totalCombustibles || 0) * multiplier);
+          item.totalAceites += (Number(st.totalAceites || 0) * multiplier);
+          item.ventaTotal += (Number(st.ventaTotal || 0) * multiplier);
+          item.efectivo += (Number(st.efectivo || 0) * multiplier);
+          item.tarjetas += (Number(st.tarjetas || 0) * multiplier);
+          item.creditos += (Number(st.creditos || 0) * multiplier);
           item.ids.push(st.id);
         });
 
@@ -2643,7 +2587,7 @@
             <td class="py-3.5 px-4 text-right text-[#ff6600] font-black">${formatCurrency(st.efectivo)}</td>
             <td class="py-3.5 px-4 text-right text-slate-800 font-bold">${formatCurrency(st.tarjetas)}</td>
             <td class="py-3.5 px-4 text-right text-slate-800 font-bold">${formatCurrency(st.creditos)}</td>
-            <td class="py-3.5 px-4 text-center">
+            <td class="py-3.5 px-4 text-center no-print">
               <button onclick="removeStationGroup('${st.stationId}')" title="Eliminar todos los meses de esta estación" class="p-1.5 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition">
                 <i data-lucide="trash-2" class="w-4 h-4"></i>
               </button>
@@ -2653,7 +2597,6 @@
         });
 
       } else {
-        // MODO 2: POR MES (Desglose mensual detallado)
         const tableMonthSelect = document.getElementById('tableSpecificMonthSelect');
         const selectedTableMonth = tableMonthSelect ? tableMonthSelect.value : 'ALL';
 
@@ -2673,20 +2616,20 @@
           tr.innerHTML = `
             <td class="py-3.5 px-4 font-sans font-bold text-slate-900">
               <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-[#ff6600]"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-[#ff6600]"></span>
                 <span class="font-extrabold">${st.nombre}</span>
                 <span class="text-[10px] px-2 py-0.5 rounded-md bg-orange-100 text-[#ea580c] font-mono font-bold">${st.monthLabel || 'Mes'}</span>
               </div>
               <span class="text-[10px] text-slate-400 font-mono block mt-0.5">${st.periodo || 'Corte Mensual'}</span>
             </td>
-            <td class="py-3.5 px-4 text-right text-slate-800 font-bold">${formatNumber(st.litros * multiplier)}</td>
-            <td class="py-3.5 px-4 text-right text-[#ff6600] font-bold">${formatCurrency(st.totalCombustibles * multiplier)}</td>
-            <td class="py-3.5 px-4 text-right text-slate-600">${formatCurrency(st.totalAceites * multiplier)}</td>
-            <td class="py-3.5 px-4 text-right text-slate-900 font-black bg-slate-50">${formatCurrency(st.ventaTotal * multiplier)}</td>
-            <td class="py-3.5 px-4 text-right text-[#ff6600] font-bold">${formatCurrency(st.efectivo * multiplier)}</td>
-            <td class="py-3.5 px-4 text-right text-slate-700">${formatCurrency(st.tarjetas * multiplier)}</td>
-            <td class="py-3.5 px-4 text-right text-slate-700">${formatCurrency(st.creditos * multiplier)}</td>
-            <td class="py-3.5 px-4 text-center">
+            <td class="py-3.5 px-4 text-right text-slate-800 font-bold">${formatNumber((st.litros || 0) * multiplier)}</td>
+            <td class="py-3.5 px-4 text-right text-[#ff6600] font-bold">${formatCurrency((st.totalCombustibles || 0) * multiplier)}</td>
+            <td class="py-3.5 px-4 text-right text-slate-600">${formatCurrency((st.totalAceites || 0) * multiplier)}</td>
+            <td class="py-3.5 px-4 text-right text-slate-900 font-black bg-slate-50">${formatCurrency((st.ventaTotal || 0) * multiplier)}</td>
+            <td class="py-3.5 px-4 text-right text-[#ff6600] font-bold">${formatCurrency((st.efectivo || 0) * multiplier)}</td>
+            <td class="py-3.5 px-4 text-right text-slate-700">${formatCurrency((st.tarjetas || 0) * multiplier)}</td>
+            <td class="py-3.5 px-4 text-right text-slate-700">${formatCurrency((st.creditos || 0) * multiplier)}</td>
+            <td class="py-3.5 px-4 text-center no-print">
               <button onclick="removeStation('${st.id}')" title="Eliminar este corte" class="p-1.5 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition">
                 <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
               </button>
@@ -2704,7 +2647,7 @@
         showBanner("⛔ Se requiere permiso de administrador para eliminar estaciones.");
         return;
       }
-      window.currentStations = window.currentStations.filter(s => (s.stationId || s.id.split('_')[0] || s.id) !== stationId);
+      window.currentStations = window.currentStations.filter(s => (s.stationId || (s.id ? s.id.split('_')[0] : '') || s.id) !== stationId);
       if (window.saveStationsToCloud) {
         window.saveStationsToCloud(window.currentStations);
       }
@@ -2725,7 +2668,6 @@
       showBanner("Corte de estación removido del panel.");
     }
 
-    // Parsing Excel with multi-month accuracy
     async function parseExcelFile(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -2752,8 +2694,7 @@
               period = `${matchPeriod[1]} al ${matchPeriod[2]}`.trim();
             }
 
-            // Extract distinct period and month
-            const { periodKey, monthLabel } = extractPeriodDetails(topHeader, file.name);
+            const { periodKey, monthLabel, startIsoDate, endIsoDate } = extractPeriodDetails(topHeader, file.name);
 
             let totalCombustibles = 0;
             let litrosCombustibles = 0;
@@ -2830,7 +2771,6 @@
             }
 
             const cleanStationId = stationName.replace(/\s+/g, '_').toUpperCase();
-            // Compound ID per station AND month so months never overwrite each other
             const recordId = `${cleanStationId}_${periodKey}`;
             const dataFingerprint = `${recordId}_${period}_${litrosCombustibles.toFixed(2)}_${ventaTotal.toFixed(2)}`;
 
@@ -2841,6 +2781,8 @@
               periodKey: periodKey,
               monthLabel: monthLabel,
               periodo: period,
+              startIsoDate: startIsoDate,
+              endIsoDate: endIsoDate,
               litros: litrosCombustibles,
               jarras: jarrasTotal,
               totalCombustibles: totalCombustibles,
@@ -2884,7 +2826,7 @@
 
             const isExactDuplicate = window.currentStations.some(s => 
               s.fileFingerprint === fp || 
-              (s.id === stObj.id && Math.abs(s.ventaTotal - stObj.ventaTotal) < 0.01 && Math.abs(s.litros - stObj.litros) < 0.01)
+              (s.id === stObj.id && Math.abs((s.ventaTotal || 0) - stObj.ventaTotal) < 0.01 && Math.abs((s.litros || 0) - stObj.litros) < 0.01)
             );
 
             if (isExactDuplicate) {
@@ -2898,7 +2840,6 @@
               continue;
             }
 
-            // Update only if same station AND same month
             const existingIdx = window.currentStations.findIndex(s => s.id === stObj.id);
 
             if (existingIdx >= 0) {
@@ -2937,7 +2878,7 @@
       const logDetailsEl = document.getElementById('ingestionLogDetails');
       const titleEl = document.getElementById('ingestionTitle');
 
-      if (logEntries.length > 0) {
+      if (logEntries.length > 0 && logDetailsEl && titleEl && alertEl) {
         logDetailsEl.innerHTML = logEntries.join('');
         titleEl.textContent = `Auditoría de Ingesta: ${addedCount} nueva(s), ${updatedCount} actualizada(s), ${duplicateCount} duplicada(s)`;
         alertEl.classList.remove('hidden');
@@ -2970,6 +2911,538 @@
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+    }
+
+    let currentAdminTab = 'users';
+    let currentPurgeMode = 'ALL';
+
+    function openAdminModal(tabName = 'users') {
+      if (!window.activeUser || (window.activeUser.rol !== 'SUPER_ADMIN' && window.activeUser.rol !== 'ADMIN')) {
+        showBanner("⛔ Acceso reservado exclusivamente para administradores.");
+        return;
+      }
+
+      const modal = document.getElementById('adminModal');
+      const isSuper = window.activeUser.rol === 'SUPER_ADMIN';
+
+      const superBadge = document.getElementById('adminSuperBadge');
+      if (superBadge) superBadge.classList.toggle('hidden', !isSuper);
+
+      const purgeTabBtn = document.getElementById('adminTabBtn-purge');
+      if (purgeTabBtn) purgeTabBtn.classList.toggle('hidden', !isSuper);
+
+      const targetTab = (!isSuper && tabName === 'purge') ? 'users' : tabName;
+
+      switchAdminTab(targetTab);
+      populatePurgeSelectors();
+      renderAdminUsersTable();
+      updateTargetsUI();
+
+      modal.classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeAdminModal() {
+      const modal = document.getElementById('adminModal');
+      if (modal) modal.classList.add('hidden');
+      resetUserForm();
+    }
+
+    function switchAdminTab(tab) {
+      currentAdminTab = tab;
+      const tabs = ['users', 'targets', 'purge'];
+
+      tabs.forEach(t => {
+        const btn = document.getElementById(`adminTabBtn-${t}`);
+        const sec = document.getElementById(`adminPanelSection-${t}`);
+
+        if (btn) {
+          if (t === tab) {
+            btn.className = t === 'purge' 
+              ? 'admin-nav-tab flex items-center gap-2 px-4 py-2 rounded-xl font-bold bg-rose-600 text-white shadow-sm transition border border-rose-600'
+              : 'admin-nav-tab flex items-center gap-2 px-4 py-2 rounded-xl font-bold bg-white text-slate-900 shadow-sm border border-slate-200 transition';
+          } else {
+            btn.className = t === 'purge'
+              ? 'admin-nav-tab flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-slate-600 hover:text-rose-700 hover:bg-rose-50 transition border border-transparent'
+              : 'admin-nav-tab flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-slate-600 hover:text-slate-900 hover:bg-white transition border border-transparent';
+          }
+        }
+
+        if (sec) {
+          sec.classList.toggle('hidden', t !== tab);
+        }
+      });
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function setPurgeMode(mode) {
+      currentPurgeMode = mode;
+      document.querySelectorAll('.purge-tab-btn').forEach(b => {
+        b.className = 'purge-tab-btn p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-center transition';
+      });
+      const activeBtn = document.getElementById(`purgeTab-${mode}`);
+      if (activeBtn) {
+        activeBtn.className = 'purge-tab-btn p-3 rounded-xl border border-rose-600 bg-rose-600 text-white font-bold text-center transition shadow-sm';
+      }
+
+      ['ALL', 'STATION', 'PERIOD', 'FILE'].forEach(m => {
+        const v = document.getElementById(`purgeView-${m}`);
+        if (v) v.classList.toggle('hidden', m !== mode);
+      });
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function populatePurgeSelectors() {
+      const stations = window.currentStations || [];
+      const allCountBadge = document.getElementById('purgeAllCountBadge');
+      if (allCountBadge) allCountBadge.textContent = `${stations.length} corte(s) activo(s)`;
+
+      const stSelect = document.getElementById('purgeStationSelect');
+      if (stSelect) {
+        stSelect.innerHTML = '';
+        if (stations.length === 0) {
+          stSelect.innerHTML = '<option value="">No hay estaciones cargadas</option>';
+        } else {
+          const uniqueStationIds = [...new Set(stations.map(s => s.stationId || (s.id ? s.id.split('_')[0] : '') || s.id))];
+          uniqueStationIds.forEach(id => {
+            const stObj = stations.find(s => (s.stationId || (s.id ? s.id.split('_')[0] : '') || s.id) === id);
+            const opt = document.createElement('option');
+            opt.value = id;
+            opt.textContent = `⛽ ${stObj ? stObj.nombre : id}`;
+            stSelect.appendChild(opt);
+          });
+        }
+      }
+
+      const periodSelect = document.getElementById('purgePeriodSelect');
+      if (periodSelect) {
+        periodSelect.innerHTML = '';
+        const uniquePeriods = [...new Set(stations.map(s => s.periodKey || s.periodo).filter(Boolean))];
+        if (uniquePeriods.length === 0) {
+          periodSelect.innerHTML = '<option value="">No hay periodos disponibles</option>';
+        } else {
+          uniquePeriods.forEach(pk => {
+            const match = stations.find(s => (s.periodKey || s.periodo) === pk);
+            const label = match ? (match.monthLabel || match.periodo) : pk;
+            const countInPeriod = stations.filter(s => (s.periodKey || s.periodo) === pk).length;
+            const opt = document.createElement('option');
+            opt.value = pk;
+            opt.textContent = `📅 ${label} (${countInPeriod} corte/s)`;
+            periodSelect.appendChild(opt);
+          });
+        }
+      }
+
+      const fileSelect = document.getElementById('purgeFileSelect');
+      if (fileSelect) {
+        fileSelect.innerHTML = '';
+        if (stations.length === 0) {
+          fileSelect.innerHTML = '<option value="">No hay archivos disponibles</option>';
+        } else {
+          stations.forEach((s) => {
+            const fileName = s.sourceFileName || `reporte_${s.id.toLowerCase()}.xlsx`;
+            const opt = document.createElement('option');
+            opt.value = s.id;
+            opt.textContent = `📄 ${fileName} - ${s.nombre} (${formatNumber(s.litros)} L)`;
+            fileSelect.appendChild(opt);
+          });
+        }
+      }
+    }
+
+    async function executePurgeAction() {
+      if (!window.activeUser || window.activeUser.rol !== 'SUPER_ADMIN') {
+        showBanner("⛔ Operación denegada. Se requiere rol de Super Administrador.");
+        return;
+      }
+
+      const confirmKeyword = document.getElementById('purgeConfirmKeywordInput').value.trim().toUpperCase();
+      const valMsg = document.getElementById('purgeValidationMsg');
+
+      if (confirmKeyword !== 'BORRAR') {
+        if (valMsg) valMsg.classList.remove('hidden');
+        return;
+      }
+
+      if (valMsg) valMsg.classList.add('hidden');
+
+      let deletedDescription = '';
+      const prevCount = window.currentStations.length;
+
+      if (currentPurgeMode === 'ALL') {
+        window.currentStations = [];
+        processedFileHashes.clear();
+        deletedDescription = `Se vaciaron todas las estaciones (${prevCount} registros). El panel quedó en ceros.`;
+      } else if (currentPurgeMode === 'STATION') {
+        const targetId = document.getElementById('purgeStationSelect').value;
+        const targetObj = window.currentStations.find(s => (s.stationId || (s.id ? s.id.split('_')[0] : '') || s.id) === targetId);
+        const targetName = targetObj ? targetObj.nombre : targetId;
+        window.currentStations = window.currentStations.filter(s => (s.stationId || (s.id ? s.id.split('_')[0] : '') || s.id) !== targetId);
+        deletedDescription = `Se eliminaron todos los cortes de la estación <strong>${targetName}</strong>.`;
+      } else if (currentPurgeMode === 'PERIOD') {
+        const targetPeriod = document.getElementById('purgePeriodSelect').value;
+        window.currentStations = window.currentStations.filter(s => (s.periodKey || s.periodo) !== targetPeriod);
+        deletedDescription = `Se eliminaron todos los cortes del periodo <strong>${targetPeriod}</strong>.`;
+      } else if (currentPurgeMode === 'FILE') {
+        const targetId = document.getElementById('purgeFileSelect').value;
+        const targetItem = window.currentStations.find(s => s.id === targetId);
+        const fileName = targetItem?.sourceFileName || targetItem?.nombre || targetId;
+        window.currentStations = window.currentStations.filter(s => s.id !== targetId);
+        deletedDescription = `Se eliminó el archivo <strong>${fileName}</strong> del sistema.`;
+      }
+
+      localStorage.setItem('milenium_cached_stations', JSON.stringify(window.currentStations));
+      localStorage.setItem('milenium_stations_initialized', 'true');
+
+      if (window.saveStationsToCloud) {
+        await window.saveStationsToCloud(window.currentStations);
+      }
+
+      document.getElementById('purgeConfirmKeywordInput').value = '';
+
+      closeAdminModal();
+      populateStationSelect();
+      populateMonthPeriodSelect();
+      updateDashboard();
+      showBanner(`🗑️ <strong>Depuración completada:</strong> ${deletedDescription}`);
+    }
+
+    function renderAdminUsersTable() {
+      const tbody = document.getElementById('adminUserTableBody');
+      const badge = document.getElementById('tableUserCount');
+      const tabBadge = document.getElementById('tabUserCounterBadge');
+      const usersBadge = document.getElementById('usersCountBadge');
+      if (!tbody) return;
+
+      tbody.innerHTML = '';
+      const users = window.platformUsers || [];
+
+      if (badge) badge.textContent = `${users.length} usuario(s)`;
+      if (tabBadge) tabBadge.textContent = users.length;
+      if (usersBadge) usersBadge.textContent = users.length;
+
+      users.forEach(u => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition";
+        const isRoot = u.id === ROOT_SUPER_ADMIN.id || u.username === ROOT_SUPER_ADMIN.username;
+        const statusBadge = u.estado === 'ACTIVO'
+          ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">ACTIVO</span>`
+          : `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-700">SUSPENDIDO</span>`;
+
+        tr.innerHTML = `
+          <td class="py-2.5 px-3">
+            <div class="font-bold text-slate-900">${u.nombre || u.username}</div>
+            <div class="text-[10px] text-slate-400 font-mono">@${u.username} &bull; ${u.email || ''}</div>
+          </td>
+          <td class="py-2.5 px-3 font-mono font-bold text-xs text-[#ff6600]">${u.rol}</td>
+          <td class="py-2.5 px-3 text-slate-600">${u.estacion || 'ALL'}</td>
+          <td class="py-2.5 px-3 text-center">${statusBadge}</td>
+          <td class="py-2.5 px-3 text-center">
+            ${isRoot ? `<span class="text-[10px] text-slate-400 font-mono">Protegido</span>` : `
+              <div class="flex items-center justify-center gap-1.5">
+                <button onclick="editUser('${u.id}')" title="Editar" class="p-1 rounded hover:bg-slate-200 text-slate-600 transition">
+                  <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
+                </button>
+                <button onclick="deleteUser('${u.id}')" title="Eliminar" class="p-1 rounded bg-rose-50 hover:bg-rose-100 text-rose-600 transition">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            `}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function resetUserForm() {
+      const form = document.getElementById('userForm');
+      if (form) form.reset();
+      const idInput = document.getElementById('editUserId');
+      if (idInput) idInput.value = '';
+      const title = document.getElementById('formUserTitle');
+      if (title) title.textContent = "Dar de Alta Usuario";
+    }
+
+    function editUser(id) {
+      const u = window.platformUsers.find(x => x.id === id);
+      if (!u) return;
+      document.getElementById('editUserId').value = u.id;
+      document.getElementById('inputUserName').value = u.nombre || '';
+      document.getElementById('inputUserLogin').value = u.username || '';
+      document.getElementById('inputUserPassword').value = u.password || '';
+      document.getElementById('inputUserEmail').value = u.email || '';
+      document.getElementById('inputUserRole').value = u.rol || 'OPERADOR';
+      document.getElementById('inputUserStation').value = u.estacion || 'ALL';
+      document.getElementById('inputUserStatus').value = u.estado || 'ACTIVO';
+      document.getElementById('formUserTitle').textContent = "Editar Usuario";
+    }
+
+    function handleUserFormSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('editUserId').value;
+      const nombre = document.getElementById('inputUserName').value.trim();
+      const username = document.getElementById('inputUserLogin').value.trim();
+      const password = document.getElementById('inputUserPassword').value.trim();
+      const email = document.getElementById('inputUserEmail').value.trim();
+      const rol = document.getElementById('inputUserRole').value;
+      const estacion = document.getElementById('inputUserStation').value;
+      const estado = document.getElementById('inputUserStatus').value;
+
+      if (id) {
+        const idx = window.platformUsers.findIndex(x => x.id === id);
+        if (idx >= 0) {
+          window.platformUsers[idx] = {
+            ...window.platformUsers[idx],
+            nombre, username, password, email, rol, estacion, estado
+          };
+          showBanner(`Usuario <strong>${username}</strong> actualizado.`);
+        }
+      } else {
+        const newUser = {
+          id: `usr_${Date.now()}`,
+          nombre, username, password, email, rol, estacion, estado,
+          creadoEl: new Date().toISOString()
+        };
+        window.platformUsers.push(newUser);
+        showBanner(`Usuario <strong>${username}</strong> creado.`);
+      }
+
+      localStorage.setItem('milenium_cached_users', JSON.stringify(window.platformUsers));
+      if (window.saveUsersToCloud) {
+        const usersToSave = window.platformUsers.filter(u => u.id !== ROOT_SUPER_ADMIN.id);
+        window.saveUsersToCloud(usersToSave);
+      }
+
+      resetUserForm();
+      renderAdminUsersTable();
+    }
+
+    window.deleteUser = function(id) {
+      if (!window.activeUser || (window.activeUser.rol !== 'SUPER_ADMIN' && window.activeUser.rol !== 'ADMIN')) {
+        showBanner("⛔ Se requiere permiso administrativo para dar de baja usuarios.");
+        return;
+      }
+
+      const target = window.platformUsers.find(x => x.id === id);
+      if (!target) return;
+
+      if (target.rol === 'SUPER_ADMIN' || target.id === ROOT_SUPER_ADMIN.id || target.username === ROOT_SUPER_ADMIN.username) {
+        showBanner("⛔ La cuenta de Super Administrador (lnoriega) está protegida y no puede ser eliminada.");
+        return;
+      }
+
+      const userName = target.nombre || target.username || 'Usuario';
+      
+      window.platformUsers = window.platformUsers.filter(x => x.id !== id);
+      localStorage.setItem('milenium_cached_users', JSON.stringify(window.platformUsers));
+
+      if (window.saveUsersToCloud) {
+        const usersToSave = window.platformUsers.filter(u => u.id !== ROOT_SUPER_ADMIN.id);
+        window.saveUsersToCloud(usersToSave);
+      }
+
+      renderAdminUsersTable();
+      showBanner(`Usuario <strong>${userName}</strong> eliminado de la plataforma y de Firebase.`);
+    };
+
+    function showLoginScreen() {
+      const login = document.getElementById('loginScreen');
+      if (login) login.classList.remove('hidden');
+      const err = document.getElementById('loginErrorMsg');
+      if (err) err.classList.add('hidden');
+      const uIn = document.getElementById('loginUserInput');
+      if (uIn) uIn.value = '';
+      const pIn = document.getElementById('loginPassInput');
+      if (pIn) pIn.value = '';
+    }
+
+    function handleUserLogin(e) {
+      e.preventDefault();
+      const userInput = document.getElementById('loginUserInput').value.trim();
+      const passInput = document.getElementById('loginPassInput').value.trim();
+      const errorDiv = document.getElementById('loginErrorMsg');
+      const errorText = document.getElementById('loginErrorText');
+
+      const user = window.platformUsers.find(u => 
+        (u.username.toLowerCase() === userInput.toLowerCase() || (u.email && u.email.toLowerCase() === userInput.toLowerCase())) &&
+        u.password === passInput
+      );
+
+      if (!user) {
+        if (errorText) errorText.textContent = "Credenciales incorrectas o usuario inexistente.";
+        if (errorDiv) errorDiv.classList.remove('hidden');
+        return;
+      }
+
+      if (user.estado === 'SUSPENDIDO') {
+        if (errorText) errorText.textContent = "Esta cuenta ha sido suspendida. Contacta a Dirección.";
+        if (errorDiv) errorDiv.classList.remove('hidden');
+        return;
+      }
+
+      authenticateUser(user);
+    }
+
+    function authenticateUser(user) {
+      window.activeUser = user;
+      sessionStorage.setItem('milenium_active_session', JSON.stringify(user));
+
+      const loginScreen = document.getElementById('loginScreen');
+      if (loginScreen) loginScreen.classList.add('hidden');
+
+      const nameLabel = document.getElementById('userNameLabel');
+      if (nameLabel) nameLabel.textContent = user.nombre || user.username;
+
+      const roleLabel = document.getElementById('userRoleLabel');
+      if (roleLabel) roleLabel.textContent = user.rol;
+
+      const avatar = document.getElementById('userAvatar');
+      if (avatar) avatar.textContent = (user.nombre || user.username || 'U')[0].toUpperCase();
+
+      const ddName = document.getElementById('ddUserName');
+      if (ddName) ddName.textContent = user.nombre || user.username;
+
+      const ddEmail = document.getElementById('ddUserEmail');
+      if (ddEmail) ddEmail.textContent = user.email || `${user.username}@grupomilenium.mx`;
+
+      const sRole = document.getElementById('sessionRoleBadge');
+      if (sRole) sRole.textContent = user.rol;
+
+      const sStation = document.getElementById('sessionStationBadge');
+      if (sStation) sStation.textContent = user.estacion === 'ALL' ? 'Red Global' : user.estacion;
+
+      const btnAdmin = document.getElementById('btnOpenAdmin');
+      const isSuper = user.rol === 'SUPER_ADMIN';
+      const isAdmin = user.rol === 'ADMIN' || isSuper;
+
+      if (btnAdmin) btnAdmin.classList.toggle('hidden', !isAdmin);
+
+      const superShortcuts = document.getElementById('superAdminShortcuts');
+      if (superShortcuts) superShortcuts.classList.toggle('hidden', !isSuper);
+
+      populateStationSelect();
+      populateMonthPeriodSelect();
+      updateDashboard();
+      showBanner(`Bienvenido(a), <strong>${user.nombre || user.username}</strong>.`);
+    }
+
+    function handleLogout() {
+      sessionStorage.removeItem('milenium_active_session');
+      window.activeUser = null;
+      toggleUserDropdown(false);
+      showLoginScreen();
+    }
+
+    function toggleUserDropdown(forceState) {
+      const dd = document.getElementById('userDropdown');
+      if (!dd) return;
+      if (typeof forceState === 'boolean') {
+        dd.classList.toggle('hidden', !forceState);
+      } else {
+        dd.classList.toggle('hidden');
+      }
+    }
+
+    // Remote sync callbacks
+    window.receiveRemoteStations = function(stations, updatedAt) {
+      if (Array.isArray(stations)) {
+        window.currentStations = stations.map(s => {
+          if (!s.startIsoDate || !s.endIsoDate) {
+            const { startIsoDate, endIsoDate } = extractPeriodDetails(s.periodo || '', s.monthLabel || '');
+            return { ...s, startIsoDate, endIsoDate };
+          }
+          return s;
+        });
+
+        localStorage.setItem('milenium_cached_stations', JSON.stringify(window.currentStations));
+        localStorage.setItem('milenium_stations_initialized', 'true');
+        
+        populateStationSelect();
+        populateMonthPeriodSelect();
+        updateDashboard();
+        
+        const badge = document.getElementById('lastUpdatedBadge');
+        if (badge && updatedAt) {
+          badge.textContent = `Actualizado ${new Date(updatedAt).toLocaleTimeString('es-MX')}`;
+        }
+      }
+    };
+
+    window.receiveRemoteUsers = function(users) {
+      if (Array.isArray(users)) {
+        const filtered = users.filter(u => u.username !== ROOT_SUPER_ADMIN.username && u.rol !== 'SUPER_ADMIN');
+        window.platformUsers = [ROOT_SUPER_ADMIN, ...filtered];
+        localStorage.setItem('milenium_cached_users', JSON.stringify(window.platformUsers));
+        renderAdminUsersTable();
+      }
+    };
+
+    window.syncFromCloud = function() {
+      const icon = document.getElementById('syncSpinIcon');
+      if (icon) icon.classList.add('animate-spin');
+      setTimeout(() => {
+        if (icon) icon.classList.remove('animate-spin');
+        populateStationSelect();
+        populateMonthPeriodSelect();
+        updateDashboard();
+        showBanner("Datos sincronizados con Firebase Firestore.");
+      }, 700);
+    };
+
+    function initData() {
+      const cachedStations = localStorage.getItem('milenium_cached_stations');
+      if (cachedStations) {
+        try {
+          const parsed = JSON.parse(cachedStations);
+          window.currentStations = Array.isArray(parsed) ? parsed : [];
+        } catch(e) {
+          window.currentStations = [];
+        }
+      } else {
+        window.currentStations = [];
+      }
+
+      const cachedUsers = localStorage.getItem('milenium_cached_users');
+      if (cachedUsers) {
+        try {
+          const parsedU = JSON.parse(cachedUsers);
+          const filtered = parsedU.filter(u => u.username !== ROOT_SUPER_ADMIN.username && u.rol !== 'SUPER_ADMIN');
+          window.platformUsers = [ROOT_SUPER_ADMIN, ...filtered];
+        } catch(e) {}
+      }
+
+      const cachedTargets = localStorage.getItem('milenium_sales_targets');
+      if (cachedTargets) {
+        try {
+          window.stationSalesTargets = JSON.parse(cachedTargets);
+        } catch(e) {}
+      }
+
+      window.currentStations.forEach(s => {
+        const fp = `${s.id}_${s.periodo}_${Number(s.litros || 0).toFixed(2)}_${Number(s.ventaTotal || 0).toFixed(2)}`;
+        processedFileHashes.add(fp);
+      });
+
+      populateStationSelect();
+      populateMonthPeriodSelect();
+      updateDashboard();
+      
+      const savedSession = sessionStorage.getItem('milenium_active_session');
+      if (savedSession) {
+        try {
+          const userObj = JSON.parse(savedSession);
+          authenticateUser(userObj);
+          return;
+        } catch(e) {
+          sessionStorage.removeItem('milenium_active_session');
+        }
+      }
+
+      showLoginScreen();
     }
 
     window.addEventListener('DOMContentLoaded', () => {
