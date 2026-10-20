@@ -33,7 +33,7 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -133,7 +133,6 @@
       animation: orange-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
 
-    /* Print and PDF generation styles */
     @media print {
       body { background: #ffffff !important; }
       header, footer, #dropZoneContainer, .no-print { display: none !important; }
@@ -147,7 +146,6 @@
   <div id="loginScreen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
     <div class="bg-white rounded-3xl max-w-md w-full border border-slate-200 shadow-2xl p-7 sm:p-9 space-y-6 text-center">
       
-      <!-- Brand in Login Screen -->
       <div class="space-y-3">
         <div class="w-20 h-20 mx-auto rounded-2xl bg-white p-2 border border-slate-200 shadow-md flex items-center justify-center overflow-hidden">
           <img src="https://i.ibb.co/yB6VkSvx/Logo-Milenium.png" alt="Milenium Logo" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='https://placehold.co/120x120/ffffff/ff6600?text=MILENIUM';">
@@ -160,7 +158,6 @@
         </div>
       </div>
 
-      <!-- Login Form -->
       <form id="mainLoginForm" onsubmit="handleUserLogin(event)" class="space-y-4 text-left text-xs">
         <div>
           <label class="block font-bold text-slate-700 uppercase tracking-wider mb-1.5 text-[11px]">Usuario</label>
@@ -207,7 +204,6 @@
   <header class="sticky top-0 z-40 milenium-glass border-b border-slate-200/90 px-4 sm:px-8 py-3.5 transition-all no-print">
     <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
       
-      <!-- Brand & Status -->
       <div class="flex items-center gap-3.5">
         <div class="relative flex items-center justify-center w-11 h-11 rounded-xl bg-white p-1 border border-slate-200 shadow-sm overflow-hidden">
           <img src="https://i.ibb.co/yB6VkSvx/Logo-Milenium.png" alt="Milenium Logo" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='https://placehold.co/80x80/ffffff/ff6600?text=M';">
@@ -225,10 +221,8 @@
         </div>
       </div>
 
-      <!-- Actions, Role Badges & Controls -->
       <div class="flex items-center flex-wrap gap-2.5">
         
-        <!-- Frequency Selector (Diario / Semanal / Mensual) -->
         <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-bold text-slate-600">
           <button onclick="setPeriodView('DIARIO')" id="tab-DIARIO" class="period-btn px-3 py-1.5 rounded-lg text-slate-500 hover:text-black transition">
             Diario
@@ -241,13 +235,11 @@
           </button>
         </div>
 
-        <!-- Botón Exportar PDF Ejecutivo -->
         <button onclick="generateExecutivePDF()" title="Descargar Resumen Ejecutivo en PDF" class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-slate-300 hover:border-[#ff6600] text-slate-800 hover:text-[#ff6600] text-xs font-bold shadow-sm transition active:scale-95">
           <i data-lucide="file-text" class="w-4 h-4 text-[#ff6600]"></i>
           <span class="hidden sm:inline">Reporte PDF</span>
         </button>
 
-        <!-- Import Button (Controlled by role) -->
         <label id="uploadBtnLabel" class="cursor-pointer group flex items-center gap-2 px-4 py-2 rounded-xl orange-glow-btn text-xs sm:text-sm font-bold active:scale-95 shadow-sm">
           <i data-lucide="upload" class="w-4 h-4 transition-transform group-hover:-translate-y-0.5 stroke-[2.5]"></i>
           <span class="hidden sm:inline">Cargar Reportes</span>
@@ -255,14 +247,12 @@
           <input type="file" id="fileUploadInput" multiple accept=".xlsx, .xls" class="hidden">
         </label>
 
-        <!-- Admin Portal Trigger Button (Visible para SUPER_ADMIN y ADMIN) -->
         <button onclick="openAdminModal('users')" id="btnOpenAdmin" class="hidden flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold shadow-sm transition active:scale-95 border border-slate-700">
           <i data-lucide="shield" class="w-4 h-4 text-[#ff6600]"></i>
           <span class="hidden md:inline font-sans font-bold">Panel Admin</span>
           <span class="text-[10px] bg-[#ff6600] px-2 py-0.5 rounded-full font-mono font-black text-white" id="usersCountBadge">1</span>
         </button>
 
-        <!-- Current User Profile & Sign Out Dropdown -->
         <div class="relative">
           <button onclick="toggleUserDropdown()" id="userProfileBtn" class="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-slate-300 text-xs text-slate-800 shadow-sm transition">
             <div class="w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-[11px]" id="userAvatar">
@@ -275,7 +265,6 @@
             <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400"></i>
           </button>
 
-          <!-- User dropdown menu -->
           <div id="userDropdown" class="hidden absolute right-0 mt-2 w-64 bg-white border border-slate-200 rounded-2xl shadow-xl p-3 z-50 space-y-2 text-xs">
             <div class="border-b border-slate-100 pb-2">
               <p class="font-bold text-slate-900" id="ddUserName">Usuario</p>
@@ -293,7 +282,6 @@
               </div>
             </div>
 
-            <!-- Shortcuts for Super Admin -->
             <div id="superAdminShortcuts" class="pt-1 border-t border-slate-100 space-y-1">
               <button onclick="toggleUserDropdown(); openAdminModal('users')" class="w-full flex items-center gap-2 p-2 rounded-xl hover:bg-slate-50 text-slate-700 font-semibold text-[11px] transition">
                 <i data-lucide="users" class="w-3.5 h-3.5 text-[#ff6600]"></i>
@@ -318,7 +306,6 @@
           </div>
         </div>
 
-        <!-- Reload Data button -->
         <button onclick="syncFromCloud()" title="Sincronizar Datos de la Nube" class="p-2 rounded-xl bg-white border border-slate-200 hover:border-slate-400 text-slate-600 hover:text-black shadow-sm transition">
           <i data-lucide="refresh-cw" class="w-4 h-4" id="syncSpinIcon"></i>
         </button>
@@ -330,7 +317,6 @@
   <!-- Main Container -->
   <main id="executiveReportContainer" class="flex-1 max-w-7xl mx-auto w-full p-4 sm:p-6 lg:p-8 space-y-6">
 
-    <!-- Status Notification Banner -->
     <div id="statusBanner" class="bg-white p-3.5 rounded-2xl flex flex-wrap items-center justify-between gap-3 text-xs border border-orange-200 shadow-sm bg-gradient-to-r from-orange-50/60 to-white no-print">
       <div class="flex items-center gap-2.5">
         <div class="p-1 rounded-full bg-[#ff6600]/15 text-[#ff6600]">
@@ -359,7 +345,6 @@
         </button>
       </div>
       <div id="ingestionLogDetails" class="text-slate-600 space-y-1 font-mono text-[11px] bg-slate-50 p-3 rounded-xl border border-slate-100 max-h-40 overflow-y-auto">
-        <!-- Ingestion summary inserted here -->
       </div>
     </div>
 
@@ -373,6 +358,10 @@
           <span>Estación:</span>
           <select id="stationSelect" onchange="applyFilters()" class="bg-slate-50 border border-slate-300 text-slate-900 text-xs sm:text-sm font-bold rounded-xl px-3 py-2 focus:outline-none focus:border-[#ff6600] cursor-pointer min-w-[210px] shadow-sm ml-1">
             <option value="ALL">🌐 Red Milenium (Consolidado Total)</option>
+            <option value="COSMOPOLIS">⛽ COSMOPOLIS</option>
+            <option value="GUADALUPE">⛽ GUADALUPE</option>
+            <option value="REYNOSA">⛽ REYNOSA</option>
+            <option value="SANTO_DOMINGO">⛽ SANTO DOMINGO</option>
           </select>
         </div>
 
@@ -420,7 +409,6 @@
     <!-- 4 High Impact Executive Cards with Month-over-Month (MoM) badges -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       
-      <!-- Card 1: Facturación Total Neta -->
       <div class="milenium-card p-5 rounded-2xl relative overflow-hidden group">
         <div class="flex items-start justify-between">
           <div>
@@ -440,7 +428,6 @@
         </div>
       </div>
 
-      <!-- Card 2: Volumen Litros Despachados -->
       <div class="milenium-card p-5 rounded-2xl relative overflow-hidden group">
         <div class="flex items-start justify-between">
           <div>
@@ -460,7 +447,6 @@
         </div>
       </div>
 
-      <!-- Card 3: Efectivo Líquido -->
       <div class="milenium-card p-5 rounded-2xl relative overflow-hidden group">
         <div class="flex items-start justify-between">
           <div>
@@ -480,7 +466,6 @@
         </div>
       </div>
 
-      <!-- Card 4: Tarjetas Bancarias y Crédito Flotillas -->
       <div class="milenium-card p-5 rounded-2xl relative overflow-hidden group">
         <div class="flex items-start justify-between">
           <div>
@@ -500,9 +485,8 @@
     </div>
 
     <!-- Second Row: Advanced Strategic KPIs -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
       
-      <!-- KPI Strategic 1: Precio Promedio Ponderado por Litro -->
       <div class="milenium-card p-4 rounded-2xl relative overflow-hidden group">
         <div class="flex items-start justify-between">
           <div>
@@ -522,12 +506,11 @@
         </div>
       </div>
 
-      <!-- KPI Strategic 2: Venta Cruzada de Lubricantes ($ por m3 despachado) -->
       <div class="milenium-card p-4 rounded-2xl relative overflow-hidden group">
         <div class="flex items-start justify-between">
           <div>
             <div class="flex items-center gap-1.5">
-              <p class="text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Venta Cruzada Lubricantes</p>
+              <p class="text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Venta Aceites / m³</p>
               <span class="text-[9px] px-1.5 py-0.2 rounded bg-orange-100 text-[#ea580c] font-mono font-bold">ALTO MARGEN</span>
             </div>
             <h3 class="text-2xl font-black text-slate-900 mt-1.5 tracking-tight" id="kpiOilsPerM3">$0.00 / m³</h3>
@@ -537,12 +520,11 @@
           </div>
         </div>
         <div class="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
-          <span class="text-slate-500">Aporte a venta total:</span>
-          <span class="font-mono font-bold text-slate-900" id="kpiOilSharePct">0.00%</span>
+          <span class="text-slate-500">Unidades vendidas:</span>
+          <span class="font-mono font-bold text-slate-900" id="kpiTotalOilPieces">0 pzas</span>
         </div>
       </div>
 
-      <!-- KPI Strategic 3: Merma Operativa y Calibración (% Jarreos) -->
       <div class="milenium-card p-4 rounded-2xl relative overflow-hidden group">
         <div class="flex items-start justify-between">
           <div>
@@ -562,12 +544,191 @@
         </div>
       </div>
 
+      <div class="milenium-card p-4 rounded-2xl relative overflow-hidden group">
+        <div class="flex items-start justify-between">
+          <div>
+            <div class="flex items-center gap-1.5">
+              <p class="text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Ratio Litros / Botella</p>
+              <span class="text-[9px] px-1.5 py-0.2 rounded bg-blue-100 text-blue-700 font-mono font-bold">PISTA</span>
+            </div>
+            <h3 class="text-2xl font-black text-slate-900 mt-1.5 tracking-tight" id="kpiLitersPerOilBottle">0 L / pza</h3>
+          </div>
+          <div class="p-2 rounded-xl bg-blue-50 text-blue-600 border border-blue-200">
+            <i data-lucide="award" class="w-4 h-4 stroke-[2.3]"></i>
+          </div>
+        </div>
+        <div class="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+          <span class="text-slate-500">Intensidad en pista:</span>
+          <span class="font-mono font-bold text-blue-700" id="kpiOilIntensityNote">Cálculo activo</span>
+        </div>
+      </div>
+
     </div>
 
-    <!-- FEATURE 1 & 3: Proyecciones de Metas y Tendencias Multi-Mes -->
+    <!-- THIRD ROW: NUEVOS KPIS DE CRÉDITOS, DÉBITOS, VALES Y FALTANTES -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <!-- KPI 1: Clientes Crédito -->
+      <div class="milenium-card p-4 rounded-2xl relative overflow-hidden group border-l-4 border-l-blue-600">
+        <div class="flex items-start justify-between">
+          <div>
+            <div class="flex items-center gap-1.5">
+              <p class="text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Clientes Crédito (Flotillas)</p>
+              <span class="text-[9px] px-1.5 py-0.2 rounded bg-blue-100 text-blue-700 font-mono font-bold">CxC</span>
+            </div>
+            <h3 class="text-2xl font-black text-slate-900 mt-1.5 tracking-tight" id="kpiClientsCredit">$0.00</h3>
+          </div>
+          <div class="p-2.5 rounded-xl bg-blue-50 text-blue-600 border border-blue-200">
+            <i data-lucide="building-2" class="w-5 h-5 stroke-[2.3]"></i>
+          </div>
+        </div>
+        <div class="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+          <span class="text-slate-500">Participación s/ venta:</span>
+          <span class="font-mono font-bold text-blue-700" id="kpiCreditSharePct">0.0%</span>
+        </div>
+      </div>
+
+      <!-- KPI 2: Débitos de Operadores -->
+      <div class="milenium-card p-4 rounded-2xl relative overflow-hidden group border-l-4 border-l-purple-600">
+        <div class="flex items-start justify-between">
+          <div>
+            <div class="flex items-center gap-1.5">
+              <p class="text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Total Débitos de Turno</p>
+              <span class="text-[9px] px-1.5 py-0.2 rounded bg-purple-100 text-purple-700 font-mono font-bold">OPERACIÓN</span>
+            </div>
+            <h3 class="text-2xl font-black text-slate-900 mt-1.5 tracking-tight" id="kpiDebits">$0.00</h3>
+          </div>
+          <div class="p-2.5 rounded-xl bg-purple-50 text-purple-600 border border-purple-200">
+            <i data-lucide="arrow-down-left" class="w-5 h-5 stroke-[2.3]"></i>
+          </div>
+        </div>
+        <div class="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+          <span class="text-slate-500">Ajustes y retenciones:</span>
+          <span class="font-mono font-bold text-purple-700" id="kpiDebitsStatus">Conciliado</span>
+        </div>
+      </div>
+
+      <!-- KPI 3: Vales y Cupones -->
+      <div class="milenium-card p-4 rounded-2xl relative overflow-hidden group border-l-4 border-l-emerald-600">
+        <div class="flex items-start justify-between">
+          <div>
+            <div class="flex items-center gap-1.5">
+              <p class="text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Vales de Combustible</p>
+              <span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-700 font-mono font-bold">CANJES</span>
+            </div>
+            <h3 class="text-2xl font-black text-slate-900 mt-1.5 tracking-tight" id="kpiVales">$0.00</h3>
+          </div>
+          <div class="p-2.5 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200">
+            <i data-lucide="ticket" class="w-5 h-5 stroke-[2.3]"></i>
+          </div>
+        </div>
+        <div class="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+          <span class="text-slate-500">Cobro en vales:</span>
+          <span class="font-mono font-bold text-emerald-700" id="kpiValesSharePct">0.0%</span>
+        </div>
+      </div>
+
+      <!-- KPI 4: Faltantes de Caja -->
+      <div class="milenium-card p-4 rounded-2xl relative overflow-hidden group border-l-4 border-l-rose-600">
+        <div class="flex items-start justify-between">
+          <div>
+            <div class="flex items-center gap-1.5">
+              <p class="text-[10px] font-extrabold uppercase tracking-widest text-slate-500">Faltantes en Caja / Turno</p>
+              <span class="text-[9px] px-1.5 py-0.2 rounded bg-rose-100 text-rose-700 font-mono font-bold" id="kpiFaltantesTag">ARQUEO</span>
+            </div>
+            <h3 class="text-2xl font-black text-rose-600 mt-1.5 tracking-tight" id="kpiFaltantes">$0.00</h3>
+          </div>
+          <div class="p-2.5 rounded-xl bg-rose-50 text-rose-600 border border-rose-200">
+            <i data-lucide="alert-octagon" class="w-5 h-5 stroke-[2.3]"></i>
+          </div>
+        </div>
+        <div class="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
+          <span class="text-slate-500">Estatus de descuadre:</span>
+          <span class="font-mono font-bold" id="kpiFaltantesNote">Sin faltante</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SECCIÓN: RANKING Y TOP VENTAS DE LUBRICANTES Y PRODUCTOS COMPLEMENTARIOS -->
+    <div class="milenium-card rounded-2xl p-5 border border-slate-200">
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="p-1.5 rounded-xl bg-orange-100 text-[#ea580c]">
+              <i data-lucide="package-search" class="w-5 h-5 stroke-[2.2]"></i>
+            </span>
+            <h4 class="font-black text-base text-slate-900 uppercase tracking-tight">
+              Top Ranking de Ventas: Aceites, Lubricantes & Aditivos
+            </h4>
+          </div>
+          <p class="text-xs text-slate-500 mt-0.5">
+            Desglose por producto, volumen de piezas vendidas, facturación y sucursal líder con mayor desplazamiento
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2 text-xs font-mono font-bold">
+          <span class="px-2.5 py-1 rounded-lg bg-orange-50 border border-orange-200 text-[#ff6600]" id="oilsProductCatalogCount">
+            0 Productos en Catálogo
+          </span>
+          <span class="px-2.5 py-1 rounded-lg bg-slate-900 text-white" id="oilsTotalPzasRevenue">
+            0 Piezas &bull; $0.00
+          </span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <div class="lg:col-span-2 overflow-x-auto border border-slate-200 rounded-2xl">
+          <table class="w-full text-left text-xs font-mono">
+            <thead class="bg-slate-50 text-slate-600 uppercase tracking-wider font-extrabold border-b border-slate-200">
+              <tr>
+                <th class="py-3 px-3.5"># Rank &bull; Producto / Marca</th>
+                <th class="py-3 px-3 text-right">Piezas</th>
+                <th class="py-3 px-3 text-right">Precio Prom.</th>
+                <th class="py-3 px-3 text-right text-slate-900">Total Venta ($)</th>
+                <th class="py-3 px-3 text-center">Part. %</th>
+              </tr>
+            </thead>
+            <tbody id="lubricantsTopTableBody" class="divide-y divide-slate-100 text-slate-700">
+            </tbody>
+          </table>
+        </div>
+
+        <div class="space-y-4 flex flex-col justify-between">
+          <div class="p-4 rounded-2xl bg-gradient-to-br from-orange-500 to-[#e05900] text-white shadow-md relative overflow-hidden">
+            <div class="relative z-10 space-y-1.5">
+              <span class="text-[10px] font-black uppercase tracking-widest text-orange-200 font-mono">Estación Líder en Lubricantes</span>
+              <h5 class="text-xl font-black uppercase tracking-tight" id="topOilStationName">--</h5>
+              <div class="pt-2 flex items-center justify-between text-xs font-mono border-t border-white/20">
+                <span>Venta acumulada:</span>
+                <span class="font-black text-sm" id="topOilStationAmount">$0.00</span>
+              </div>
+              <div class="flex items-center justify-between text-xs font-mono">
+                <span>Unidades colocadas:</span>
+                <span class="font-bold" id="topOilStationPieces">0 pzas</span>
+              </div>
+            </div>
+            <div class="absolute -right-3 -bottom-3 opacity-15 text-white">
+              <i data-lucide="trophy" class="w-24 h-24"></i>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+            <h6 class="text-xs font-extrabold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+              <i data-lucide="bar-chart" class="w-4 h-4 text-[#ff6600]"></i> Desplazamiento por Marca
+            </h6>
+            <div id="brandsShareContainer" class="space-y-2 text-xs">
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Proyecciones de Metas y Tendencias Multi-Mes -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-      <!-- Panel de Metas y Cumplimiento de Ventas -->
       <div class="milenium-card p-5 rounded-2xl flex flex-col justify-between">
         <div class="flex items-center justify-between mb-2">
           <div>
@@ -583,7 +744,6 @@
         </div>
 
         <div id="targetsProgressContainer" class="space-y-3.5 my-2">
-          <!-- Dynamic progress bars injected here -->
         </div>
 
         <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
@@ -592,7 +752,6 @@
         </div>
       </div>
 
-      <!-- Gráfico de Tendencias Históricas Multi-Mes (Líneas Magna, Premium, Diesel) -->
       <div class="milenium-card p-5 rounded-2xl lg:col-span-2 flex flex-col justify-between">
         <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
           <div>
@@ -633,7 +792,6 @@
     <!-- Charts Row: Fuel Mix & Station Performance -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-      <!-- Doughnut Chart: Fuel Volume Breakdown (Magna Green, Premium Red, Diesel Black) -->
       <div class="milenium-card p-5 rounded-2xl flex flex-col justify-between">
         <div class="flex items-center justify-between mb-2">
           <div>
@@ -672,7 +830,6 @@
         </div>
       </div>
 
-      <!-- Bar Chart: Comparative Revenue & Volume by Station -->
       <div class="milenium-card p-5 rounded-2xl lg:col-span-2 flex flex-col justify-between">
         <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
           <div>
@@ -707,7 +864,7 @@
 
     </div>
 
-    <!-- FEATURE 4: Semáforo Operativo & Auditoría de Faltantes / Mermas -->
+    <!-- Semáforo Operativo & Auditoría de Faltantes / Mermas -->
     <div class="milenium-card rounded-2xl p-5 border border-slate-200">
       <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
         <div>
@@ -744,7 +901,6 @@
             </tr>
           </thead>
           <tbody id="auditRadarTableBody" class="divide-y divide-slate-100 text-slate-700">
-            <!-- Dynamic audit rows -->
           </tbody>
         </table>
       </div>
@@ -753,7 +909,6 @@
     <!-- Second Row: Payment Arqueo & Fiscal Audit (IEPS, IVA, Subtotales) -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       
-      <!-- Arqueo de Medios de Pago -->
       <div class="milenium-card p-5 rounded-2xl flex flex-col justify-between">
         <div>
           <h4 class="font-extrabold text-sm text-slate-900 flex items-center gap-2 uppercase tracking-wide">
@@ -782,14 +937,25 @@
           </div>
           <div class="flex justify-between items-center text-slate-700">
             <span class="flex items-center gap-2 font-medium">
-              <span class="w-2.5 h-2.5 rounded-full bg-black"></span> Créditos / Flotillas
+              <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span> Clientes Crédito (Flotillas)
             </span>
             <span class="font-mono font-bold text-slate-900" id="creditBreakdownVal">$0.00</span>
+          </div>
+          <div class="flex justify-between items-center text-slate-700">
+            <span class="flex items-center gap-2 font-medium">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Vales de Gasolina
+            </span>
+            <span class="font-mono font-bold text-slate-900" id="valesBreakdownVal">$0.00</span>
+          </div>
+          <div class="flex justify-between items-center text-slate-700">
+            <span class="flex items-center gap-2 font-medium">
+              <span class="w-2.5 h-2.5 rounded-full bg-purple-600"></span> Débitos
+            </span>
+            <span class="font-mono font-bold text-slate-900" id="debitBreakdownVal">$0.00</span>
           </div>
         </div>
       </div>
 
-      <!-- Desglose Fiscal Ejecutivo -->
       <div class="milenium-card p-5 rounded-2xl lg:col-span-2 flex flex-col justify-between">
         <div>
           <div class="flex items-center justify-between">
@@ -822,7 +988,6 @@
           </div>
         </div>
 
-        <!-- Proporción Visual de Impuestos -->
         <div class="space-y-2">
           <div class="flex justify-between text-xs text-slate-600">
             <span class="font-medium">Composición del Ticket Total:</span>
@@ -858,8 +1023,7 @@
         </span>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="leaderboardCardsContainer">
-        <!-- Dynamically generated station cards -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4" id="leaderboardCardsContainer">
       </div>
     </div>
 
@@ -875,7 +1039,6 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-2.5 no-print">
-          <!-- Table Mode Selector Buttons: Consolidado Total vs Desglose por Mes -->
           <div class="flex items-center bg-white p-1 rounded-xl border border-slate-300 shadow-sm text-xs font-bold text-slate-600">
             <button type="button" onclick="setTableMode('CONSOLIDATED')" id="btnTableModeConsolidated" class="px-3 py-1.5 rounded-lg bg-black text-white font-extrabold shadow-sm transition">
               Consolidado Total (Meses juntos)
@@ -885,7 +1048,6 @@
             </button>
           </div>
 
-          <!-- Secondary Month Filter for Table (visible in BY_MONTH mode) -->
           <div id="tableSpecificMonthContainer" class="hidden flex items-center gap-1.5 bg-white border border-slate-300 px-2.5 py-1.5 rounded-xl text-xs">
             <i data-lucide="calendar" class="w-3.5 h-3.5 text-[#ff6600]"></i>
             <select id="tableSpecificMonthSelect" onchange="renderTableFromState()" class="bg-transparent font-bold text-slate-800 text-xs focus:outline-none cursor-pointer">
@@ -915,7 +1077,6 @@
             </tr>
           </thead>
           <tbody id="stationsTableBody" class="divide-y divide-slate-100 text-slate-700 font-mono">
-            <!-- Table rows dynamically generated -->
           </tbody>
         </table>
       </div>
@@ -929,7 +1090,7 @@
         </div>
         <p class="text-sm font-bold text-slate-900">Arrastra nuevos reportes (.xlsx) de estaciones aquí</p>
         <p class="text-xs text-slate-500 leading-relaxed">
-          Detecta automáticamente encabezados de corte, nombre de sucursal, fechas del periodo, volúmenes de Magna/Diesel/Premium, arqueo de pagos e impuestos sin recargar la página. Sincronizado en tiempo real con Firebase.
+          Reconoce automáticamente a COSMÓPOLIS, GUADALUPE, REYNOSA y SANTO DOMINGO. Extrae cortes mensuales, aceites detallados y arqueo con sincronización directa en Firebase Firestore.
         </p>
       </div>
     </div>
@@ -940,7 +1101,6 @@
   <div id="adminModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/75 backdrop-blur-md no-print">
     <div class="bg-white rounded-3xl max-w-5xl w-full max-h-[94vh] flex flex-col border border-slate-200 shadow-2xl overflow-hidden transition-all">
       
-      <!-- Modal Header con Pestañas -->
       <div class="px-5 sm:px-7 pt-5 pb-3 border-b border-slate-200 bg-slate-50/90 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-2xl bg-slate-900 text-[#ff6600] flex items-center justify-center font-bold shadow-md shrink-0">
@@ -960,7 +1120,6 @@
         </button>
       </div>
 
-      <!-- Barra de Pestañas de Navegación del Panel Admin -->
       <div class="px-5 sm:px-7 py-2.5 bg-slate-100/70 border-b border-slate-200 flex flex-wrap items-center gap-2 text-xs">
         <button type="button" onclick="switchAdminTab('users')" id="adminTabBtn-users" class="admin-nav-tab flex items-center gap-2 px-4 py-2 rounded-xl font-bold bg-white text-slate-900 shadow-sm border border-slate-200 transition">
           <i data-lucide="users" class="w-4 h-4 text-[#ff6600]"></i>
@@ -978,14 +1137,12 @@
         </button>
       </div>
 
-      <!-- Contenedor Principal con Scroll Limpio -->
       <div class="flex-1 overflow-y-auto p-5 sm:p-7 space-y-6">
 
-        <!-- ================= PESTAÑA 1: GESTIÓN DE USUARIOS ================= -->
+        <!-- PESTAÑA 1: GESTIÓN DE USUARIOS -->
         <div id="adminPanelSection-users" class="space-y-6">
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
-            <!-- Columna Formulario: Alta / Edición de Usuario (5 cols) -->
             <div class="lg:col-span-5 bg-slate-50/80 p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
               <div class="flex items-center justify-between pb-3 border-b border-slate-200">
                 <h4 class="font-extrabold text-xs uppercase tracking-wider text-slate-800 flex items-center gap-2">
@@ -1036,9 +1193,10 @@
                     <label class="block font-bold text-slate-700 mb-1">Estación</label>
                     <select id="inputUserStation" class="w-full bg-white border border-slate-300 rounded-xl px-2.5 py-2 text-slate-900 font-semibold focus:outline-none focus:border-[#ff6600]">
                       <option value="ALL">🌐 Todas (Red)</option>
+                      <option value="COSMOPOLIS">⛽ Cosmopolis</option>
                       <option value="GUADALUPE">⛽ Guadalupe</option>
                       <option value="REYNOSA">⛽ Reynosa</option>
-                      <option value="STO_DOMINGO">⛽ Sto Domingo</option>
+                      <option value="SANTO_DOMINGO">⛽ Santo Domingo</option>
                     </select>
                   </div>
                 </div>
@@ -1063,7 +1221,6 @@
               </form>
             </div>
 
-            <!-- Columna Lista de Usuarios: Tabla Completa Responsiva (7 cols) -->
             <div class="lg:col-span-7 space-y-3">
               <div class="flex items-center justify-between">
                 <div>
@@ -1076,7 +1233,6 @@
                 <span class="text-xs font-mono font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200" id="tableUserCount">1 usuario</span>
               </div>
 
-              <!-- Tabla de Usuarios con Scroll -->
               <div class="border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-sm max-h-[460px] overflow-y-auto">
                 <div class="overflow-x-auto min-w-full">
                   <table class="w-full text-left text-xs">
@@ -1090,17 +1246,15 @@
                       </tr>
                     </thead>
                     <tbody id="adminUserTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium">
-                      <!-- Filas de usuarios renderizadas dinámicamente -->
                     </tbody>
                   </table>
                 </div>
               </div>
 
-              <!-- Alerta Informativa de Persistencia -->
               <div class="p-3 bg-orange-50/70 rounded-xl border border-orange-200 text-[11px] text-slate-700 flex items-start gap-2.5">
                 <i data-lucide="shield-check" class="w-4 h-4 text-[#ff6600] shrink-0 mt-0.5"></i>
                 <p class="leading-relaxed">
-                  <strong>Control Centralizado:</strong> Los cambios de usuarios se sincronizan al instante en el proyecto Firebase <strong>mileniumdbestaciones</strong>. La cuenta de Super Administrador <strong>lnoriega</strong> está protegida contra borrado o bloqueo.
+                  <strong>Control Centralizado:</strong> Los cambios de usuarios se sincronizan en Firebase <strong>mileniumdbestaciones</strong>. La cuenta de Super Administrador <strong>lnoriega</strong> está protegida contra borrado o bloqueo.
                 </p>
               </div>
             </div>
@@ -1108,7 +1262,7 @@
           </div>
         </div>
 
-        <!-- ================= PESTAÑA 2: CONFIGURACIÓN DE METAS COMERCIALES ================= -->
+        <!-- PESTAÑA 2: CONFIGURACIÓN DE METAS COMERCIALES -->
         <div id="adminPanelSection-targets" class="hidden space-y-5">
           <div class="p-4 bg-orange-50/70 border border-orange-200 rounded-2xl flex items-center justify-between gap-3 text-xs">
             <div class="flex items-center gap-3">
@@ -1123,8 +1277,7 @@
           </div>
 
           <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-4">
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4" id="targetsInputsGrid">
-              <!-- Dynamically populated target inputs per station -->
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4" id="targetsInputsGrid">
             </div>
             <div class="pt-3 border-t border-slate-100 flex justify-end">
               <button onclick="saveCustomTargets()" class="px-5 py-2.5 rounded-xl orange-glow-btn font-extrabold text-xs shadow-md active:scale-95 transition flex items-center gap-2">
@@ -1135,7 +1288,7 @@
           </div>
         </div>
 
-        <!-- ================= PESTAÑA 3: DEPURACIÓN & BORRADO DE DATOS ================= -->
+        <!-- PESTAÑA 3: DEPURACIÓN & BORRADO DE DATOS -->
         <div id="adminPanelSection-purge" class="hidden space-y-5">
           
           <div class="p-4 bg-rose-50 border border-rose-200 rounded-2xl flex items-start justify-between gap-3 text-rose-900">
@@ -1146,14 +1299,13 @@
               <div>
                 <h4 class="font-extrabold text-sm text-slate-900">Centro de Depuración y Borrado de Información</h4>
                 <p class="text-[11px] text-rose-700 leading-relaxed mt-0.5">
-                  Esta sección permite eliminar reportes y cortes en la nube de forma granular (por estación, por mes/periodo, por archivo o reset completo). <strong>Requiere rol de Super Administrador</strong>.
+                  Elimina reportes y cortes en la nube de forma granular (por estación, por mes/periodo, por archivo o reset completo). <strong>Requiere rol de Super Administrador</strong>.
                 </p>
               </div>
             </div>
             <span class="text-[10px] px-2.5 py-1 rounded-full font-mono font-bold bg-rose-200/80 text-rose-900 border border-rose-300 shrink-0">SUPER ADMIN</span>
           </div>
 
-          <!-- Selector de Criterio de Eliminación -->
           <div class="space-y-2">
             <label class="block font-bold text-slate-800 uppercase tracking-wider text-[11px]">1. Selecciona el Criterio de Borrado:</label>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
@@ -1176,54 +1328,46 @@
             </div>
           </div>
 
-          <!-- Vista Dinámica 1: Borrar Todo -->
           <div id="purgeView-ALL" class="p-4 rounded-2xl bg-rose-50/70 border border-rose-200 space-y-2">
             <h5 class="font-extrabold text-xs uppercase tracking-wider text-rose-900 flex items-center gap-2">
               <i data-lucide="alert-triangle" class="w-4 h-4 text-rose-600"></i>
               Opción A: Reset Total de la Plataforma
             </h5>
             <p class="text-xs text-rose-800 leading-relaxed">
-              Eliminará <strong>todas las estaciones, reportes cargados y cortes acumulados</strong> de Firestore. El tablero quedará completamente en ceros y listo para recibir un nuevo ciclo de archivos Excel.
+              Eliminará <strong>todas las estaciones, reportes cargados y cortes acumulados</strong> de Firestore. El tablero quedará completamente en ceros.
             </p>
             <div class="pt-2 text-xs font-mono font-bold text-slate-700">
               Registros activos a eliminar: <span id="purgeAllCountBadge" class="text-rose-600 font-black">0</span>
             </div>
           </div>
 
-          <!-- Vista Dinámica 2: Borrar por Estación -->
           <div id="purgeView-STATION" class="hidden p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
             <label class="block font-bold text-slate-800 text-xs">Selecciona la estación que deseas eliminar:</label>
             <select id="purgeStationSelect" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold focus:outline-none focus:border-rose-500 text-xs">
-              <!-- Opciones dinámicas -->
             </select>
             <p class="text-[11px] text-slate-500">
-              Se eliminarán únicamente los reportes correspondientes a la sucursal elegida, conservando intactas las demás estaciones.
+              Se eliminarán únicamente los reportes correspondientes a la sucursal elegida.
             </p>
           </div>
 
-          <!-- Vista Dinámica 3: Borrar por Mes / Periodo -->
           <div id="purgeView-PERIOD" class="hidden p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
             <label class="block font-bold text-slate-800 text-xs">Selecciona el periodo o mes a depurar:</label>
             <select id="purgePeriodSelect" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold focus:outline-none focus:border-rose-500 text-xs">
-              <!-- Periodos detectados -->
             </select>
             <p class="text-[11px] text-slate-500">
-              Se eliminarán todas las estaciones y cortes que coincidan con la fecha o periodo de corte seleccionado.
+              Se eliminarán todas las estaciones y cortes del periodo seleccionado.
             </p>
           </div>
 
-          <!-- Vista Dinámica 4: Borrar por Archivo Específico -->
           <div id="purgeView-FILE" class="hidden p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
             <label class="block font-bold text-slate-800 text-xs">Selecciona el reporte individual a eliminar:</label>
             <select id="purgeFileSelect" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2.5 text-slate-900 font-semibold focus:outline-none focus:border-rose-500 text-xs">
-              <!-- Lista de archivos -->
             </select>
             <p class="text-[11px] text-slate-500">
-              Elimina un corte o archivo particular que haya sido cargado con errores sin afectar el resto del sistema.
+              Elimina un archivo particular cargado con errores.
             </p>
           </div>
 
-          <!-- Confirmación de Seguridad Obligatoria -->
           <div class="p-4 bg-slate-100 rounded-2xl border border-slate-300 space-y-2">
             <label class="block font-bold text-slate-800 text-xs">
               2. Para autorizar la operación, escribe <span class="font-mono text-rose-600 font-black px-1.5 py-0.5 rounded bg-rose-100">BORRAR</span> en el campo:
@@ -1245,7 +1389,6 @@
 
       </div>
 
-      <!-- Modal Footer -->
       <div class="px-5 sm:px-7 py-3.5 border-t border-slate-200 bg-slate-50 flex flex-wrap justify-between items-center gap-2 text-xs">
         <p class="text-[11px] text-slate-500 font-mono flex items-center gap-1.5">
           <span class="w-2 h-2 rounded-full bg-emerald-500 status-pulse"></span> Sincronizado en tiempo real con Firebase
@@ -1307,7 +1450,6 @@
         const dot = document.getElementById('cloudStatusDot');
         const text = document.getElementById('cloudStatusText');
         if (user) {
-          console.log("Firebase Auth conectado exitosamente. UID:", user.uid);
           if (dot) dot.className = "w-1.5 h-1.5 rounded-full bg-emerald-500 status-pulse";
           if (text) text.textContent = "Conectado a Firebase (Nube Activa)";
           setupFirestoreListeners();
@@ -1316,9 +1458,6 @@
             console.error("Error al autenticar con Firebase:", err);
             if (dot) dot.className = "w-1.5 h-1.5 rounded-full bg-rose-500";
             if (text) text.textContent = "Error de Auth Firebase (Revisa reglas)";
-            if (window.showBanner) {
-              window.showBanner(`⚠️ <strong>Atención Firebase:</strong> ${err.message || 'Habilita Anonymous Auth en Firebase'}`);
-            }
           });
         }
       });
@@ -1334,17 +1473,13 @@
         if (snap.exists()) {
           const data = snap.data();
           if (Array.isArray(data.stations)) {
-            console.log(`📡 Recibidos ${data.stations.length} registros desde Firestore`);
-            window.receiveRemoteStations(data.stations, data.updatedAt);
+            if (typeof window.receiveRemoteStations === 'function') {
+              window.receiveRemoteStations(data.stations, data.updatedAt);
+            }
           }
-        } else {
-          console.log("No existe documento previo en Firestore. Base de datos lista para recibir datos.");
         }
       }, (err) => {
         console.error("Error en listener de Firestore:", err);
-        if (window.showBanner) {
-          window.showBanner(`⚠️ <strong>Error Firestore:</strong> ${err.code === 'permission-denied' ? 'Permiso denegado. Revisa las reglas en Firebase Console.' : err.message}`);
-        }
       });
 
       const usersDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'platform_users', 'current');
@@ -1352,7 +1487,9 @@
         if (snap.exists()) {
           const data = snap.data();
           if (Array.isArray(data.users)) {
-            window.receiveRemoteUsers(data.users);
+            if (typeof window.receiveRemoteUsers === 'function') {
+              window.receiveRemoteUsers(data.users);
+            }
           }
         }
       }, (err) => console.warn("Users listener note:", err));
@@ -1364,17 +1501,14 @@
           if (data.targets && typeof data.targets === 'object') {
             window.stationSalesTargets = data.targets;
             localStorage.setItem('milenium_sales_targets', JSON.stringify(data.targets));
-            if (window.updateTargetsUI) window.updateTargetsUI();
+            if (typeof window.updateTargetsUI === 'function') window.updateTargetsUI();
           }
         }
       }, (err) => console.warn("Targets listener note:", err));
     }
 
     window.saveStationsToCloud = async function(stationsList) {
-      if (!db) {
-        console.warn("Base de datos no disponible aún.");
-        return;
-      }
+      if (!db) return;
       try {
         const stationsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'stations_summary', 'current');
         await setDoc(stationsDocRef, {
@@ -1384,12 +1518,11 @@
         });
         localStorage.setItem('milenium_cached_stations', JSON.stringify(stationsList));
         localStorage.setItem('milenium_stations_initialized', 'true');
-        console.log(`✅ ¡Éxito! ${stationsList.length} cortes guardados en Firebase Firestore.`);
         if (window.showBanner) {
           window.showBanner(`☁️ <strong>Sincronizado con Firebase:</strong> ${stationsList.length} reporte(s) guardados en la nube.`);
         }
       } catch (err) {
-        console.error("Error crítico al guardar estaciones en Firestore:", err);
+        console.error("Error al guardar en Firebase:", err);
         if (window.showBanner) {
           window.showBanner(`❌ <strong>Error al guardar en Firebase:</strong> ${err.message || err.code}`);
         }
@@ -1447,13 +1580,15 @@
     window.platformUsers = [ROOT_SUPER_ADMIN];
     window.activeUser = null;
     window.stationSalesTargets = {
+      COSMOPOLIS: 420000,
       GUADALUPE: 450000,
       REYNOSA: 380000,
-      STO_DOMINGO: 290000
+      SANTO_DOMINGO: 290000
     };
 
     let currentPeriodFilter = 'MENSUAL';
     let currentTableMode = 'CONSOLIDATED';
+    let currentPurgeMode = 'ALL';
     let processedFileHashes = new Set();
     let currentRenderDataset = [];
     let currentRenderMultiplier = 1;
@@ -1477,18 +1612,73 @@
       }
     }
 
-    // Convert any date format to ISO standard YYYY-MM-DD
+    // NORMALIZACIÓN ESTRICTA DE ESTACIONES DE LA RED MILENIUM
+    function normalizeStationName(rawName) {
+      if (!rawName) return { id: "GUADALUPE", displayName: "GUADALUPE" };
+      const str = String(rawName).trim().toUpperCase();
+
+      if (str.includes("STO") || str.includes("DOMINGO") || str.includes("SANTO")) {
+        return { id: "SANTO_DOMINGO", displayName: "SANTO DOMINGO" };
+      }
+      if (str.includes("COSMO")) {
+        return { id: "COSMOPOLIS", displayName: "COSMOPOLIS" };
+      }
+      if (str.includes("GPE") || str.includes("GUADALUPE") || str.includes("ISIGAS")) {
+        return { id: "GUADALUPE", displayName: "GUADALUPE" };
+      }
+      if (str.includes("REYNOSA")) {
+        return { id: "REYNOSA", displayName: "REYNOSA" };
+      }
+      return { id: str.replace(/[^A-Z0-9]/g, "_"), displayName: str };
+    }
+
+    function detectLubricantBrand(name) {
+      const u = String(name).toUpperCase();
+      if (u.includes("AKRON")) return "AKRON";
+      if (u.includes("QUAKER")) return "QUAKER STATE";
+      if (u.includes("ROSHFRANS")) return "ROSHFRANS";
+      if (u.includes("MOBIL")) return "MOBIL";
+      if (u.includes("CASTROL")) return "CASTROL";
+      if (u.includes("SHELL") || u.includes("HELIX") || u.includes("ROTELLA")) return "SHELL";
+      if (u.includes("LUCAS")) return "LUCAS OIL";
+      if (u.includes("BARDAHL")) return "BARDAHL";
+      if (u.includes("GONHER")) return "GONHER";
+      if (u.includes("RALOY")) return "RALOY";
+      if (u.includes("MEXLUB")) return "MEXLUB";
+      if (u.includes("PENNZOIL")) return "PENNZOIL";
+      if (u.includes("CHEVRON") || u.includes("DELO") || u.includes("HAVOLINE")) return "CHEVRON";
+      if (u.includes("VALVOLINE")) return "VALVOLINE";
+      if (u.includes("FRAM")) return "FRAM";
+      if (u.includes("MOTORCRAFT")) return "MOTORCRAFT";
+      if (u.includes("ACDELCO") || u.includes("AC DELCO")) return "ACDELCO";
+      if (u.includes("ANTICONGELANTE") || u.includes("COOLANT") || u.includes("FREEZE")) return "ANTICONGELANTES";
+      if (u.includes("LIQUIDO PARA FRENOS") || u.includes("FRENOS") || u.includes("BRAKE")) return "LÍQUIDOS FRENOS";
+      if (u.includes("AGUA DESMINERALIZADA") || u.includes("AGUA DESTILADA") || u.includes("AGUA")) return "AGUA / FLUIDOS";
+      if (u.includes("ADITIVO") || u.includes("TRATAMIENTO") || u.includes("INYECTORES")) return "ADITIVOS";
+      return "OTROS LUBRICANTES";
+    }
+
+    // LISTA NEGRA ESTRICTA PARA EVITAR QUE SE FILTREN TOTALES O PAGOS A ACEITES
+    function isNonOilOperationalLabel(label) {
+      if (!label) return true;
+      const u = String(label).trim().toUpperCase();
+      const blacklist = [
+        "SUMA", "SUMA:", "VENTA TOTAL", "TOTALES", "TOTALES($)", "TOTALES($):", "TOTALES ($)",
+        "TOTAL DÉBITO", "TOTAL DEBITO", "TOTAL CRÉDITO", "TOTAL CREDITO",
+        "EFECTIVO", "TARJETAS", "TARJETA", "TOTAL CLIENTES CRÉDITO", "TOTAL CLIENTES CREDITO",
+        "TOTAL CLIENTES", "CLIENTES CRÉDITO", "CLIENTES CREDITO", "TOTAL DE ACEITES",
+        "TOTAL DE COMBUSTIBLES", "TOTAL COMBUSTIBLES", "COMBUSTIBLES", "COMBUSTIBLE",
+        "MAGNA", "PREMIUM", "DIESEL", "SUBTOTAL", "IEPS", "IVA", "JARREO", "JARREOS",
+        "FALTANTES", "FALTANTE", "SOBRANTES", "SOBRANTE", "CORTE", "CORTE DE INFORMACIÓN",
+        "PRODUCTO", "DESCRIPCIÓN", "DESCRIPCION", "CANTIDAD", "PRECIO", "IMPORTE"
+      ];
+      return blacklist.some(term => u === term || u.startsWith(term + ":") || u.startsWith(term + "(") || u.startsWith(term + " "));
+    }
+
     function parseDateToISO(dateStr, fallbackIso) {
       if (!dateStr) return fallbackIso;
       const str = String(dateStr).trim();
-      
-      const numMatch = str.match(/([0-3]?[0-9])[/-]([0-1]?[0-9])[/-](202[0-9])/);
-      if (numMatch) {
-        const day = String(numMatch[1]).padStart(2, '0');
-        const month = String(numMatch[2]).padStart(2, '0');
-        const year = numMatch[3];
-        return `${year}-${month}-${day}`;
-      }
+      const upper = str.toUpperCase();
 
       const monthsMap = {
         'ENERO': '01', 'JANUARY': '01', 'ENE': '01', 'JAN': '01',
@@ -1505,27 +1695,40 @@
         'DICIEMBRE': '12', 'DECEMBER': '12', 'DIC': '12', 'DEC': '12'
       };
 
-      const upper = str.toUpperCase();
       let year = '2026';
       const ym = upper.match(/202[0-9]/);
       if (ym) year = ym[0];
 
-      let month = '09';
+      let month = '';
       for (const [name, num] of Object.entries(monthsMap)) {
-        if (upper.includes(name)) {
+        // Buscar la palabra del mes completa o delimitada para no confundir
+        const regex = new RegExp(`\\b${name}\\b`, 'i');
+        if (regex.test(upper)) {
           month = num;
           break;
         }
       }
 
+      // Si no encontró mes en texto, buscar formato estricto DD/MM/YYYY o DD-MM-YYYY
+      if (!month) {
+        const numMatch = str.match(/([0-3]?[0-9])[/-]([0-1]?[0-9])[/-](202[0-9])/);
+        if (numMatch) {
+          const day = String(numMatch[1]).padStart(2, '0');
+          month = String(numMatch[2]).padStart(2, '0');
+          year = numMatch[3];
+          return `${year}-${month}-${day}`;
+        }
+        return fallbackIso;
+      }
+
       let day = '01';
+      // Extraer el día que precede o sucede al mes
       const dm = upper.match(/\b([0-3]?[0-9])\b/);
       if (dm) day = String(dm[1]).padStart(2, '0');
 
       return `${year}-${month}-${day}`;
     }
 
-    // Intelligent month/period extractor for any date format
     function extractPeriodDetails(rawText, fallbackName = '') {
       const text = `${rawText} ${fallbackName}`.toUpperCase();
       
@@ -1560,14 +1763,29 @@
       const yearMatch = text.match(/202[0-9]/);
       if (yearMatch) detectedYear = yearMatch[0];
 
-      let detectedMonthNum = '09';
-      let detectedMonthName = 'Septiembre';
+      let detectedMonthNum = '';
+      let detectedMonthName = '';
 
       for (const [key, val] of Object.entries(monthDict)) {
-        if (text.includes(key)) {
+        const regex = new RegExp(`\\b${key}\\b`, 'i');
+        if (regex.test(text)) {
           detectedMonthNum = val.num;
           detectedMonthName = val.label;
           break;
+        }
+      }
+
+      // Si no detectó nombre de mes, buscar fechas numéricas DD/MM/YYYY
+      if (!detectedMonthNum) {
+        const numMatch = text.match(/[0-3]?[0-9][/-]([0-1]?[0-9])[/-](202[0-9])/);
+        if (numMatch) {
+          detectedMonthNum = String(numMatch[1]).padStart(2, '0');
+          detectedYear = numMatch[2];
+          const monthsInSpanish = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+          detectedMonthName = monthsInSpanish[parseInt(detectedMonthNum)] || 'Mes ' + detectedMonthNum;
+        } else {
+          detectedMonthNum = '09';
+          detectedMonthName = 'Septiembre';
         }
       }
 
@@ -1586,7 +1804,6 @@
       return { periodKey, monthLabel, startIsoDate, endIsoDate };
     }
 
-    // Populate Station Filter Dropdown
     function populateStationSelect() {
       const select = document.getElementById('stationSelect');
       if (!select) return;
@@ -1594,18 +1811,18 @@
       const previousValue = select.value;
       select.innerHTML = '<option value="ALL">🌐 Red Milenium (Consolidado Total)</option>';
 
-      const stations = window.currentStations || [];
-      const addedIds = new Set();
+      const standardList = [
+        { id: "COSMOPOLIS", nombre: "COSMOPOLIS" },
+        { id: "GUADALUPE", nombre: "GUADALUPE" },
+        { id: "REYNOSA", nombre: "REYNOSA" },
+        { id: "SANTO_DOMINGO", nombre: "SANTO DOMINGO" }
+      ];
 
-      stations.forEach(st => {
-        const stationKey = st.stationId || (st.id ? st.id.split('_')[0] : '') || st.nombre;
-        if (stationKey && !addedIds.has(stationKey)) {
-          addedIds.add(stationKey);
-          const opt = document.createElement('option');
-          opt.value = stationKey;
-          opt.textContent = `⛽ ${st.nombre}`;
-          select.appendChild(opt);
-        }
+      standardList.forEach(st => {
+        const opt = document.createElement('option');
+        opt.value = st.id;
+        opt.textContent = `⛽ ${st.nombre}`;
+        select.appendChild(opt);
       });
 
       if (previousValue && Array.from(select.options).some(o => o.value === previousValue)) {
@@ -1613,7 +1830,6 @@
       }
     }
 
-    // Populate Month/Period Filter Dropdown
     function populateMonthPeriodSelect() {
       const select = document.getElementById('monthPeriodSelect');
       if (!select) return;
@@ -1648,7 +1864,6 @@
       }
     }
 
-    // Populate Secondary Month Filter inside Detailed Table
     function populateTableMonthFilter() {
       const select = document.getElementById('tableSpecificMonthSelect');
       if (!select) return;
@@ -1743,7 +1958,6 @@
       renderTableFromState();
     }
 
-    // FEATURE 1: Month-Over-Month (MoM) calculation logic
     function computeMoM(currentRev, currentVol, currentCash, selectedPeriod) {
       const allStations = window.currentStations || [];
       const revBadge = document.getElementById('momRevenueBadge');
@@ -1759,7 +1973,6 @@
         return;
       }
 
-      // Find previous chronological month in dataset
       const periods = [...new Set(allStations.map(s => s.periodKey).filter(Boolean))].sort();
       const currentIndex = periods.indexOf(selectedPeriod);
 
@@ -1806,12 +2019,10 @@
 
       let dataset = window.currentStations || [];
       
-      // Filtro 1: Por Estación
       if (selectedStation !== 'ALL') {
         dataset = dataset.filter(s => (s.stationId || (s.id ? s.id.split('_')[0] : '') || s.id) === selectedStation);
       }
       
-      // Filtro 2: Por Rango de Fechas Personalizado
       if (customStart || customEnd) {
         dataset = dataset.filter(s => {
           const itemStart = s.startIsoDate || (s.periodKey ? `${s.periodKey}-01` : '1970-01-01');
@@ -1826,9 +2037,7 @@
           }
           return true;
         });
-      } 
-      // Filtro 3: Por Mes Preseleccionado
-      else if (selectedPeriod !== 'ALL') {
+      } else if (selectedPeriod !== 'ALL') {
         dataset = dataset.filter(s => (s.periodKey || s.periodo) === selectedPeriod);
       }
 
@@ -1865,7 +2074,11 @@
       let totCash = 0;
       let totCards = 0;
       let totCredits = 0;
+      let totDebits = 0;
+      let totVales = 0;
+      let totFaltantes = 0;
       let totOils = 0;
+      let totOilPieces = 0;
       let totSubtotal = 0;
       let totIEPS = 0;
       let totIVA = 0;
@@ -1884,7 +2097,11 @@
         totCash += (Number(st.efectivo || 0) * multiplier);
         totCards += (Number(st.tarjetas || 0) * multiplier);
         totCredits += (Number(st.creditos || 0) * multiplier);
+        totDebits += (Number(st.debitos || 0) * multiplier);
+        totVales += (Number(st.vales || 0) * multiplier);
+        totFaltantes += (Number(st.faltantes || 0) * multiplier);
         totOils += (Number(st.totalAceites || 0) * multiplier);
+        totOilPieces += (Number(st.totalAceitesPiezas || 0) * multiplier);
         totSubtotal += (Number(st.subtotal || 0) * multiplier);
         totIEPS += (Number(st.ieps || 0) * multiplier);
         totIVA += (Number(st.iva || 0) * multiplier);
@@ -1919,14 +2136,73 @@
       const digPct = totRevenue > 0 ? ((cardsPlusCredits / totRevenue) * 100).toFixed(1) : '0';
       document.getElementById('kpiDigitalPct').textContent = `${digPct}% penetración`;
 
+      // Renderizado de los nuevos KPIs
+      const clientsCreditEl = document.getElementById('kpiClientsCredit');
+      if (clientsCreditEl) clientsCreditEl.textContent = formatCurrency(totCredits);
+      const creditShareEl = document.getElementById('kpiCreditSharePct');
+      if (creditShareEl) {
+        const creditShare = totRevenue > 0 ? ((totCredits / totRevenue) * 100).toFixed(1) : '0.0';
+        creditShareEl.textContent = `${creditShare}% del total`;
+      }
+
+      const debitsEl = document.getElementById('kpiDebits');
+      if (debitsEl) debitsEl.textContent = formatCurrency(totDebits);
+      const debitsStatusEl = document.getElementById('kpiDebitsStatus');
+      if (debitsStatusEl) {
+        debitsStatusEl.textContent = totDebits > 0 ? `${formatCurrency(totDebits)} retenido` : 'Sin débitos';
+      }
+
+      const valesEl = document.getElementById('kpiVales');
+      if (valesEl) valesEl.textContent = formatCurrency(totVales);
+      const valesShareEl = document.getElementById('kpiValesSharePct');
+      if (valesShareEl) {
+        const valesShare = totRevenue > 0 ? ((totVales / totRevenue) * 100).toFixed(1) : '0.0';
+        valesShareEl.textContent = `${valesShare}% de cobro`;
+      }
+
+      const faltantesEl = document.getElementById('kpiFaltantes');
+      if (faltantesEl) faltantesEl.textContent = formatCurrency(totFaltantes);
+      const faltantesNoteEl = document.getElementById('kpiFaltantesNote');
+      const faltantesTagEl = document.getElementById('kpiFaltantesTag');
+      if (faltantesNoteEl) {
+        if (totFaltantes > 2000) {
+          faltantesNoteEl.textContent = 'Alerta de auditoría';
+          faltantesNoteEl.className = 'font-mono font-bold text-rose-600';
+          if (faltantesTagEl) {
+            faltantesTagEl.textContent = 'CRÍTICO';
+            faltantesTagEl.className = 'text-[9px] px-1.5 py-0.2 rounded bg-rose-600 text-white font-mono font-bold animate-pulse';
+          }
+        } else if (totFaltantes > 0) {
+          faltantesNoteEl.textContent = 'En observación';
+          faltantesNoteEl.className = 'font-mono font-bold text-amber-600';
+          if (faltantesTagEl) {
+            faltantesTagEl.textContent = 'ATENCIÓN';
+            faltantesTagEl.className = 'text-[9px] px-1.5 py-0.2 rounded bg-amber-100 text-amber-700 font-mono font-bold';
+          }
+        } else {
+          faltantesNoteEl.textContent = 'Caja cuadrada ($0.00)';
+          faltantesNoteEl.className = 'font-mono font-bold text-emerald-600';
+          if (faltantesTagEl) {
+            faltantesTagEl.textContent = 'CORRECTO';
+            faltantesTagEl.className = 'text-[9px] px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-700 font-mono font-bold';
+          }
+        }
+      }
+
       const avgPrice = totLiters > 0 ? (totFuelRev / totLiters) : 0;
       document.getElementById('kpiAvgPricePerLiter').textContent = `${formatCurrency(avgPrice)} / L`;
       document.getElementById('kpiAvgPriceNote').textContent = avgPrice > 25 ? 'Mezcla Premium/Diesel' : 'Mezcla Regular/Frontera';
 
       const oilsPerM3 = totLiters > 0 ? (totOils / (totLiters / 1000)) : 0;
       document.getElementById('kpiOilsPerM3').textContent = `${formatCurrency(oilsPerM3)} / m³`;
-      const oilShare = totRevenue > 0 ? ((totOils / totRevenue) * 100).toFixed(2) : '0.00';
-      document.getElementById('kpiOilSharePct').textContent = `${oilShare}% de venta neta`;
+      document.getElementById('kpiTotalOilPieces').textContent = `${formatNumber(totOilPieces)} pzas`;
+
+      const litersPerBottle = totOilPieces > 0 ? (totLiters / totOilPieces) : 0;
+      document.getElementById('kpiLitersPerOilBottle').textContent = `${formatNumber(litersPerBottle)} L / pza`;
+      const intensityNote = document.getElementById('kpiOilIntensityNote');
+      if (intensityNote) {
+        intensityNote.textContent = litersPerBottle > 0 && litersPerBottle < 4000 ? 'Alta proactividad' : 'Oportunidad de empuje';
+      }
 
       const jarreoRatio = totLiters > 0 ? ((totJarras / totLiters) * 100) : 0;
       document.getElementById('kpiJarreosRatio').textContent = `${jarreoRatio.toFixed(3)}%`;
@@ -1962,6 +2238,10 @@
       document.getElementById('cashBreakdownVal').textContent = formatCurrency(totCash);
       document.getElementById('cardBreakdownVal').textContent = formatCurrency(totCards);
       document.getElementById('creditBreakdownVal').textContent = formatCurrency(totCredits);
+      const vBreakdown = document.getElementById('valesBreakdownVal');
+      if (vBreakdown) vBreakdown.textContent = formatCurrency(totVales);
+      const dBreakdown = document.getElementById('debitBreakdownVal');
+      if (dBreakdown) dBreakdown.textContent = formatCurrency(totDebits);
 
       if (dataset.length > 0) {
         const topSt = [...dataset].sort((a,b) => (b.ventaTotal || 0) - (a.ventaTotal || 0))[0];
@@ -1978,16 +2258,154 @@
       renderLeaderboard(dataset, multiplier);
       renderFuelDonut(prodTotals);
       renderStationsBar(dataset, multiplier);
-      renderPaymentPie(totCash, totCards, totCredits);
+      renderPaymentPie(totCash, totCards, totCredits, totVales, totDebits);
       renderTableFromState();
       renderAuditRadar(dataset);
       renderHistoricalTrends();
+      renderLubricantsRanking(dataset, multiplier);
       updateTargetsUI(dataset);
 
       if (window.lucide) lucide.createIcons();
     }
 
-    // FEATURE 1: Render historical multi-month volume trends
+    function renderLubricantsRanking(dataset, multiplier) {
+      const tbody = document.getElementById('lubricantsTopTableBody');
+      const catalogCountBadge = document.getElementById('oilsProductCatalogCount');
+      const totalsBadge = document.getElementById('oilsTotalPzasRevenue');
+      const topStationName = document.getElementById('topOilStationName');
+      const topStationAmount = document.getElementById('topOilStationAmount');
+      const topStationPieces = document.getElementById('topOilStationPieces');
+      const brandsContainer = document.getElementById('brandsShareContainer');
+
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      const itemsMap = new Map();
+      const stationOilMap = new Map();
+      const brandMap = new Map();
+
+      let grandTotalOilRev = 0;
+      let grandTotalOilPzas = 0;
+
+      dataset.forEach(s => {
+        const stName = (s.nombre || 'ESTACION').toUpperCase();
+        const stationRev = (Number(s.totalAceites) || 0) * multiplier;
+        const stationPzas = (Number(s.totalAceitesPiezas) || 0) * multiplier;
+
+        if (!stationOilMap.has(stName)) {
+          stationOilMap.set(stName, { name: stName, amount: 0, pieces: 0 });
+        }
+
+        if (Array.isArray(s.aceitesDetalle) && s.aceitesDetalle.length > 0) {
+          s.aceitesDetalle.forEach(item => {
+            const rawDesc = String(item.descripcion || item.producto || '').trim();
+            if (!rawDesc || isNonOilOperationalLabel(rawDesc)) return;
+
+            const prodName = rawDesc.toUpperCase();
+            const pzas = (Number(item.piezas || item.cantidad || item.pzas) || 0) * multiplier;
+            const imp = (Number(item.importe) || 0) * multiplier;
+
+            // Evitar anomalías: si un producto tiene un precio unitario disparatado o importe gigante (> $500,000) por error de captura, descartar
+            if (imp > 500000 || pzas < 0 || imp < 0) return;
+
+            grandTotalOilRev += imp;
+            grandTotalOilPzas += pzas;
+
+            const curSt = stationOilMap.get(stName);
+            curSt.amount += imp;
+            curSt.pieces += pzas;
+
+            if (!itemsMap.has(prodName)) {
+              itemsMap.set(prodName, {
+                name: prodName,
+                piezas: 0,
+                importe: 0,
+                unitPrice: Number(item.precioUnitario || item.precioUnit) || (pzas > 0 ? imp / pzas : 0)
+              });
+            }
+            const curItem = itemsMap.get(prodName);
+            curItem.piezas += pzas;
+            curItem.importe += imp;
+
+            const brand = item.marca || detectLubricantBrand(prodName);
+            brandMap.set(brand, (brandMap.get(brand) || 0) + imp);
+          });
+        } else if (stationRev > 0) {
+          // Si no tiene desglose granular pero sí total de aceites
+          const curSt = stationOilMap.get(stName);
+          curSt.amount += stationRev;
+          curSt.pieces += stationPzas;
+          grandTotalOilRev += stationRev;
+          grandTotalOilPzas += stationPzas;
+        }
+      });
+
+      const sortedProducts = Array.from(itemsMap.values()).sort((a,b) => b.importe - a.importe);
+
+      if (catalogCountBadge) catalogCountBadge.textContent = `${sortedProducts.length} Productos Identificados`;
+      if (totalsBadge) totalsBadge.textContent = `${formatNumber(grandTotalOilPzas)} Piezas • ${formatCurrency(grandTotalOilRev)}`;
+
+      const rankedStations = Array.from(stationOilMap.values()).sort((a,b) => b.amount - a.amount);
+      if (rankedStations.length > 0 && topStationName) {
+        topStationName.textContent = rankedStations[0].name;
+        topStationAmount.textContent = formatCurrency(rankedStations[0].amount);
+        topStationPieces.textContent = `${formatNumber(rankedStations[0].pieces)} piezas`;
+      }
+
+      if (brandsContainer) {
+        brandsContainer.innerHTML = '';
+        const sortedBrands = Array.from(brandMap.entries()).sort((a,b) => b[1] - a[1]).slice(0, 5);
+        if (sortedBrands.length === 0) {
+          brandsContainer.innerHTML = '<p class="text-slate-400 font-mono text-[11px]">Carga reportes detallados para ver marcas.</p>';
+        } else {
+          sortedBrands.forEach(([brand, amt]) => {
+            const share = grandTotalOilRev > 0 ? ((amt / grandTotalOilRev) * 100).toFixed(1) : 0;
+            const bDiv = document.createElement('div');
+            bDiv.className = 'space-y-1';
+            bDiv.innerHTML = `
+              <div class="flex justify-between items-center text-[11px] font-mono">
+                <span class="font-bold text-slate-800">${brand}</span>
+                <span class="text-slate-500">${formatCurrency(amt)} (${share}%)</span>
+              </div>
+              <div class="w-full h-1.5 rounded-full bg-slate-200 overflow-hidden">
+                <div class="bg-[#ff6600] h-full" style="width: ${share}%"></div>
+              </div>
+            `;
+            brandsContainer.appendChild(bDiv);
+          });
+        }
+      }
+
+      if (sortedProducts.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400">Sin desglose granular de aceites en este periodo. Carga los reportes detallados.</td></tr>`;
+        return;
+      }
+
+      sortedProducts.slice(0, 10).forEach((item, idx) => {
+        const share = grandTotalOilRev > 0 ? ((item.importe / grandTotalOilRev) * 100).toFixed(1) : 0;
+        const avgUnit = item.piezas > 0 ? (item.importe / item.piezas) : item.unitPrice;
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition";
+        tr.innerHTML = `
+          <td class="py-2.5 px-3.5">
+            <div class="flex items-center gap-2">
+              <span class="w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-black ${idx < 3 ? 'bg-orange-100 text-[#ea580c]' : 'bg-slate-100 text-slate-600'}">
+                #${idx + 1}
+              </span>
+              <span class="font-bold text-slate-900">${item.name}</span>
+            </div>
+          </td>
+          <td class="py-2.5 px-3 text-right font-bold text-slate-800">${formatNumber(item.piezas)} pza(s)</td>
+          <td class="py-2.5 px-3 text-right text-slate-500">${formatCurrency(avgUnit)}</td>
+          <td class="py-2.5 px-3 text-right font-black text-slate-900">${formatCurrency(item.importe)}</td>
+          <td class="py-2.5 px-3 text-center">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-orange-50 text-[#ea580c] border border-orange-200">${share}%</span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
     function renderHistoricalTrends() {
       const canvas = document.getElementById('historicalTrendChart');
       if (!canvas) return;
@@ -2101,7 +2519,6 @@
       });
     }
 
-    // FEATURE 3: Targets and Sales Goals
     window.updateTargetsUI = function(dataset = currentRenderDataset) {
       const container = document.getElementById('targetsProgressContainer');
       const globalEl = document.getElementById('globalTargetPercent');
@@ -2109,9 +2526,10 @@
       container.innerHTML = '';
 
       const targets = window.stationSalesTargets || {
+        COSMOPOLIS: 420000,
         GUADALUPE: 450000,
         REYNOSA: 380000,
-        STO_DOMINGO: 290000
+        SANTO_DOMINGO: 290000
       };
 
       const stMap = new Map();
@@ -2154,14 +2572,13 @@
         globalEl.textContent = `${globalPct}% (${formatNumber(grandActual)} / ${formatNumber(grandTarget)} L)`;
       }
 
-      // Populate Inputs in Admin targets tab
       const inputsGrid = document.getElementById('targetsInputsGrid');
       if (inputsGrid) {
         inputsGrid.innerHTML = '';
         stationsList.forEach(stKey => {
           const div = document.createElement('div');
           div.innerHTML = `
-            <label class="block font-bold text-slate-700 text-xs mb-1">Meta para ${stKey} (Litros):</label>
+            <label class="block font-bold text-slate-700 text-xs mb-1">Meta ${stKey} (Litros):</label>
             <input type="number" id="targetInput_${stKey}" value="${targets[stKey]}" class="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-slate-900 font-mono font-bold text-xs focus:outline-none focus:border-[#ff6600]">
           `;
           inputsGrid.appendChild(div);
@@ -2182,7 +2599,6 @@
       closeAdminModal();
     };
 
-    // FEATURE 4: Semáforo Operativo (Mermas, Jarreos, Faltantes)
     function renderAuditRadar(dataset) {
       const tbody = document.getElementById('auditRadarTableBody');
       if (!tbody) return;
@@ -2225,7 +2641,6 @@
       });
     }
 
-    // FEATURE 2: Generador de Reporte Ejecutivo en PDF
     window.generateExecutivePDF = function() {
       const element = document.getElementById('executiveReportContainer');
       const opt = {
@@ -2242,7 +2657,6 @@
       });
     };
 
-    // FEATURE 5: PWA Installation Support
     let deferredPrompt = null;
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
@@ -2268,7 +2682,7 @@
       container.innerHTML = '';
 
       if (!dataset || dataset.length === 0) {
-        container.innerHTML = `<div class="col-span-3 text-center py-6 text-slate-400 font-mono text-xs">No hay datos para clasificar en el periodo seleccionado.</div>`;
+        container.innerHTML = `<div class="col-span-4 text-center py-6 text-slate-400 font-mono text-xs">No hay datos para clasificar en el periodo seleccionado.</div>`;
         return;
       }
 
@@ -2276,8 +2690,10 @@
       let grandTotalRevenue = 0;
 
       dataset.forEach(s => {
-        const rawId = s.stationId || (s.id ? s.id.split('_')[0] : '') || s.id;
-        const name = (s.nombre || 'ESTACION').replace(/EST ISIGAS/gi, 'GUADALUPE').replace(/ISIGAS/gi, 'GUADALUPE').trim();
+        const norm = normalizeStationName(s.nombre || s.stationId);
+        const rawId = norm.id;
+        const name = norm.displayName;
+
         const sales = (Number(s.ventaTotal) || 0) * multiplier;
         const liters = (Number(s.litros) || 0) * multiplier;
         const cash = (Number(s.efectivo) || 0) * multiplier;
@@ -2301,7 +2717,8 @@
       const medals = [
         { badge: '🥇 1º LUGAR', bg: 'bg-amber-500/10 text-amber-700 border-amber-300', ring: 'border-amber-200' },
         { badge: '🥈 2º LUGAR', bg: 'bg-slate-200 text-slate-700 border-slate-300', ring: 'border-slate-200' },
-        { badge: '🥉 3º LUGAR', bg: 'bg-orange-500/10 text-orange-800 border-orange-300', ring: 'border-orange-200' }
+        { badge: '🥉 3º LUGAR', bg: 'bg-orange-500/10 text-orange-800 border-orange-300', ring: 'border-orange-200' },
+        { badge: '🎖️ 4º LUGAR', bg: 'bg-slate-100 text-slate-700 border-slate-300', ring: 'border-slate-200' }
       ];
 
       rankedStations.forEach((st, idx) => {
@@ -2361,22 +2778,25 @@
       const ctx = canvas.getContext('2d');
       if (fuelDonutChart) fuelDonutChart.destroy();
 
+      const magna = prodTotals.MAGNA ? Number(prodTotals.MAGNA.lts || 0) : 0;
+      const premium = prodTotals.PREMIUM ? Number(prodTotals.PREMIUM.lts || 0) : 0;
+      const diesel = prodTotals.DIESEL ? Number(prodTotals.DIESEL.lts || 0) : 0;
+
       fuelDonutChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-          labels: ['Magna (Verde)', 'Premium (Rojo)', 'Diesel (Negro)'],
+          labels: ['Magna', 'Premium', 'Diesel'],
           datasets: [{
-            data: [prodTotals.MAGNA.lts, prodTotals.PREMIUM.lts, prodTotals.DIESEL.lts],
+            data: [magna, premium, diesel],
             backgroundColor: ['#10b981', '#ef4444', '#09090b'],
-            borderWidth: 3,
             borderColor: '#ffffff',
+            borderWidth: 2,
             hoverOffset: 6
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          cutout: '72%',
           plugins: {
             legend: { display: false },
             tooltip: {
@@ -2386,8 +2806,48 @@
               titleColor: '#ffffff',
               bodyColor: '#ffffff',
               callbacks: {
-                label: function(item) {
-                  return ` ${item.label}: ${formatNumber(item.raw)} Litros`;
+                label: function(ctx) {
+                  return ` ${ctx.label}: ${formatNumber(ctx.raw)} L`;
+                }
+              }
+            }
+          },
+          cutout: '70%'
+        }
+      });
+    }
+
+    function renderPaymentPie(cash, cards, credits, vales = 0, debits = 0) {
+      const canvas = document.getElementById('paymentPieChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (paymentPieChart) paymentPieChart.destroy();
+
+      paymentPieChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['Efectivo Físico', 'Tarjetas Bancarias', 'Crédito Flotillas', 'Vales Gasolina', 'Débitos'],
+          datasets: [{
+            data: [cash, cards, credits, vales, debits],
+            backgroundColor: ['#ff6600', '#94a3b8', '#2563eb', '#10b981', '#9333ea'],
+            borderColor: '#ffffff',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#09090b',
+              borderColor: '#ff6600',
+              borderWidth: 1,
+              titleColor: '#ffffff',
+              bodyColor: '#ffffff',
+              callbacks: {
+                label: function(ctx) {
+                  return ` ${ctx.label}: ${formatCurrency(ctx.raw)}`;
                 }
               }
             }
@@ -2404,7 +2864,9 @@
 
       const stMap = new Map();
       dataset.forEach(s => {
-        const name = (s.nombre || 'ESTACION').replace(/EST ISIGAS/gi, 'GUADALUPE').replace(/ISIGAS/gi, 'GUADALUPE').trim();
+        const norm = normalizeStationName(s.nombre || s.stationId);
+        const name = norm.displayName;
+
         if (!stMap.has(name)) {
           stMap.set(name, { sales: 0, liters: 0 });
         }
@@ -2668,6 +3130,22 @@
       showBanner("Corte de estación removido del panel.");
     }
 
+    function exportCurrentViewCSV() {
+      if (!window.currentStations || window.currentStations.length === 0) return;
+      let csv = "Estacion,Mes,Periodo,Litros,Combustibles,Aceites,PiezasAceites,VentaTotal,Efectivo,Tarjetas,Creditos\n";
+      window.currentStations.forEach(s => {
+        csv += `"${s.nombre}","${s.monthLabel || ''}","${s.periodo}",${s.litros},${s.totalCombustibles},${s.totalAceites},${s.totalAceitesPiezas || 0},${s.ventaTotal},${s.efectivo},${s.tarjetas},${s.creditos}\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `Milenium_Reporte_Estaciones_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
     async function parseExcelFile(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -2675,133 +3153,320 @@
           try {
             const data = new Uint8Array(e.target.result);
             const workbook = XLSX.read(data, { type: 'array' });
-            const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+            const cuts = [];
 
-            const topHeader = rows[0] && rows[0][0] ? String(rows[0][0]) : '';
-            let stationName = file.name.replace(/\.[^/.]+$/, "").replace("reporte_periodo_concentrado", "").trim();
-            if (topHeader.includes("ESTACIÓN:")) {
-              stationName = topHeader.split("ESTACIÓN:")[1].trim().split("\n")[0];
-            }
+            // Procesar cada pestaña del archivo
+            workbook.SheetNames.forEach(sheetName => {
+              const sheet = workbook.Sheets[sheetName];
+              const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+              if (!rows || rows.length === 0) return;
 
-            if (/ISIGAS/i.test(stationName) || /GUADALUPE/i.test(file.name)) {
-              stationName = "GUADALUPE";
-            }
-
-            let period = "Periodo Actual";
-            const matchPeriod = topHeader.match(/DEL (.*?) AL (.*?)(?:\n|$)/i);
-            if (matchPeriod) {
-              period = `${matchPeriod[1]} al ${matchPeriod[2]}`.trim();
-            }
-
-            const { periodKey, monthLabel, startIsoDate, endIsoDate } = extractPeriodDetails(topHeader, file.name);
-
-            let totalCombustibles = 0;
-            let litrosCombustibles = 0;
-            let totalAceites = 0;
-            let ventaTotal = 0;
-            let efectivo = 0;
-            let tarjetas = 0;
-            let creditos = 0;
-            let debitos = 0;
-            let faltantes = 0;
-            let jarrasTotal = 0;
-            let subtotal = 0;
-            let ieps = 0;
-            let iva = 0;
-
-            let productos = {
-              MAGNA: { lts: 0, importe: 0 },
-              DIESEL: { lts: 0, importe: 0 },
-              PREMIUM: { lts: 0, importe: 0 }
-            };
-
-            let inCombustibles = false;
-
-            for (let r = 0; r < rows.length; r++) {
-              const row = rows[r];
-              if (!row || row.length === 0) continue;
-              const c1 = String(row[1] || '').trim();
-              const c5 = parseFloat(row[5]) || 0;
-
-              if (c1 === 'COMBUSTIBLES') inCombustibles = true;
-              
-              if (c1.includes('Total de Combustibles:')) {
-                inCombustibles = false;
-                totalCombustibles = c5;
-                litrosCombustibles = parseFloat(row[3]) || 0;
-                jarrasTotal = parseFloat(row[2]) || 0;
-              }
-
-              if (inCombustibles) {
-                const prod = c1.toUpperCase();
-                const lts = parseFloat(row[3]) || 0;
-                const imp = c5;
-                if (prod.includes('MAGNA')) {
-                  productos.MAGNA.lts += lts;
-                  productos.MAGNA.importe += imp;
-                } else if (prod.includes('DIESEL')) {
-                  productos.DIESEL.lts += lts;
-                  productos.DIESEL.importe += imp;
-                } else if (prod.includes('PREMIUM')) {
-                  productos.PREMIUM.lts += lts;
-                  productos.PREMIUM.importe += imp;
+              // Identificar si la hoja contiene múltiples cortes apilados verticalmente
+              let cutStartIndices = [];
+              for (let i = 0; i < rows.length; i++) {
+                const rowStr = (rows[i] || []).join(' ').toUpperCase();
+                if (rowStr.includes('CORTE DE INFORMACIÓN') || (rowStr.includes('DEL ') && rowStr.includes(' AL ') && rowStr.includes('202'))) {
+                  cutStartIndices.push(i);
                 }
               }
 
-              if (c1.includes('Total de Aceites y Lubricantes:')) totalAceites = c5;
-              if (c1.includes('Venta Total')) ventaTotal = c5;
-
-              if (c1.includes('Totales($):')) {
-                subtotal = parseFloat(row[2]) || 0;
-                ieps = parseFloat(row[3]) || 0;
-                iva = parseFloat(row[4]) || 0;
+              // Si no detectó cortes apilados, procesar la hoja entera como 1 bloque
+              if (cutStartIndices.length === 0) {
+                cutStartIndices = [0];
               }
 
-              if (c1 === 'EFECTIVO') efectivo = c5;
-              if (c1 === 'TARJETAS') tarjetas = c5;
-              if (c1 === 'CRÉDITOS') creditos = c5;
-              if (c1 === 'DÉBITOS') debitos = c5;
-              if (c1 === 'FALTANTES') faltantes = c5;
-            }
+              for (let b = 0; b < cutStartIndices.length; b++) {
+                const startRow = cutStartIndices[b];
+                const endRow = (b + 1 < cutStartIndices.length) ? cutStartIndices[b + 1] : rows.length;
+                const blockRows = rows.slice(startRow, endRow);
 
-            if (subtotal === 0 && ventaTotal > 0) {
-              subtotal = ventaTotal / 1.16;
-              iva = ventaTotal - subtotal;
-            }
+                let rawStationText = file.name.replace(/\.[^/.]+$/, "").replace("reporte_periodo_concentrado", "").replace("reporte_periodo_detallado", "").trim();
+                
+                let topHeader = `${sheetName} `;
+                for (let i = 0; i < Math.min(8, blockRows.length); i++) {
+                  const rowStr = (blockRows[i] || []).join(' ');
+                  if (rowStr.toUpperCase().includes('ESTACIÓN:') || rowStr.toUpperCase().includes('ESTACION')) {
+                    topHeader += ' ' + rowStr;
+                    const parts = rowStr.split(/ESTACI[OÓ]N:?/i);
+                    if (parts[1]) rawStationText = parts[1].trim().split('\n')[0];
+                  }
+                  if (rowStr.toUpperCase().includes('DEL ') && rowStr.toUpperCase().includes(' AL ')) {
+                    topHeader += ' ' + rowStr;
+                  }
+                }
 
-            const cleanStationId = stationName.replace(/\s+/g, '_').toUpperCase();
-            const recordId = `${cleanStationId}_${periodKey}`;
-            const dataFingerprint = `${recordId}_${period}_${litrosCombustibles.toFixed(2)}_${ventaTotal.toFixed(2)}`;
+                const normalized = normalizeStationName(rawStationText);
+                const stationKey = normalized.id;
+                const stationDisplayName = normalized.displayName;
 
-            const parsedStation = {
-              id: recordId,
-              stationId: cleanStationId,
-              nombre: stationName,
-              periodKey: periodKey,
-              monthLabel: monthLabel,
-              periodo: period,
-              startIsoDate: startIsoDate,
-              endIsoDate: endIsoDate,
-              litros: litrosCombustibles,
-              jarras: jarrasTotal,
-              totalCombustibles: totalCombustibles,
-              totalAceites: totalAceites,
-              ventaTotal: ventaTotal || (totalCombustibles + totalAceites),
-              subtotal: subtotal,
-              ieps: ieps,
-              iva: iva,
-              efectivo: efectivo,
-              tarjetas: tarjetas,
-              creditos: creditos,
-              debitos: debitos,
-              faltantes: faltantes,
-              productos: productos,
-              fileFingerprint: dataFingerprint,
-              sourceFileName: file.name
-            };
+                let period = "Periodo Actual";
+                const matchPeriod = topHeader.match(/DEL (.*?) AL (.*?)(?:\n|$)/i);
+                if (matchPeriod) {
+                  period = `${matchPeriod[1]} al ${matchPeriod[2]}`.trim();
+                }
 
-            resolve(parsedStation);
+                const { periodKey, monthLabel, startIsoDate, endIsoDate } = extractPeriodDetails(topHeader, `${file.name} ${sheetName}`);
+
+                let totalCombustibles = 0;
+                let litrosCombustibles = 0;
+                let totalAceites = 0;
+                let totalAceitesPiezas = 0;
+                let ventaTotal = 0;
+                let efectivo = 0;
+                let tarjetas = 0;
+                let creditos = 0;
+                let debitos = 0;
+                let vales = 0;
+                let faltantes = 0;
+                let jarrasTotal = 0;
+                let subtotal = 0;
+                let ieps = 0;
+                let iva = 0;
+
+                let productos = {
+                  MAGNA: { lts: 0, importe: 0 },
+                  DIESEL: { lts: 0, importe: 0 },
+                  PREMIUM: { lts: 0, importe: 0 }
+                };
+
+                let aceitesDetalle = [];
+                let inCombustibles = false;
+                let inAceites = false;
+
+                for (let r = 0; r < blockRows.length; r++) {
+                  const row = blockRows[r];
+                  if (!row || row.length === 0) continue;
+                  
+                  // Concatenar texto de las primeras celdas para detección de encabezados
+                  const fullRowStr = row.map(cell => String(cell || '').trim()).join(' ').toUpperCase();
+                  const c0 = String(row[0] || '').trim();
+                  const c1 = String(row[1] !== undefined ? row[1] : '').trim();
+                  const c1Upper = (c1 || c0).toUpperCase();
+
+                  const c2Num = parseFloat(row[2]) || 0;
+                  const c3Num = parseFloat(row[3]) || 0;
+                  const c4Num = parseFloat(row[4]) || 0;
+                  const c5Num = parseFloat(row[5]) || 0;
+                  
+                  // Helper para extraer el mayor número de la fila
+                  const rowNumbers = row.map(x => parseFloat(x)).filter(x => !isNaN(x) && isFinite(x));
+                  const maxRowNumber = rowNumbers.length > 0 ? rowNumbers[rowNumbers.length - 1] : 0;
+
+                  // 1. CONTROL DE ENTRADA A COMBUSTIBLES
+                  if (fullRowStr.includes('COMBUSTIBLES') && !fullRowStr.includes('TOTAL')) {
+                    inCombustibles = true;
+                    inAceites = false;
+                    continue;
+                  }
+                  
+                  // SALIDA DE COMBUSTIBLES
+                  if (fullRowStr.includes('TOTAL DE COMBUSTIBLES') || fullRowStr.includes('TOTAL COMBUSTIBLES')) {
+                    inCombustibles = false;
+                    totalCombustibles = c5Num || c4Num || maxRowNumber || totalCombustibles;
+                    litrosCombustibles = c3Num || litrosCombustibles;
+                    jarrasTotal = c2Num || jarrasTotal;
+                    continue;
+                  }
+
+                  if (inCombustibles) {
+                    const prod = c1Upper;
+                    const lts = c3Num;
+                    const imp = c5Num || c4Num;
+                    if (prod.includes('MAGNA')) {
+                      productos.MAGNA.lts += lts;
+                      productos.MAGNA.importe += imp;
+                    } else if (prod.includes('DIESEL')) {
+                      productos.DIESEL.lts += lts;
+                      productos.DIESEL.importe += imp;
+                    } else if (prod.includes('PREMIUM')) {
+                      productos.PREMIUM.lts += lts;
+                      productos.PREMIUM.importe += imp;
+                    }
+                  }
+
+                  // 2. CONTROL ESTRICTO DE ENTRADA A ACEITES Y LUBRICANTES
+                  if (fullRowStr.includes('ACEITES Y LUBRICANTES') && !fullRowStr.includes('TOTAL')) {
+                    inAceites = true;
+                    inCombustibles = false;
+                    continue;
+                  }
+
+                  // SALIDA OBLIGATORIA DE ACEITES Y LUBRICANTES:
+                  if (
+                    fullRowStr.includes('TOTAL DE ACEITES') || 
+                    fullRowStr.includes('TOTAL ACEITES') ||
+                    fullRowStr.includes('VENTA TOTAL') ||
+                    fullRowStr.includes('TOTALES($)') ||
+                    fullRowStr.includes('TOTALES ($)') ||
+                    fullRowStr.includes('TOTAL DÉBITO') ||
+                    fullRowStr.includes('TOTAL DEBITO') ||
+                    fullRowStr.includes('EFECTIVO') ||
+                    fullRowStr.includes('TARJETAS') ||
+                    fullRowStr.includes('TOTAL CLIENTES') ||
+                    fullRowStr.includes('SUMA:')
+                  ) {
+                    inAceites = false;
+                  }
+
+                  // EXTRACCIÓN EXCLUSIVA DE PRODUCTOS DE ACEITE
+                  if (inAceites) {
+                    const itemDesc = (c1 || c0).trim();
+                    if (itemDesc.length > 2 && !isNonOilOperationalLabel(itemDesc)) {
+                      let pzas = 0;
+                      let importe = 0;
+                      let precioUnit = 0;
+
+                      if (c4Num > 0 && c2Num > 0) {
+                        pzas = c2Num;
+                        precioUnit = c3Num || (c4Num / c2Num);
+                        importe = c4Num;
+                      } else if (c5Num > 0 && c3Num > 0) {
+                        pzas = c3Num;
+                        precioUnit = c4Num || (c5Num / c3Num);
+                        importe = c5Num;
+                      } else if (c5Num > 0 && c2Num > 0) {
+                        pzas = c2Num;
+                        importe = c5Num;
+                        precioUnit = importe / pzas;
+                      }
+
+                      if (importe > 0 && importe < 300000 && pzas > 0) {
+                        totalAceitesPiezas += pzas;
+                        aceitesDetalle.push({
+                          descripcion: itemDesc,
+                          marca: detectLubricantBrand(itemDesc),
+                          pzas: pzas,
+                          piezas: pzas,
+                          precioUnit: precioUnit,
+                          precioUnitario: precioUnit,
+                          importe: importe
+                        });
+                      }
+                    }
+                  }
+
+                  // 3. CAPTURA DE TOTAL DE ACEITES
+                  if (fullRowStr.includes('TOTAL DE ACEITES') || fullRowStr.includes('TOTAL ACEITES')) {
+                    totalAceites = c5Num || c4Num || maxRowNumber || totalAceites;
+                    continue;
+                  }
+
+                  // 4. CAPTURA DE VENTA TOTAL Y TOTALES FISCALES
+                  if (fullRowStr.includes('VENTA TOTAL')) {
+                    ventaTotal = c5Num || c4Num || maxRowNumber || ventaTotal;
+                  }
+
+                  if (fullRowStr.includes('TOTALES($):') || fullRowStr.includes('TOTALES ($)')) {
+                    subtotal = c2Num;
+                    ieps = c3Num;
+                    iva = c4Num;
+                  }
+
+                  // 5. CAPTURA EXHAUSTIVA DE ARQUEO, CLIENTES CRÉDITO, DÉBITOS, VALES Y FALTANTES
+                  if (c1Upper === 'EFECTIVO' || fullRowStr.startsWith('EFECTIVO')) {
+                    efectivo = c5Num || c4Num || maxRowNumber || efectivo;
+                  }
+                  
+                  if (c1Upper === 'TARJETAS' || fullRowStr.includes('TARJETA')) {
+                    tarjetas = c5Num || c4Num || maxRowNumber || tarjetas;
+                  }
+                  
+                  // Clientes Crédito / Flotillas
+                  if (
+                    c1Upper.includes('CRÉDITO') || 
+                    c1Upper.includes('CREDITO') || 
+                    fullRowStr.includes('TOTAL CLIENTES CRÉDITO') || 
+                    fullRowStr.includes('TOTAL CLIENTES CREDITO') ||
+                    fullRowStr.includes('CLIENTES CRÉDITO') ||
+                    fullRowStr.includes('CLIENTES CREDITO')
+                  ) {
+                    creditos = c5Num || c4Num || maxRowNumber || creditos;
+                  }
+                  
+                  // Débitos / Total Débito
+                  if (
+                    c1Upper.includes('DÉBITO') || 
+                    c1Upper.includes('DEBITO') || 
+                    fullRowStr.includes('TOTAL DÉBITO') ||
+                    fullRowStr.includes('TOTAL DEBITO') ||
+                    fullRowStr.includes('DÉBITOS') ||
+                    fullRowStr.includes('DEBITOS')
+                  ) {
+                    debitos = c5Num || c4Num || maxRowNumber || debitos;
+                  }
+
+                  // Vales / Cupones
+                  if (
+                    c1Upper.includes('VALES') || 
+                    c1Upper.includes('VALE') || 
+                    fullRowStr.includes('TOTAL VALES') || 
+                    fullRowStr.includes('VALES DE') ||
+                    fullRowStr.includes('CUPONES')
+                  ) {
+                    vales = c5Num || c4Num || maxRowNumber || vales;
+                  }
+                  
+                  // Faltantes de Caja
+                  if (
+                    c1Upper.includes('FALTANTE') || 
+                    c1Upper.includes('FALTANTES') || 
+                    fullRowStr.includes('FALTANTES') ||
+                    fullRowStr.includes('FALTANTE EN CORTE')
+                  ) {
+                    faltantes = Math.abs(c5Num || c4Num || maxRowNumber || faltantes);
+                  }
+                }
+
+                if (totalAceites === 0 && aceitesDetalle.length > 0) {
+                  totalAceites = aceitesDetalle.reduce((acc, a) => acc + (a.importe || 0), 0);
+                }
+
+                if (subtotal === 0 && ventaTotal > 0) {
+                  subtotal = ventaTotal / 1.16;
+                  iva = ventaTotal - subtotal;
+                }
+
+                // Si no hay datos en este bloque, ignorarlo
+                if (litrosCombustibles === 0 && ventaTotal === 0 && totalAceites === 0) {
+                  continue;
+                }
+
+                const recordId = `${stationKey}_${periodKey}`;
+                const dataFingerprint = `${recordId}_${litrosCombustibles.toFixed(2)}_${ventaTotal.toFixed(2)}_${totalAceites.toFixed(2)}_${creditos.toFixed(2)}_${debitos.toFixed(2)}`;
+
+                cuts.push({
+                  id: recordId,
+                  stationId: stationKey,
+                  nombre: stationDisplayName,
+                  periodKey: periodKey,
+                  monthLabel: monthLabel,
+                  periodo: period,
+                  startIsoDate: startIsoDate,
+                  endIsoDate: endIsoDate,
+                  litros: litrosCombustibles,
+                  jarras: jarrasTotal,
+                  totalCombustibles: totalCombustibles,
+                  totalAceites: totalAceites,
+                  totalAceitesPiezas: totalAceitesPiezas,
+                  ventaTotal: ventaTotal || (totalCombustibles + totalAceites),
+                  subtotal: subtotal,
+                  ieps: ieps,
+                  iva: iva,
+                  efectivo: efectivo,
+                  tarjetas: tarjetas,
+                  creditos: creditos,
+                  debitos: debitos,
+                  vales: vales,
+                  faltantes: faltantes,
+                  productos: productos,
+                  aceitesDetalle: aceitesDetalle,
+                  fileFingerprint: dataFingerprint,
+                  sourceFileName: file.name
+                });
+              }
+            });
+
+            resolve(cuts);
           } catch (err) {
             reject(err);
           }
@@ -2821,234 +3486,181 @@
       for (const file of fileList) {
         if (file.name.match(/\.xlsx?$|\.xls?$/i)) {
           try {
-            const stObj = await parseExcelFile(file);
-            const fp = stObj.fileFingerprint;
+            const cuts = await parseExcelFile(file);
 
-            const isExactDuplicate = window.currentStations.some(s => 
-              s.fileFingerprint === fp || 
-              (s.id === stObj.id && Math.abs((s.ventaTotal || 0) - stObj.ventaTotal) < 0.01 && Math.abs((s.litros || 0) - stObj.litros) < 0.01)
-            );
-
-            if (isExactDuplicate) {
-              duplicateCount++;
+            if (!cuts || cuts.length === 0) {
               logEntries.push(`
-                <div class="flex items-center justify-between text-amber-700 bg-amber-50 px-2 py-1 rounded">
-                  <span>⚠️ <strong>${stObj.nombre}</strong> (${stObj.monthLabel}): Reporte idéntico ignorado (Evita duplicidad).</span>
-                  <span class="text-[10px] uppercase font-bold text-amber-600">Duplicado</span>
+                <div class="text-amber-700 bg-amber-50 px-2 py-1 rounded">
+                  ⚠️ Archivo <strong>${file.name}</strong> sin datos de ventas legibles.
                 </div>
               `);
               continue;
             }
 
-            const existingIdx = window.currentStations.findIndex(s => s.id === stObj.id);
+            cuts.forEach(stObj => {
+              const fp = stObj.fileFingerprint;
 
-            if (existingIdx >= 0) {
-              window.currentStations[existingIdx] = stObj;
-              processedFileHashes.add(fp);
-              updatedCount++;
-              logEntries.push(`
-                <div class="flex items-center justify-between text-blue-700 bg-blue-50 px-2 py-1 rounded">
-                  <span>🔄 <strong>${stObj.nombre}</strong> (${stObj.monthLabel}): Corte actualizado (${formatCurrency(stObj.ventaTotal)}).</span>
-                  <span class="text-[10px] uppercase font-bold text-blue-600">Actualizado</span>
-                </div>
-              `);
-            } else {
-              window.currentStations.push(stObj);
-              processedFileHashes.add(fp);
-              addedCount++;
-              logEntries.push(`
-                <div class="flex items-center justify-between text-emerald-700 bg-emerald-50 px-2 py-1 rounded">
-                  <span>✅ <strong>${stObj.nombre}</strong> (${stObj.monthLabel}): Nuevo corte incorporado con éxito.</span>
-                  <span class="text-[10px] uppercase font-bold text-emerald-600">Agregada</span>
-                </div>
-              `);
-            }
+              const isExactDuplicate = window.currentStations.some(s => 
+                s.fileFingerprint === fp || 
+                (s.id === stObj.id && Math.abs((s.ventaTotal || 0) - stObj.ventaTotal) < 0.01 && Math.abs((s.litros || 0) - stObj.litros) < 0.01)
+              );
+
+              if (isExactDuplicate) {
+                duplicateCount++;
+                logEntries.push(`
+                  <div class="flex items-center justify-between text-amber-700 bg-amber-50 px-2 py-1 rounded">
+                    <span>⚠️ <strong>${stObj.nombre}</strong> (${stObj.monthLabel}): Corte idéntico ignorado (evita duplicidad).</span>
+                    <span class="text-[10px] uppercase font-bold text-amber-600">Duplicado</span>
+                  </div>
+                `);
+                return;
+              }
+
+              const existingIdx = window.currentStations.findIndex(s => s.id === stObj.id);
+
+              if (existingIdx >= 0) {
+                window.currentStations[existingIdx] = stObj;
+                processedFileHashes.add(fp);
+                updatedCount++;
+                logEntries.push(`
+                  <div class="flex items-center justify-between text-blue-700 bg-blue-50 px-2 py-1 rounded">
+                    <span>🔄 <strong>${stObj.nombre}</strong> (${stObj.monthLabel}): Corte actualizado (${formatCurrency(stObj.ventaTotal)}).</span>
+                    <span class="text-[10px] uppercase font-bold text-blue-600">Actualizado</span>
+                  </div>
+                `);
+              } else {
+                window.currentStations.push(stObj);
+                processedFileHashes.add(fp);
+                addedCount++;
+                logEntries.push(`
+                  <div class="flex items-center justify-between text-emerald-700 bg-emerald-50 px-2 py-1 rounded">
+                    <span>✅ <strong>${stObj.nombre}</strong> (${stObj.monthLabel}): Ingresado con éxito (${formatCurrency(stObj.ventaTotal)}).</span>
+                    <span class="text-[10px] uppercase font-bold text-emerald-600">Nuevo</span>
+                  </div>
+                `);
+              }
+            });
+
           } catch (err) {
             console.error("Error al procesar archivo:", file.name, err);
             logEntries.push(`
-              <div class="text-red-700 bg-red-50 px-2 py-1 rounded">
-                ❌ Error al procesar archivo: <strong>${file.name}</strong>
+              <div class="text-rose-700 bg-rose-50 px-2 py-1 rounded">
+                ❌ Error en <strong>${file.name}</strong>: ${err.message}
               </div>
             `);
           }
         }
       }
 
-      const alertEl = document.getElementById('ingestionAlert');
-      const logDetailsEl = document.getElementById('ingestionLogDetails');
-      const titleEl = document.getElementById('ingestionTitle');
-
-      if (logEntries.length > 0 && logDetailsEl && titleEl && alertEl) {
-        logDetailsEl.innerHTML = logEntries.join('');
-        titleEl.textContent = `Auditoría de Ingesta: ${addedCount} nueva(s), ${updatedCount} actualizada(s), ${duplicateCount} duplicada(s)`;
-        alertEl.classList.remove('hidden');
+      const alertContainer = document.getElementById('ingestionAlert');
+      const detailsContainer = document.getElementById('ingestionLogDetails');
+      if (alertContainer && detailsContainer) {
+        detailsContainer.innerHTML = logEntries.join('');
+        alertContainer.classList.remove('hidden');
       }
 
       if (addedCount > 0 || updatedCount > 0) {
+        localStorage.setItem('milenium_cached_stations', JSON.stringify(window.currentStations));
+        localStorage.setItem('milenium_stations_initialized', 'true');
+
         if (window.saveStationsToCloud) {
-          window.saveStationsToCloud(window.currentStations);
+          await window.saveStationsToCloud(window.currentStations);
         }
+
         populateStationSelect();
         populateMonthPeriodSelect();
         updateDashboard();
-        showBanner(`Sistema y nube actualizados: ${addedCount} corte(s) agregado(s), ${updatedCount} actualizado(s).`);
+
+        showBanner(`✅ Procesamiento finalizado: ${addedCount} agregado(s), ${updatedCount} actualizado(s), ${duplicateCount} duplicado(s).`);
       } else if (duplicateCount > 0) {
-        showBanner(`⚠️ No se incorporaron nuevos datos: ${duplicateCount} reporte(s) duplicado(s) detectado(s).`);
+        showBanner(`⚠️ No se agregaron nuevos datos: ${duplicateCount} reporte(s) ya existían.`);
       }
     }
 
-    function exportCurrentViewCSV() {
-      if (!window.currentStations || window.currentStations.length === 0) return;
-      let csv = "Estacion,Mes,Periodo,Litros,Combustibles,Aceites,VentaTotal,Efectivo,Tarjetas,Creditos\n";
-      window.currentStations.forEach(s => {
-        csv += `"${s.nombre}","${s.monthLabel || ''}","${s.periodo}",${s.litros},${s.totalCombustibles},${s.totalAceites},${s.ventaTotal},${s.efectivo},${s.tarjetas},${s.creditos}\n`;
+    function switchAdminTab(tabKey) {
+      ['users', 'targets', 'purge'].forEach(k => {
+        const btn = document.getElementById(`adminTabBtn-${k}`);
+        const sec = document.getElementById(`adminPanelSection-${k}`);
+        if (btn && sec) {
+          if (k === tabKey) {
+            btn.className = "admin-nav-tab flex items-center gap-2 px-4 py-2 rounded-xl font-bold bg-white text-slate-900 shadow-sm border border-slate-200 transition";
+            sec.classList.remove('hidden');
+          } else {
+            btn.className = "admin-nav-tab flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-slate-600 hover:text-slate-900 hover:bg-white transition border border-transparent";
+            sec.classList.add('hidden');
+          }
+        }
       });
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.setAttribute("href", url);
-      link.setAttribute("download", `milenium_business_panel_export_${Date.now()}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
     }
 
-    let currentAdminTab = 'users';
-    let currentPurgeMode = 'ALL';
-
-    function openAdminModal(tabName = 'users') {
-      if (!window.activeUser || (window.activeUser.rol !== 'SUPER_ADMIN' && window.activeUser.rol !== 'ADMIN')) {
-        showBanner("⛔ Acceso reservado exclusivamente para administradores.");
-        return;
-      }
-
+    function openAdminModal(tabKey = 'users') {
       const modal = document.getElementById('adminModal');
-      const isSuper = window.activeUser.rol === 'SUPER_ADMIN';
-
-      const superBadge = document.getElementById('adminSuperBadge');
-      if (superBadge) superBadge.classList.toggle('hidden', !isSuper);
-
-      const purgeTabBtn = document.getElementById('adminTabBtn-purge');
-      if (purgeTabBtn) purgeTabBtn.classList.toggle('hidden', !isSuper);
-
-      const targetTab = (!isSuper && tabName === 'purge') ? 'users' : tabName;
-
-      switchAdminTab(targetTab);
-      populatePurgeSelectors();
+      if (modal) modal.classList.remove('hidden');
+      switchAdminTab(tabKey);
       renderAdminUsersTable();
       updateTargetsUI();
-
-      modal.classList.remove('hidden');
-      if (window.lucide) lucide.createIcons();
+      populatePurgeSelectors();
     }
 
     function closeAdminModal() {
       const modal = document.getElementById('adminModal');
       if (modal) modal.classList.add('hidden');
-      resetUserForm();
-    }
-
-    function switchAdminTab(tab) {
-      currentAdminTab = tab;
-      const tabs = ['users', 'targets', 'purge'];
-
-      tabs.forEach(t => {
-        const btn = document.getElementById(`adminTabBtn-${t}`);
-        const sec = document.getElementById(`adminPanelSection-${t}`);
-
-        if (btn) {
-          if (t === tab) {
-            btn.className = t === 'purge' 
-              ? 'admin-nav-tab flex items-center gap-2 px-4 py-2 rounded-xl font-bold bg-rose-600 text-white shadow-sm transition border border-rose-600'
-              : 'admin-nav-tab flex items-center gap-2 px-4 py-2 rounded-xl font-bold bg-white text-slate-900 shadow-sm border border-slate-200 transition';
-          } else {
-            btn.className = t === 'purge'
-              ? 'admin-nav-tab flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-slate-600 hover:text-rose-700 hover:bg-rose-50 transition border border-transparent'
-              : 'admin-nav-tab flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-slate-600 hover:text-slate-900 hover:bg-white transition border border-transparent';
-          }
-        }
-
-        if (sec) {
-          sec.classList.toggle('hidden', t !== tab);
-        }
-      });
-
-      if (window.lucide) lucide.createIcons();
     }
 
     function setPurgeMode(mode) {
       currentPurgeMode = mode;
-      document.querySelectorAll('.purge-tab-btn').forEach(b => {
-        b.className = 'purge-tab-btn p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-center transition';
-      });
-      const activeBtn = document.getElementById(`purgeTab-${mode}`);
-      if (activeBtn) {
-        activeBtn.className = 'purge-tab-btn p-3 rounded-xl border border-rose-600 bg-rose-600 text-white font-bold text-center transition shadow-sm';
-      }
-
       ['ALL', 'STATION', 'PERIOD', 'FILE'].forEach(m => {
-        const v = document.getElementById(`purgeView-${m}`);
-        if (v) v.classList.toggle('hidden', m !== mode);
+        const btn = document.getElementById(`purgeTab-${m}`);
+        const view = document.getElementById(`purgeView-${m}`);
+        if (btn && view) {
+          if (m === mode) {
+            btn.className = "purge-tab-btn p-3 rounded-xl border border-rose-600 bg-rose-600 text-white font-bold text-center transition shadow-sm";
+            view.classList.remove('hidden');
+          } else {
+            btn.className = "purge-tab-btn p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-center transition";
+            view.classList.add('hidden');
+          }
+        }
       });
-
-      if (window.lucide) lucide.createIcons();
     }
 
     function populatePurgeSelectors() {
-      const stations = window.currentStations || [];
       const allCountBadge = document.getElementById('purgeAllCountBadge');
-      if (allCountBadge) allCountBadge.textContent = `${stations.length} corte(s) activo(s)`;
+      if (allCountBadge) allCountBadge.textContent = window.currentStations.length;
 
       const stSelect = document.getElementById('purgeStationSelect');
       if (stSelect) {
         stSelect.innerHTML = '';
-        if (stations.length === 0) {
-          stSelect.innerHTML = '<option value="">No hay estaciones cargadas</option>';
-        } else {
-          const uniqueStationIds = [...new Set(stations.map(s => s.stationId || (s.id ? s.id.split('_')[0] : '') || s.id))];
-          uniqueStationIds.forEach(id => {
-            const stObj = stations.find(s => (s.stationId || (s.id ? s.id.split('_')[0] : '') || s.id) === id);
-            const opt = document.createElement('option');
-            opt.value = id;
-            opt.textContent = `⛽ ${stObj ? stObj.nombre : id}`;
-            stSelect.appendChild(opt);
-          });
-        }
+        const uniqueStations = [...new Set(window.currentStations.map(s => s.nombre || s.stationId))];
+        uniqueStations.forEach(name => {
+          const opt = document.createElement('option');
+          opt.value = name;
+          opt.textContent = name;
+          stSelect.appendChild(opt);
+        });
       }
 
-      const periodSelect = document.getElementById('purgePeriodSelect');
-      if (periodSelect) {
-        periodSelect.innerHTML = '';
-        const uniquePeriods = [...new Set(stations.map(s => s.periodKey || s.periodo).filter(Boolean))];
-        if (uniquePeriods.length === 0) {
-          periodSelect.innerHTML = '<option value="">No hay periodos disponibles</option>';
-        } else {
-          uniquePeriods.forEach(pk => {
-            const match = stations.find(s => (s.periodKey || s.periodo) === pk);
-            const label = match ? (match.monthLabel || match.periodo) : pk;
-            const countInPeriod = stations.filter(s => (s.periodKey || s.periodo) === pk).length;
-            const opt = document.createElement('option');
-            opt.value = pk;
-            opt.textContent = `📅 ${label} (${countInPeriod} corte/s)`;
-            periodSelect.appendChild(opt);
-          });
-        }
+      const pSelect = document.getElementById('purgePeriodSelect');
+      if (pSelect) {
+        pSelect.innerHTML = '';
+        const uniquePeriods = [...new Set(window.currentStations.map(s => s.monthLabel || s.periodo))];
+        uniquePeriods.forEach(p => {
+          const opt = document.createElement('option');
+          opt.value = p;
+          opt.textContent = p;
+          pSelect.appendChild(opt);
+        });
       }
 
-      const fileSelect = document.getElementById('purgeFileSelect');
-      if (fileSelect) {
-        fileSelect.innerHTML = '';
-        if (stations.length === 0) {
-          fileSelect.innerHTML = '<option value="">No hay archivos disponibles</option>';
-        } else {
-          stations.forEach((s) => {
-            const fileName = s.sourceFileName || `reporte_${s.id.toLowerCase()}.xlsx`;
-            const opt = document.createElement('option');
-            opt.value = s.id;
-            opt.textContent = `📄 ${fileName} - ${s.nombre} (${formatNumber(s.litros)} L)`;
-            fileSelect.appendChild(opt);
-          });
-        }
+      const fSelect = document.getElementById('purgeFileSelect');
+      if (fSelect) {
+        fSelect.innerHTML = '';
+        window.currentStations.forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s.id;
+          opt.textContent = `${s.nombre} - ${s.monthLabel} (${s.sourceFileName || 'Archivo'})`;
+          fSelect.appendChild(opt);
+        });
       }
     }
 
@@ -3074,23 +3686,19 @@
       if (currentPurgeMode === 'ALL') {
         window.currentStations = [];
         processedFileHashes.clear();
-        deletedDescription = `Se vaciaron todas las estaciones (${prevCount} registros). El panel quedó en ceros.`;
+        deletedDescription = `Se vaciaron todas las estaciones (${prevCount} registros).`;
       } else if (currentPurgeMode === 'STATION') {
-        const targetId = document.getElementById('purgeStationSelect').value;
-        const targetObj = window.currentStations.find(s => (s.stationId || (s.id ? s.id.split('_')[0] : '') || s.id) === targetId);
-        const targetName = targetObj ? targetObj.nombre : targetId;
-        window.currentStations = window.currentStations.filter(s => (s.stationId || (s.id ? s.id.split('_')[0] : '') || s.id) !== targetId);
+        const targetName = document.getElementById('purgeStationSelect').value;
+        window.currentStations = window.currentStations.filter(s => (s.nombre || s.stationId) !== targetName);
         deletedDescription = `Se eliminaron todos los cortes de la estación <strong>${targetName}</strong>.`;
       } else if (currentPurgeMode === 'PERIOD') {
         const targetPeriod = document.getElementById('purgePeriodSelect').value;
-        window.currentStations = window.currentStations.filter(s => (s.periodKey || s.periodo) !== targetPeriod);
+        window.currentStations = window.currentStations.filter(s => (s.monthLabel || s.periodo) !== targetPeriod);
         deletedDescription = `Se eliminaron todos los cortes del periodo <strong>${targetPeriod}</strong>.`;
       } else if (currentPurgeMode === 'FILE') {
         const targetId = document.getElementById('purgeFileSelect').value;
-        const targetItem = window.currentStations.find(s => s.id === targetId);
-        const fileName = targetItem?.sourceFileName || targetItem?.nombre || targetId;
         window.currentStations = window.currentStations.filter(s => s.id !== targetId);
-        deletedDescription = `Se eliminó el archivo <strong>${fileName}</strong> del sistema.`;
+        deletedDescription = `Se eliminó el corte seleccionado.`;
       }
 
       localStorage.setItem('milenium_cached_stations', JSON.stringify(window.currentStations));
@@ -3347,7 +3955,6 @@
       }
     }
 
-    // Remote sync callbacks
     window.receiveRemoteStations = function(stations, updatedAt) {
       if (Array.isArray(stations)) {
         window.currentStations = stations.map(s => {
@@ -3447,6 +4054,31 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       initData();
+
+      // Efecto Ripple dinámico al hacer clic en botones de acción
+      document.addEventListener('click', (e) => {
+        const targetBtn = e.target.closest('.orange-glow-btn, .period-btn, .admin-nav-tab');
+        if (!targetBtn) return;
+
+        const circle = document.createElement('span');
+        const diameter = Math.max(targetBtn.clientWidth, targetBtn.clientHeight);
+        const radius = diameter / 2;
+        const rect = targetBtn.getBoundingClientRect();
+
+        circle.style.width = circle.style.height = `${diameter}px`;
+        circle.style.left = `${e.clientX - rect.left - radius}px`;
+        circle.style.top = `${e.clientY - rect.top - radius}px`;
+        circle.classList.add('ripple-effect');
+
+        const existingRipple = targetBtn.querySelector('.ripple-effect');
+        if (existingRipple) existingRipple.remove();
+
+        targetBtn.style.position = 'relative';
+        targetBtn.style.overflow = 'hidden';
+        targetBtn.appendChild(circle);
+
+        setTimeout(() => circle.remove(), 600);
+      });
 
       const fileInput = document.getElementById('fileUploadInput');
       if (fileInput) {
