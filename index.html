@@ -85,48 +85,13 @@
       0%   { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-    @keyframes ambientFloat {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      50%      { transform: translate(25px, 15px) scale(1.08); }
-    }
 
     body {
       background-color: #f8fafc;
       color: #09090b;
-      background-image: 
-        radial-gradient(circle at 15% 0%, rgba(255, 102, 0, 0.05) 0%, transparent 45%),
-        radial-gradient(circle at 95% 100%, rgba(255, 102, 0, 0.04) 0%, transparent 50%),
-        radial-gradient(#e2e8f0 1px, transparent 1px);
-      background-size: 100% 100%, 100% 100%, 28px 28px;
+      background-image: none !important;
       overflow-x: hidden;
       animation: fadeIn 0.4s ease-out both;
-    }
-
-    /* Ambient Orbs */
-    .ambient-orb {
-      position: fixed;
-      border-radius: 9999px;
-      filter: blur(80px);
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0.45;
-      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .ambient-orb-1 {
-      top: -60px;
-      left: -60px;
-      width: 320px;
-      height: 320px;
-      background: radial-gradient(circle, rgba(255, 102, 0, 0.22) 0%, transparent 70%);
-      animation: ambientFloat 9s ease-in-out infinite;
-    }
-    .ambient-orb-2 {
-      bottom: -60px;
-      right: -60px;
-      width: 380px;
-      height: 380px;
-      background: radial-gradient(circle, rgba(255, 102, 0, 0.16) 0%, transparent 70%);
-      animation: ambientFloat 12s ease-in-out infinite reverse;
     }
 
     /* Scrollbar */
@@ -234,11 +199,7 @@
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col antialiased selection:bg-[#ff6600] selection:text-white relative">
-
-  <!-- Ambient Light Orbs -->
-  <div class="ambient-orb ambient-orb-1" aria-hidden="true"></div>
-  <div class="ambient-orb ambient-orb-2" aria-hidden="true"></div>
+<body class="min-h-screen flex flex-col antialiased selection:bg-[#ff6600] selection:text-white relative bg-slate-50">
 
   <!-- ==================== PANTALLA DE ACCESO OBLIGATORIA (LOGIN PORTAL) ==================== -->
   <div id="loginScreen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
@@ -407,6 +368,20 @@
         <button onclick="syncFromCloud()" title="Sincronizar Datos de la Nube" class="p-2 rounded-xl bg-white border border-slate-200 hover:border-slate-400 text-slate-600 hover:text-black shadow-sm transition">
           <i data-lucide="refresh-cw" class="w-4 h-4" id="syncSpinIcon"></i>
         </button>
+
+        <button onclick="openKpiPreferencesModal()" title="Personalizar Tarjetas / KPIs" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-slate-300 hover:border-[#ff6600] text-slate-700 hover:text-[#ff6600] text-xs font-bold shadow-sm transition active:scale-95">
+          <i data-lucide="sliders-horizontal" class="w-4 h-4 text-[#ff6600]"></i>
+          <span class="hidden md:inline">Personalizar KPIs</span>
+        </button>
+
+        <button onclick="copyWhatsAppSummary()" title="Copiar resumen para WhatsApp" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold shadow-sm transition active:scale-95">
+          <i data-lucide="message-circle" class="w-4 h-4"></i>
+          <span class="hidden md:inline">WhatsApp</span>
+        </button>
+
+        <button onclick="toggleDarkMode()" id="darkModeBtn" title="Alternar Modo Oscuro" class="p-2 rounded-xl bg-white border border-slate-200 hover:border-slate-400 text-slate-600 hover:text-black shadow-sm transition">
+          <i data-lucide="moon" class="w-4 h-4" id="darkModeIcon"></i>
+        </button>
       </div>
 
     </div>
@@ -495,7 +470,7 @@
       <div class="flex items-center gap-3 lg:ml-auto text-xs font-mono text-slate-500 self-end lg:self-center">
         <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200">
           <span class="w-2 h-2 rounded-full bg-[#ff6600]"></span>
-          <span id="statCountText" class="text-slate-800 font-sans font-semibold">0 Estaciones &bull; 0 Cortes</span>
+          <span id="statCountText" class="text-slate-800 font-sans font-semibold">0 Estaciones • 0 Cortes</span>
         </div>
         <div class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200">
           <i data-lucide="cloud" class="w-3.5 h-3.5 text-[#ff6600]"></i>
@@ -505,9 +480,9 @@
     </div>
 
     <!-- 4 High Impact Executive Cards with Month-over-Month (MoM) badges -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="kpiRow1">
       
-      <div class="milenium-card p-5 rounded-2xl relative overflow-hidden group">
+      <div class="milenium-card p-5 rounded-2xl relative overflow-hidden group" data-kpi-card="revenue">
         <div class="flex items-start justify-between">
           <div>
             <div class="flex items-center gap-2">
@@ -526,7 +501,7 @@
         </div>
       </div>
 
-      <div class="milenium-card p-5 rounded-2xl relative overflow-hidden group">
+      <div class="milenium-card p-5 rounded-2xl relative overflow-hidden group" data-kpi-card="volume">
         <div class="flex items-start justify-between">
           <div>
             <div class="flex items-center gap-2">
@@ -545,7 +520,7 @@
         </div>
       </div>
 
-      <div class="milenium-card p-5 rounded-2xl relative overflow-hidden group">
+      <div class="milenium-card p-5 rounded-2xl relative overflow-hidden group" data-kpi-card="cash">
         <div class="flex items-start justify-between">
           <div>
             <div class="flex items-center gap-2">
@@ -564,7 +539,7 @@
         </div>
       </div>
 
-      <div class="milenium-card p-5 rounded-2xl relative overflow-hidden group">
+      <div class="milenium-card p-5 rounded-2xl relative overflow-hidden group" data-kpi-card="cards">
         <div class="flex items-start justify-between">
           <div>
             <p class="text-[11px] font-extrabold uppercase tracking-widest text-slate-500">Tarjetas & Créditos</p>
@@ -583,9 +558,9 @@
     </div>
 
     <!-- Second Row: Advanced Strategic KPIs -->
-    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4" id="kpiRow2">
       
-      <div class="milenium-card p-4 rounded-2xl relative overflow-hidden group">
+      <div class="milenium-card p-4 rounded-2xl relative overflow-hidden group" data-kpi-card="avgPrice">
         <div class="flex items-start justify-between">
           <div>
             <div class="flex items-center gap-1.5">
@@ -604,7 +579,7 @@
         </div>
       </div>
 
-      <div class="milenium-card p-4 rounded-2xl relative overflow-hidden group">
+      <div class="milenium-card p-4 rounded-2xl relative overflow-hidden group" data-kpi-card="oilsPerM3">
         <div class="flex items-start justify-between">
           <div>
             <div class="flex items-center gap-1.5">
@@ -623,7 +598,7 @@
         </div>
       </div>
 
-      <div class="milenium-card p-4 rounded-2xl relative overflow-hidden group">
+      <div class="milenium-card p-4 rounded-2xl relative overflow-hidden group" data-kpi-card="jarreosRatio">
         <div class="flex items-start justify-between">
           <div>
             <div class="flex items-center gap-1.5">
@@ -642,7 +617,7 @@
         </div>
       </div>
 
-      <div class="milenium-card p-4 rounded-2xl relative overflow-hidden group">
+      <div class="milenium-card p-4 rounded-2xl relative overflow-hidden group" data-kpi-card="litersPerBottle">
         <div class="flex items-start justify-between">
           <div>
             <div class="flex items-center gap-1.5">
@@ -664,10 +639,10 @@
     </div>
 
     <!-- THIRD ROW: KPIS DE CRÉDITOS, DÉBITOS, VALES Y FALTANTES -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="kpiRow3">
       
       <!-- KPI 1: Clientes Crédito -->
-      <div class="milenium-card p-4 rounded-2xl relative overflow-hidden group border-l-4 border-l-blue-600">
+      <div class="milenium-card p-4 rounded-2xl relative overflow-hidden group border-l-4 border-l-blue-600" data-kpi-card="creditClients">
         <div class="flex items-start justify-between">
           <div>
             <div class="flex items-center gap-1.5">
@@ -687,7 +662,7 @@
       </div>
 
       <!-- KPI 2: Débitos de Operadores -->
-      <div class="milenium-card p-4 rounded-2xl relative overflow-hidden group border-l-4 border-l-purple-600">
+      <div class="milenium-card p-4 rounded-2xl relative overflow-hidden group border-l-4 border-l-purple-600" data-kpi-card="debits">
         <div class="flex items-start justify-between">
           <div>
             <div class="flex items-center gap-1.5">
@@ -707,7 +682,7 @@
       </div>
 
       <!-- KPI 3: Vales y Cupones -->
-      <div class="milenium-card p-4 rounded-2xl relative overflow-hidden group border-l-4 border-l-emerald-600">
+      <div class="milenium-card p-4 rounded-2xl relative overflow-hidden group border-l-4 border-l-emerald-600" data-kpi-card="vales">
         <div class="flex items-start justify-between">
           <div>
             <div class="flex items-center gap-1.5">
@@ -727,7 +702,7 @@
       </div>
 
       <!-- KPI 4: Faltantes de Caja -->
-      <div class="milenium-card p-4 rounded-2xl relative overflow-hidden group border-l-4 border-l-rose-600">
+      <div class="milenium-card p-4 rounded-2xl relative overflow-hidden group border-l-4 border-l-rose-600" data-kpi-card="faltantes">
         <div class="flex items-start justify-between">
           <div>
             <div class="flex items-center gap-1.5">
@@ -743,6 +718,67 @@
         <div class="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
           <span class="text-slate-500">Estatus de descuadre:</span>
           <span class="font-mono font-bold" id="kpiFaltantesNote">Sin faltante</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PROYECCIÓN PREDICTIVA DE CIERRE DE MES (RUN-RATE) & FLOTILLAS -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="kpiRowProjections">
+      
+      <!-- Run-Rate Predictivo -->
+      <div class="milenium-card p-5 rounded-2xl flex flex-col justify-between" data-kpi-card="runRate">
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <h4 class="font-extrabold text-sm text-slate-900 flex items-center gap-2 uppercase tracking-wide">
+              <i data-lucide="trending-up" class="w-4 h-4 text-[#ff6600]"></i>
+              Proyección de Cierre de Mes (Run-Rate Forecast)
+            </h4>
+            <p class="text-[11px] text-slate-500">Estimación matemática del volumen final proyectado al día 30</p>
+          </div>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded badge-orange font-bold">PREDICTIVO</span>
+        </div>
+
+        <div id="runRateContainer" class="space-y-3 my-2">
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+          <span>Proyección Global de Red:</span>
+          <span class="font-mono font-black text-[#ff6600]" id="globalRunRateLiters">0 L proyectados</span>
+        </div>
+      </div>
+
+      <!-- Cartera de Flotillas / Clientes Crédito -->
+      <div class="milenium-card p-5 rounded-2xl flex flex-col justify-between" data-kpi-card="fleetClients">
+        <div class="flex items-center justify-between mb-2">
+          <div>
+            <h4 class="font-extrabold text-sm text-slate-900 flex items-center gap-2 uppercase tracking-wide">
+              <i data-lucide="briefcase" class="w-4 h-4 text-[#ff6600]"></i>
+              Top Clientes Crédito & Flotillas (CxC)
+            </h4>
+            <p class="text-[11px] text-slate-500">Monitoreo de cartera por cuenta comercial y concentración de riesgo</p>
+          </div>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-100 text-blue-700 font-bold">CARTERA</span>
+        </div>
+
+        <div class="overflow-x-auto my-1">
+          <table class="w-full text-left text-xs font-mono">
+            <thead class="bg-slate-50 text-slate-600 uppercase text-[10px] font-extrabold border-b border-slate-200">
+              <tr>
+                <th class="py-2 px-2">Cliente / Cuenta</th>
+                <th class="py-2 px-2 text-right">Consumo ($)</th>
+                <th class="py-2 px-2 text-center">Part. %</th>
+                <th class="py-2 px-2 text-center">Riesgo</th>
+              </tr>
+            </thead>
+            <tbody id="fleetCreditTableBody" class="divide-y divide-slate-100 text-slate-700">
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+          <span>Total Flotillas:</span>
+          <span class="font-mono font-black text-slate-900" id="fleetTotalCreditSpan">$0.00</span>
         </div>
       </div>
 
@@ -1194,6 +1230,39 @@
     </div>
 
   </main>
+
+  <!-- ==================== MODAL DE PERSONALIZACIÓN DE TARJETAS / KPIS ==================== -->
+  <div id="kpiPreferencesModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm no-print">
+    <div class="bg-white rounded-3xl max-w-lg w-full border border-slate-200 shadow-2xl p-6 space-y-5 animate-[scaleIn_0.25s_ease-out_both]">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div class="flex items-center gap-2.5">
+          <div class="p-2 rounded-xl bg-orange-50 text-[#ff6600]">
+            <i data-lucide="sliders-horizontal" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-extrabold text-base text-slate-900">Personalizar Tarjetas / KPIs</h3>
+            <p class="text-xs text-slate-500">Configura qué módulos visualizar en tu sesión</p>
+          </div>
+        </div>
+        <button onclick="closeKpiPreferencesModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="space-y-2.5 max-h-[60vh] overflow-y-auto pr-1" id="kpiTogglesContainer">
+        <!-- Rendered via JavaScript -->
+      </div>
+
+      <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2 text-xs">
+        <button onclick="resetKpiPreferences()" class="text-slate-500 hover:text-slate-800 font-bold">
+          Restablecer Todo
+        </button>
+        <button onclick="saveAndApplyKpiPreferences()" class="px-5 py-2.5 rounded-xl orange-glow-btn font-extrabold shadow-sm active:scale-95">
+          Guardar Preferencias
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- ==================== PANEL DE ADMINISTRACIÓN INTEGRADO (TABBED ADMIN CENTER) ==================== -->
   <div id="adminModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/75 backdrop-blur-md no-print">
@@ -1684,6 +1753,26 @@
       SANTO_DOMINGO: 290000
     };
 
+    // Diccionario de configuración de tarjetas KPI para personalización por usuario
+    const KPI_CARDS_CATALOG = [
+      { id: "revenue", label: "Facturación Total Neta", group: "kpiRow1" },
+      { id: "volume", label: "Volumen Despachado", group: "kpiRow1" },
+      { id: "cash", label: "Efectivo Líquido", group: "kpiRow1" },
+      { id: "cards", label: "Tarjetas & Créditos", group: "kpiRow1" },
+      { id: "avgPrice", label: "Precio Promedio Ponderado", group: "kpiRow2" },
+      { id: "oilsPerM3", label: "Venta Aceites / m³", group: "kpiRow2" },
+      { id: "jarreosRatio", label: "Índice Merma / Jarreo", group: "kpiRow2" },
+      { id: "litersPerBottle", label: "Ratio Litros / Botella", group: "kpiRow2" },
+      { id: "creditClients", label: "Clientes Crédito (Flotillas)", group: "kpiRow3" },
+      { id: "debits", label: "Total Débitos de Turno", group: "kpiRow3" },
+      { id: "vales", label: "Vales de Combustible", group: "kpiRow3" },
+      { id: "faltantes", label: "Faltantes en Caja / Turno", group: "kpiRow3" },
+      { id: "runRate", label: "Proyección Cierre de Mes (Run-Rate)", group: "kpiRowProjections" },
+      { id: "fleetClients", label: "Top Clientes Flotillas (CxC)", group: "kpiRowProjections" },
+    ];
+
+    let userKpiPreferences = {};
+
     let currentPeriodFilter = 'MENSUAL';
     let currentTableMode = 'CONSOLIDATED';
     let currentPurgeMode = 'ALL';
@@ -2052,15 +2141,348 @@
       applyFilters();
     }
 
-    function clearCustomDateRange() {
-      const d1 = document.getElementById('customStartDate');
-      const d2 = document.getElementById('customEndDate');
-      if (d1) d1.value = '';
-      if (d2) d2.value = '';
-      const monthSel = document.getElementById('monthPeriodSelect');
-      if (monthSel) monthSel.value = 'ALL';
-      applyFilters();
+    // ==========================================
+    // PERSONALIZACIÓN DE KPIS POR USUARIO
+    // ==========================================
+    function getKpiStorageKey() {
+      const u = window.activeUser ? window.activeUser.username : 'default';
+      return `milenium_kpi_prefs_${u}`;
     }
+
+    window.loadUserKpiPreferences = function() {
+      const key = getKpiStorageKey();
+      try {
+        const stored = localStorage.getItem(key);
+        if (stored) {
+          userKpiPreferences = JSON.parse(stored);
+        } else {
+          userKpiPreferences = {};
+          KPI_CARDS_CATALOG.forEach(k => userKpiPreferences[k.id] = true);
+        }
+      } catch (e) {
+        userKpiPreferences = {};
+        KPI_CARDS_CATALOG.forEach(k => userKpiPreferences[k.id] = true);
+      }
+      applyKpiPreferences();
+    };
+
+    window.applyKpiPreferences = function() {
+      KPI_CARDS_CATALOG.forEach(item => {
+        const isVisible = userKpiPreferences[item.id] !== false;
+        const el = document.querySelector(`[data-kpi-card="${item.id}"]`);
+        if (el) {
+          if (isVisible) {
+            el.classList.remove('hidden');
+          } else {
+            el.classList.add('hidden');
+          }
+        }
+      });
+    };
+
+    window.openKpiPreferencesModal = function() {
+      const modal = document.getElementById('kpiPreferencesModal');
+      const container = document.getElementById('kpiTogglesContainer');
+      if (!modal || !container) return;
+
+      container.innerHTML = '';
+      KPI_CARDS_CATALOG.forEach(item => {
+        const isChecked = userKpiPreferences[item.id] !== false;
+        const div = document.createElement('div');
+        div.className = "flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs";
+        div.innerHTML = `
+          <span class="font-bold text-slate-800">${item.label}</span>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="kpiToggle_${item.id}" ${isChecked ? 'checked' : ''} class="sr-only peer">
+            <div class="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#ff6600]"></div>
+          </label>
+        `;
+        container.appendChild(div);
+      });
+
+      modal.classList.remove('hidden');
+    };
+
+    window.closeKpiPreferencesModal = function() {
+      const modal = document.getElementById('kpiPreferencesModal');
+      if (modal) modal.classList.add('hidden');
+    };
+
+    window.saveAndApplyKpiPreferences = function() {
+      KPI_CARDS_CATALOG.forEach(item => {
+        const chk = document.getElementById(`kpiToggle_${item.id}`);
+        if (chk) {
+          userKpiPreferences[item.id] = chk.checked;
+        }
+      });
+      localStorage.setItem(getKpiStorageKey(), JSON.stringify(userKpiPreferences));
+      applyKpiPreferences();
+      closeKpiPreferencesModal();
+      showBanner("✅ Preferencias de KPIs guardadas correctamente.");
+    };
+
+    window.resetKpiPreferences = function() {
+      KPI_CARDS_CATALOG.forEach(item => userKpiPreferences[item.id] = true);
+      localStorage.removeItem(getKpiStorageKey());
+      applyKpiPreferences();
+      closeKpiPreferencesModal();
+      showBanner("Preferencias de KPIs restablecidas.");
+    };
+
+    // ==========================================
+    // PROYECCIÓN DE CIERRE DE MES (RUN-RATE)
+    // ==========================================
+    window.renderRunRateProjections = function(dataset = currentRenderDataset) {
+      const container = document.getElementById('runRateContainer');
+      const globalEl = document.getElementById('globalRunRateLiters');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (!dataset || dataset.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-400 font-mono">Sin datos para proyectar cierre de mes.</p>`;
+        if (globalEl) globalEl.textContent = "0 L proyectados";
+        return;
+      }
+
+      const targets = window.stationSalesTargets || {
+        COSMOPOLIS: 420000,
+        GUADALUPE: 450000,
+        REYNOSA: 380000,
+        SANTO_DOMINGO: 290000
+      };
+
+      const stMap = new Map();
+      let grandActual = 0;
+      let grandProjected = 0;
+
+      dataset.forEach(s => {
+        const id = s.stationId || (s.id ? s.id.split('_')[0] : '') || s.id;
+        const liters = Number(s.litros || 0);
+        const days = Math.max(1, Number(s.durationDays || 30));
+        
+        if (!stMap.has(id)) {
+          stMap.set(id, { actual: 0, days: days, name: s.nombre || id });
+        }
+        const cur = stMap.get(id);
+        cur.actual += liters;
+        cur.days = Math.max(cur.days, days);
+        grandActual += liters;
+      });
+
+      Array.from(stMap.entries()).forEach(([stKey, data]) => {
+        const target = targets[stKey] || 350000;
+        const dailyPace = data.days > 0 ? (data.actual / data.days) : 0;
+        const projectedMonth = dailyPace * 30;
+        grandProjected += projectedMonth;
+
+        const paceDiff = projectedMonth - target;
+        const isAhead = paceDiff >= 0;
+        const pctPace = target > 0 ? ((projectedMonth / target) * 100).toFixed(1) : '0';
+
+        const row = document.createElement('div');
+        row.className = "p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between text-xs";
+        row.innerHTML = `
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-extrabold text-slate-900">${data.name}</span>
+              <span class="text-[10px] font-mono ${isAhead ? 'text-emerald-700 bg-emerald-100' : 'text-amber-700 bg-amber-100'} px-1.5 py-0.2 rounded font-bold">
+                ${isAhead ? '+' : ''}${formatNumber(paceDiff)} L vs Meta (${pctPace}%)
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-500 font-mono mt-0.5">
+              Ritmo diario: <strong class="text-slate-800">${formatNumber(dailyPace)} L/día</strong> &bull; Proyectado: <strong>${formatNumber(projectedMonth)} L</strong>
+            </p>
+          </div>
+          <div class="text-right font-mono">
+            <span class="block text-[10px] text-slate-400">Meta:</span>
+            <span class="font-bold text-slate-700 text-xs">${formatNumber(target)} L</span>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+
+      if (globalEl) {
+        globalEl.textContent = `${formatNumber(grandProjected)} L (${formatNumber(grandActual)} L actuales)`;
+      }
+    };
+
+    // ==========================================
+    // MÓDULO TOP CLIENTES CRÉDITO & FLOTILLAS
+    // ==========================================
+    window.renderFleetCreditClients = function(dataset = currentRenderDataset) {
+      const tbody = document.getElementById('fleetCreditTableBody');
+      const totalSpan = document.getElementById('fleetTotalCreditSpan');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      let grandTotalCredits = 0;
+      const clientMap = new Map();
+
+      dataset.forEach(s => {
+        const cVal = Number(s.creditos || 0);
+        grandTotalCredits += cVal;
+
+        if (Array.isArray(s.creditosDetalle) && s.creditosDetalle.length > 0) {
+          s.creditosDetalle.forEach(c => {
+            const name = String(c.cliente || c.nombre || 'CLIENTE FLOTILLA').trim().toUpperCase();
+            const amt = Number(c.importe || c.monto || 0);
+            clientMap.set(name, (clientMap.get(name) || 0) + amt);
+          });
+        } else if (cVal > 0) {
+          const genericName = `FLOTILLAS ${s.nombre || s.stationId}`;
+          clientMap.set(genericName, (clientMap.get(genericName) || 0) + cVal);
+        }
+      });
+
+      if (totalSpan) totalSpan.textContent = formatCurrency(grandTotalCredits);
+
+      const sortedClients = Array.from(clientMap.entries()).sort((a,b) => b[1] - a[1]);
+
+      if (sortedClients.length === 0 || grandTotalCredits === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-slate-400">Sin cartera a crédito registrada en este periodo.</td></tr>`;
+        return;
+      }
+
+      sortedClients.slice(0, 6).forEach(([name, amt]) => {
+        const share = grandTotalCredits > 0 ? ((amt / grandTotalCredits) * 100).toFixed(1) : 0;
+        let riskBadge = `<span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800">BAJO</span>`;
+        if (Number(share) > 40) {
+          riskBadge = `<span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-rose-100 text-rose-800">ALTO</span>`;
+        } else if (Number(share) > 20) {
+          riskBadge = `<span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-100 text-amber-800">MEDIO</span>`;
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition";
+        tr.innerHTML = `
+          <td class="py-1.5 px-2 font-bold text-slate-800 truncate max-w-[150px]">${name}</td>
+          <td class="py-1.5 px-2 text-right font-black text-slate-900">${formatCurrency(amt)}</td>
+          <td class="py-1.5 px-2 text-center text-slate-500">${share}%</td>
+          <td class="py-1.5 px-2 text-center">${riskBadge}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    };
+
+    // ==========================================
+    // MODO OSCURO (DARK MODE)
+    // ==========================================
+    window.initDarkMode = function() {
+      const isDark = localStorage.getItem('milenium_theme_dark') === 'true';
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+        applyDarkStyles(true);
+      }
+    };
+
+    window.toggleDarkMode = function() {
+      const isCurrentlyDark = document.documentElement.classList.contains('dark');
+      const nextDark = !isCurrentlyDark;
+      if (nextDark) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('milenium_theme_dark', 'true');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('milenium_theme_dark', 'false');
+      }
+      applyDarkStyles(nextDark);
+    };
+
+    function applyDarkStyles(isDark) {
+      const icon = document.getElementById('darkModeIcon');
+      if (icon) {
+        icon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
+      }
+      if (isDark) {
+        document.body.style.backgroundColor = '#09090b';
+        document.body.style.color = '#f8fafc';
+      } else {
+        document.body.style.backgroundColor = '#f8fafc';
+        document.body.style.color = '#09090b';
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // ==========================================
+    // RESUMEN DIRECTO PARA WHATSAPP
+    // ==========================================
+    window.copyWhatsAppSummary = function() {
+      const ds = currentRenderDataset || [];
+      if (ds.length === 0) {
+        showBanner("No hay datos para generar el resumen de WhatsApp.");
+        return;
+      }
+
+      let totRev = 0;
+      let totLit = 0;
+      let totCash = 0;
+      let totCards = 0;
+      let totCred = 0;
+
+      // Agrupar por estación física para no confundir cortes históricos con estaciones
+      const stationMap = new Map();
+
+      ds.forEach(s => {
+        const rev = Number(s.ventaTotal || 0);
+        const lit = Number(s.litros || 0);
+        const cash = Number(s.efectivo || 0);
+        const cards = Number(s.tarjetas || 0);
+        const cred = Number(s.creditos || 0);
+
+        totRev += rev;
+        totLit += lit;
+        totCash += cash;
+        totCards += cards;
+        totCred += cred;
+
+        const stName = (s.nombre || s.stationId || 'ESTACION').toUpperCase();
+        if (!stationMap.has(stName)) {
+          stationMap.set(stName, { name: stName, rev: 0, lit: 0 });
+        }
+        const cur = stationMap.get(stName);
+        cur.rev += rev;
+        cur.lit += lit;
+      });
+
+      const uniqueStationsCount = stationMap.size;
+      const periodSelect = document.getElementById('monthPeriodSelect');
+      const selectedPeriodVal = periodSelect ? periodSelect.value : 'ALL';
+      let periodLabel = "Acumulado Histórico Total";
+      
+      if (selectedPeriodVal !== 'ALL') {
+        const selectedOption = periodSelect.options[periodSelect.selectedIndex];
+        periodLabel = selectedOption ? selectedOption.text.replace(/^[^\w]+/, '').trim() : selectedPeriodVal;
+      } else {
+        periodLabel = `Acumulado Total (${ds.length} cortes históricos)`;
+      }
+
+      // Desglose resumido de cada estación física
+      let stationLines = "";
+      stationMap.forEach(st => {
+        stationLines += `  • *${st.name}:* ${formatCurrency(st.rev)} | ${formatNumber(st.lit)} L\n`;
+      });
+
+      const msg = `⛽ *GRUPO MILENIUM - RESUMEN EJECUTIVO*\n` +
+        `📅 *Periodo:* ${periodLabel}\n` +
+        `🏢 *Estaciones de la Red:* ${uniqueStationsCount} sucursales activas\n\n` +
+        `💰 *Facturación Neta:* ${formatCurrency(totRev)}\n` +
+        `🛢️ *Volumen Despachado:* ${formatNumber(totLit)} Litros\n` +
+        `💵 *Efectivo en Caja:* ${formatCurrency(totCash)}\n` +
+        `💳 *Tarjetas Bancarias:* ${formatCurrency(totCards)}\n` +
+        `🚛 *Crédito Flotillas:* ${formatCurrency(totCred)}\n\n` +
+        `📍 *Desglose por Estación:*\n` +
+        stationLines + `\n` +
+        `_Reporte generado en tiempo real desde Milenium Business Panel_`;
+
+      const tempInput = document.createElement('textarea');
+      tempInput.value = msg;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempInput);
+
+      showBanner(`📱 Resumen de ${uniqueStationsCount} estaciones copiado al portapapeles para WhatsApp.`);
+    };
 
     function setPeriodView(view) {
       currentPeriodFilter = view;
@@ -2197,12 +2619,12 @@
       }
 
       const scopeSpan = document.getElementById('storageScopeSpan');
-      if (scopeSpan) scopeSpan.innerHTML = `Nube Activa &bull; <span class="font-bold text-slate-900">${periodLabel}</span>`;
+      if (scopeSpan) scopeSpan.innerHTML = `Nube Activa • <span class="font-bold text-slate-900">${periodLabel}</span>`;
 
       const statCountText = document.getElementById('statCountText');
       if (statCountText) {
         const uniqueStationsInFiltered = new Set(dataset.map(s => s.stationId || (s.id ? s.id.split('_')[0] : '') || s.id)).size;
-        statCountText.textContent = `${uniqueStationsInFiltered} Estación(es) &bull; ${dataset.length} Corte(s)`;
+        statCountText.textContent = `${uniqueStationsInFiltered} Estación(es) • ${dataset.length} Corte(s)`;
       }
 
       let totRevenue = 0;
@@ -2398,7 +2820,10 @@
       renderAuditRadar(dataset);
       renderHistoricalTrends();
       renderLubricantsRanking(dataset, multiplier);
+      renderRunRateProjections(dataset);
+      renderFleetCreditClients(dataset);
       updateTargetsUI(dataset);
+      applyKpiPreferences();
 
       if (window.lucide) lucide.createIcons();
     }
@@ -4065,6 +4490,25 @@
       const sStation = document.getElementById('sessionStationBadge');
       if (sStation) sStation.textContent = user.estacion === 'ALL' ? 'Red Global' : user.estacion;
 
+      const stHeaderBadge = document.getElementById('headerUserStationBadge');
+      if (stHeaderBadge) {
+        if (user.estacion && user.estacion !== 'ALL') {
+          stHeaderBadge.textContent = user.estacion;
+          stHeaderBadge.classList.remove('hidden');
+        } else {
+          stHeaderBadge.classList.add('hidden');
+        }
+      }
+
+      // Restricción estricta de selector de estación por rol
+      const stationSelect = document.getElementById('stationSelect');
+      if (stationSelect && user.estacion && user.estacion !== 'ALL') {
+        stationSelect.value = user.estacion;
+        stationSelect.disabled = true;
+      } else if (stationSelect) {
+        stationSelect.disabled = false;
+      }
+
       const btnAdmin = document.getElementById('btnOpenAdmin');
       const isSuper = user.rol === 'SUPER_ADMIN';
       const isAdmin = user.rol === 'ADMIN' || isSuper;
@@ -4074,6 +4518,7 @@
       const superShortcuts = document.getElementById('superAdminShortcuts');
       if (superShortcuts) superShortcuts.classList.toggle('hidden', !isSuper);
 
+      loadUserKpiPreferences();
       populateStationSelect();
       populateMonthPeriodSelect();
       updateDashboard();
@@ -4195,6 +4640,7 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
+      initDarkMode();
       initData();
 
       // Efecto Ripple interactivo al hacer clic en botones
