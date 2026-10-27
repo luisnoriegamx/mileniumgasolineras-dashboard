@@ -60,6 +60,36 @@
   </script>
 
   <style>
+    /* Efectos de fondo y animaciones principales */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    @keyframes shimmer {
+      0%   { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    @keyframes borderBeamRotate {
+      0%   { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes ambientFloat {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50%      { transform: translate(25px, 15px) scale(1.08); }
+    }
+
     body {
       background-color: #f8fafc;
       color: #09090b;
@@ -68,7 +98,46 @@
         radial-gradient(circle at 95% 100%, rgba(255, 102, 0, 0.04) 0%, transparent 50%),
         radial-gradient(#e2e8f0 1px, transparent 1px);
       background-size: 100% 100%, 100% 100%, 28px 28px;
+      overflow-x: hidden;
+      animation: fadeIn 0.4s ease-out both;
     }
+
+    /* Ambient Orbs */
+    .ambient-orb {
+      position: fixed;
+      border-radius: 9999px;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.45;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .ambient-orb-1 {
+      top: -60px;
+      left: -60px;
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(255, 102, 0, 0.22) 0%, transparent 70%);
+      animation: ambientFloat 9s ease-in-out infinite;
+    }
+    .ambient-orb-2 {
+      bottom: -60px;
+      right: -60px;
+      width: 380px;
+      height: 380px;
+      background: radial-gradient(circle, rgba(255, 102, 0, 0.16) 0%, transparent 70%);
+      animation: ambientFloat 12s ease-in-out infinite reverse;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 7px; height: 7px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+      transition: background 0.2s ease;
+    }
+    ::-webkit-scrollbar-thumb:hover { background: #ff6600; }
 
     .milenium-glass {
       background: rgba(255, 255, 255, 0.94);
@@ -82,26 +151,55 @@
       background: #ffffff;
       border: 1px solid #e2e8f0;
       box-shadow: 0 2px 10px -2px rgba(15, 23, 42, 0.04), 0 8px 24px -6px rgba(15, 23, 42, 0.03);
-      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+      position: relative;
+      overflow: hidden;
     }
-
     .milenium-card:hover {
-      border-color: rgba(255, 102, 0, 0.5);
-      box-shadow: 0 10px 30px -4px rgba(255, 102, 0, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.05);
-      transform: translateY(-1px);
+      border-color: rgba(255, 102, 0, 0.45);
+      box-shadow: 0 12px 30px -4px rgba(255, 102, 0, 0.14), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
+      transform: translateY(-2px);
     }
 
+    /* Brillo holográfico de tarjeta al pasar cursor */
+    .milenium-card::after {
+      content: "";
+      position: absolute;
+      top: 0; left: -100%;
+      width: 60%; height: 100%;
+      background: linear-gradient(120deg, transparent 0%, rgba(255,102,0,0.06) 50%, transparent 100%);
+      transition: left 0.7s ease;
+      pointer-events: none;
+    }
+    .milenium-card:hover::after { left: 140%; }
+
+    /* Botón naranja con brillo */
     .orange-glow-btn {
-      background: #ff6600;
+      background: linear-gradient(135deg, #ff6600 0%, #e05900 100%);
       color: #ffffff;
       box-shadow: 0 4px 14px 0 rgba(255, 102, 0, 0.35);
-      transition: all 0.2s ease;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
     }
-
     .orange-glow-btn:hover {
-      background: #e05900;
-      box-shadow: 0 6px 20px 0 rgba(255, 102, 0, 0.45);
+      background: linear-gradient(135deg, #ff7518 0%, #e05900 100%);
+      box-shadow: 0 6px 20px 0 rgba(255, 102, 0, 0.48);
       transform: translateY(-1px);
+    }
+    .orange-glow-btn:active { transform: translateY(0) scale(0.97); }
+
+    /* Efecto Ripple táctil */
+    .ripple-effect {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.45);
+      transform: scale(0);
+      animation: rippleAnim 0.55s ease-out;
+      pointer-events: none;
+    }
+    @keyframes rippleAnim {
+      to { transform: scale(4); opacity: 0; }
     }
 
     .badge-orange {
@@ -110,41 +208,41 @@
       color: #ea580c;
     }
 
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #f1f5f9;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 9999px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #ff6600;
-    }
-
     @keyframes orange-pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.35; transform: scale(1.15); }
+      50%      { opacity: 0.35; transform: scale(1.15); }
     }
-    .status-pulse {
-      animation: orange-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    .status-pulse { animation: orange-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+
+    /* Animaciones suaves en inputs */
+    input, select {
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
     }
+    input:focus, select:focus {
+      box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.15);
+    }
+
+    /* Filas de tabla */
+    tbody tr { transition: background-color 0.15s ease; }
+    tbody tr:hover { background-color: rgba(255, 102, 0, 0.035); }
 
     @media print {
       body { background: #ffffff !important; }
-      header, footer, #dropZoneContainer, .no-print { display: none !important; }
-      .milenium-card { box-shadow: none !important; border: 1px solid #cbd5e1 !important; }
+      header, footer, #dropZoneContainer, .no-print, .ambient-orb { display: none !important; }
+      .milenium-card { box-shadow: none !important; border: 1px solid #cbd5e1 !important; transform: none !important; }
+      .milenium-card::after { display: none !important; }
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col antialiased selection:bg-[#ff6600] selection:text-white">
+<body class="min-h-screen flex flex-col antialiased selection:bg-[#ff6600] selection:text-white relative">
+
+  <!-- Ambient Light Orbs -->
+  <div class="ambient-orb ambient-orb-1" aria-hidden="true"></div>
+  <div class="ambient-orb ambient-orb-2" aria-hidden="true"></div>
 
   <!-- ==================== PANTALLA DE ACCESO OBLIGATORIA (LOGIN PORTAL) ==================== -->
   <div id="loginScreen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
-    <div class="bg-white rounded-3xl max-w-md w-full border border-slate-200 shadow-2xl p-7 sm:p-9 space-y-6 text-center">
+    <div class="bg-white rounded-3xl max-w-md w-full border border-slate-200 shadow-2xl p-7 sm:p-9 space-y-6 text-center animate-[scaleIn_0.35s_cubic-bezier(0.16,1,0.3,1)_both]">
       
       <div class="space-y-3">
         <div class="w-20 h-20 mx-auto rounded-2xl bg-white p-2 border border-slate-200 shadow-md flex items-center justify-center overflow-hidden">
@@ -315,9 +413,9 @@
   </header>
 
   <!-- Main Container -->
-  <main id="executiveReportContainer" class="flex-1 max-w-7xl mx-auto w-full p-4 sm:p-6 lg:p-8 space-y-6">
+  <main id="executiveReportContainer" class="flex-1 max-w-7xl mx-auto w-full p-4 sm:p-6 lg:p-8 space-y-6 relative z-10">
 
-    <div id="statusBanner" class="bg-white p-3.5 rounded-2xl flex flex-wrap items-center justify-between gap-3 text-xs border border-orange-200 shadow-sm bg-gradient-to-r from-orange-50/60 to-white no-print">
+    <div id="statusBanner" class="bg-white p-3.5 rounded-2xl flex flex-wrap items-center justify-between gap-3 text-xs border border-orange-200 shadow-sm bg-gradient-to-r from-orange-50/60 to-white no-print transition-all duration-300">
       <div class="flex items-center gap-2.5">
         <div class="p-1 rounded-full bg-[#ff6600]/15 text-[#ff6600]">
           <i data-lucide="shield-check" class="w-4 h-4"></i>
@@ -565,7 +663,7 @@
 
     </div>
 
-    <!-- THIRD ROW: NUEVOS KPIS DE CRÉDITOS, DÉBITOS, VALES Y FALTANTES -->
+    <!-- THIRD ROW: KPIS DE CRÉDITOS, DÉBITOS, VALES Y FALTANTES -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       
       <!-- KPI 1: Clientes Crédito -->
@@ -994,9 +1092,9 @@
             <span class="font-mono font-bold text-slate-900" id="taxRatioSpan">Subtotal (84%) | IVA (13%) | IEPS (3%)</span>
           </div>
           <div class="w-full h-3 rounded-full bg-slate-100 border border-slate-200 overflow-hidden flex shadow-inner" id="taxProgressBar">
-            <div class="bg-black h-full" style="width: 84%"></div>
-            <div class="bg-[#ff6600] h-full" style="width: 13%"></div>
-            <div class="bg-slate-300 h-full" style="width: 3%"></div>
+            <div class="bg-black h-full transition-all duration-500" style="width: 84%"></div>
+            <div class="bg-[#ff6600] h-full transition-all duration-500" style="width: 13%"></div>
+            <div class="bg-slate-300 h-full transition-all duration-500" style="width: 3%"></div>
           </div>
         </div>
 
@@ -1402,7 +1500,7 @@
   </div>
 
   <!-- Executive Footer -->
-  <footer class="bg-white border-t border-slate-200 py-4 px-6 text-xs text-slate-500 mt-auto no-print">
+  <footer class="bg-white border-t border-slate-200 py-4 px-6 text-xs text-slate-500 mt-auto no-print relative z-10">
     <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-3">
       <div class="flex items-center gap-2 font-medium">
         <span class="w-2 h-2 rounded-full bg-[#ff6600]"></span>
@@ -1601,6 +1699,50 @@
     const formatCurrency = (val) => '$' + Number(val || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const formatNumber = (val) => Number(val || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+    // Animación matemática de contador numérico (Count-up con easeOutQuart)
+    const activeCounters = new Map();
+    function animateCountUp(elementId, targetValue, isCurrency = true, suffix = '') {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+
+      const target = Number(targetValue) || 0;
+      const prev = activeCounters.has(elementId) ? activeCounters.get(elementId) : 0;
+      activeCounters.set(elementId, target);
+
+      if (Math.abs(target - prev) < 0.01) {
+        el.textContent = isCurrency ? formatCurrency(target) : (formatNumber(target) + (suffix ? ' ' + suffix : ''));
+        return;
+      }
+
+      const duration = 650;
+      const startTime = performance.now();
+
+      function step(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        // easeOutQuart
+        const ease = 1 - Math.pow(1 - progress, 4);
+        const currentVal = prev + (target - prev) * ease;
+
+        if (isCurrency) {
+          el.textContent = formatCurrency(currentVal);
+        } else {
+          el.textContent = formatNumber(currentVal) + (suffix ? ' ' + suffix : '');
+        }
+
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        } else {
+          if (isCurrency) {
+            el.textContent = formatCurrency(target);
+          } else {
+            el.textContent = formatNumber(target) + (suffix ? ' ' + suffix : '');
+          }
+        }
+      }
+      requestAnimationFrame(step);
+    }
+
     function showBanner(msg) {
       const banner = document.getElementById('statusBanner');
       const bannerMsg = document.getElementById('bannerMessage');
@@ -1701,7 +1843,6 @@
 
       let month = '';
       for (const [name, num] of Object.entries(monthsMap)) {
-        // Buscar la palabra del mes completa o delimitada para no confundir
         const regex = new RegExp(`\\b${name}\\b`, 'i');
         if (regex.test(upper)) {
           month = num;
@@ -1709,7 +1850,6 @@
         }
       }
 
-      // Si no encontró mes en texto, buscar formato estricto DD/MM/YYYY o DD-MM-YYYY
       if (!month) {
         const numMatch = str.match(/([0-3]?[0-9])[/-]([0-1]?[0-9])[/-](202[0-9])/);
         if (numMatch) {
@@ -1722,7 +1862,6 @@
       }
 
       let day = '01';
-      // Extraer el día que precede o sucede al mes
       const dm = upper.match(/\b([0-3]?[0-9])\b/);
       if (dm) day = String(dm[1]).padStart(2, '0');
 
@@ -1775,7 +1914,6 @@
         }
       }
 
-      // Si no detectó nombre de mes, buscar fechas numéricas DD/MM/YYYY
       if (!detectedMonthNum) {
         const numMatch = text.match(/[0-3]?[0-9][/-]([0-1]?[0-9])[/-](202[0-9])/);
         if (numMatch) {
@@ -2122,46 +2260,43 @@
         }
       });
 
-      document.getElementById('kpiTotalRevenue').textContent = formatCurrency(totRevenue);
-      document.getElementById('kpiFuelRevenue').textContent = formatCurrency(totFuelRev);
-      document.getElementById('kpiTotalLiters').textContent = formatNumber(totLiters) + ' L';
-      document.getElementById('kpiJarreos').textContent = formatNumber(totJarras) + ' L';
-      document.getElementById('kpiCash').textContent = formatCurrency(totCash);
+      // Animaciones Count-Up en las 4 tarjetas principales
+      animateCountUp('kpiTotalRevenue', totRevenue, true);
+      animateCountUp('kpiFuelRevenue', totFuelRev, true);
+      animateCountUp('kpiTotalLiters', totLiters, false, 'L');
+      animateCountUp('kpiJarreos', totJarras, false, 'L');
+      animateCountUp('kpiCash', totCash, true);
       
       const cashPct = totRevenue > 0 ? ((totCash / totRevenue) * 100).toFixed(1) : '0';
       document.getElementById('kpiCashPct').textContent = `${cashPct}% del total`;
 
       const cardsPlusCredits = totCards + totCredits;
-      document.getElementById('kpiCardsCredits').textContent = formatCurrency(cardsPlusCredits);
+      animateCountUp('kpiCardsCredits', cardsPlusCredits, true);
       const digPct = totRevenue > 0 ? ((cardsPlusCredits / totRevenue) * 100).toFixed(1) : '0';
       document.getElementById('kpiDigitalPct').textContent = `${digPct}% penetración`;
 
-      // Renderizado de los nuevos KPIs
-      const clientsCreditEl = document.getElementById('kpiClientsCredit');
-      if (clientsCreditEl) clientsCreditEl.textContent = formatCurrency(totCredits);
+      // Renderizado de KPIs estratégicos de Cobros y Auditoría
+      animateCountUp('kpiClientsCredit', totCredits, true);
       const creditShareEl = document.getElementById('kpiCreditSharePct');
       if (creditShareEl) {
         const creditShare = totRevenue > 0 ? ((totCredits / totRevenue) * 100).toFixed(1) : '0.0';
         creditShareEl.textContent = `${creditShare}% del total`;
       }
 
-      const debitsEl = document.getElementById('kpiDebits');
-      if (debitsEl) debitsEl.textContent = formatCurrency(totDebits);
+      animateCountUp('kpiDebits', totDebits, true);
       const debitsStatusEl = document.getElementById('kpiDebitsStatus');
       if (debitsStatusEl) {
         debitsStatusEl.textContent = totDebits > 0 ? `${formatCurrency(totDebits)} retenido` : 'Sin débitos';
       }
 
-      const valesEl = document.getElementById('kpiVales');
-      if (valesEl) valesEl.textContent = formatCurrency(totVales);
+      animateCountUp('kpiVales', totVales, true);
       const valesShareEl = document.getElementById('kpiValesSharePct');
       if (valesShareEl) {
         const valesShare = totRevenue > 0 ? ((totVales / totRevenue) * 100).toFixed(1) : '0.0';
         valesShareEl.textContent = `${valesShare}% de cobro`;
       }
 
-      const faltantesEl = document.getElementById('kpiFaltantes');
-      if (faltantesEl) faltantesEl.textContent = formatCurrency(totFaltantes);
+      animateCountUp('kpiFaltantes', totFaltantes, true);
       const faltantesNoteEl = document.getElementById('kpiFaltantesNote');
       const faltantesTagEl = document.getElementById('kpiFaltantesTag');
       if (faltantesNoteEl) {
@@ -2195,7 +2330,7 @@
 
       const oilsPerM3 = totLiters > 0 ? (totOils / (totLiters / 1000)) : 0;
       document.getElementById('kpiOilsPerM3').textContent = `${formatCurrency(oilsPerM3)} / m³`;
-      document.getElementById('kpiTotalOilPieces').textContent = `${formatNumber(totOilPieces)} pzas`;
+      animateCountUp('kpiTotalOilPieces', totOilPieces, false, 'pzas');
 
       const litersPerBottle = totOilPieces > 0 ? (totLiters / totOilPieces) : 0;
       document.getElementById('kpiLitersPerOilBottle').textContent = `${formatNumber(litersPerBottle)} L / pza`;
@@ -2219,10 +2354,10 @@
       document.getElementById('legendPremiumLit').textContent = formatNumber(prodTotals.PREMIUM.lts) + ' L';
       document.getElementById('legendDieselLit').textContent = formatNumber(prodTotals.DIESEL.lts) + ' L';
 
-      document.getElementById('taxSubtotal').textContent = formatCurrency(totSubtotal);
-      document.getElementById('taxIEPS').textContent = formatCurrency(totIEPS);
-      document.getElementById('taxIVA').textContent = formatCurrency(totIVA);
-      document.getElementById('totalOilsKpi').textContent = formatCurrency(totOils);
+      animateCountUp('taxSubtotal', totSubtotal, true);
+      animateCountUp('taxIEPS', totIEPS, true);
+      animateCountUp('taxIVA', totIVA, true);
+      animateCountUp('totalOilsKpi', totOils, true);
 
       const safeTot = totRevenue > 0 ? totRevenue : 1;
       const subPct = Math.round((totSubtotal / safeTot) * 100);
@@ -2230,18 +2365,18 @@
       const iepsPct = Math.max(0, 100 - subPct - ivaPct);
       document.getElementById('taxRatioSpan').textContent = `Subtotal (${subPct}%) | IVA (${ivaPct}%) | IEPS (${iepsPct}%)`;
       document.getElementById('taxProgressBar').innerHTML = `
-        <div class="bg-black h-full" style="width: ${subPct}%" title="Subtotal: ${subPct}%"></div>
-        <div class="bg-[#ff6600] h-full" style="width: ${ivaPct}%" title="IVA: ${ivaPct}%"></div>
-        <div class="bg-slate-300 h-full" style="width: ${iepsPct}%" title="IEPS: ${iepsPct}%"></div>
+        <div class="bg-black h-full transition-all duration-500" style="width: ${subPct}%" title="Subtotal: ${subPct}%"></div>
+        <div class="bg-[#ff6600] h-full transition-all duration-500" style="width: ${ivaPct}%" title="IVA: ${ivaPct}%"></div>
+        <div class="bg-slate-300 h-full transition-all duration-500" style="width: ${iepsPct}%" title="IEPS: ${iepsPct}%"></div>
       `;
 
-      document.getElementById('cashBreakdownVal').textContent = formatCurrency(totCash);
-      document.getElementById('cardBreakdownVal').textContent = formatCurrency(totCards);
-      document.getElementById('creditBreakdownVal').textContent = formatCurrency(totCredits);
+      animateCountUp('cashBreakdownVal', totCash, true);
+      animateCountUp('cardBreakdownVal', totCards, true);
+      animateCountUp('creditBreakdownVal', totCredits, true);
       const vBreakdown = document.getElementById('valesBreakdownVal');
-      if (vBreakdown) vBreakdown.textContent = formatCurrency(totVales);
+      if (vBreakdown) animateCountUp('valesBreakdownVal', totVales, true);
       const dBreakdown = document.getElementById('debitBreakdownVal');
-      if (dBreakdown) dBreakdown.textContent = formatCurrency(totDebits);
+      if (dBreakdown) animateCountUp('debitBreakdownVal', totDebits, true);
 
       if (dataset.length > 0) {
         const topSt = [...dataset].sort((a,b) => (b.ventaTotal || 0) - (a.ventaTotal || 0))[0];
@@ -2305,7 +2440,6 @@
             const pzas = (Number(item.piezas || item.cantidad || item.pzas) || 0) * multiplier;
             const imp = (Number(item.importe) || 0) * multiplier;
 
-            // Evitar anomalías: si un producto tiene un precio unitario disparatado o importe gigante (> $500,000) por error de captura, descartar
             if (imp > 500000 || pzas < 0 || imp < 0) return;
 
             grandTotalOilRev += imp;
@@ -2331,7 +2465,6 @@
             brandMap.set(brand, (brandMap.get(brand) || 0) + imp);
           });
         } else if (stationRev > 0) {
-          // Si no tiene desglose granular pero sí total de aceites
           const curSt = stationOilMap.get(stName);
           curSt.amount += stationRev;
           curSt.pieces += stationPzas;
@@ -2368,7 +2501,7 @@
                 <span class="text-slate-500">${formatCurrency(amt)} (${share}%)</span>
               </div>
               <div class="w-full h-1.5 rounded-full bg-slate-200 overflow-hidden">
-                <div class="bg-[#ff6600] h-full" style="width: ${share}%"></div>
+                <div class="bg-[#ff6600] h-full transition-all duration-500" style="width: ${share}%"></div>
               </div>
             `;
             brandsContainer.appendChild(bDiv);
@@ -2491,6 +2624,7 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          animation: { duration: 600, easing: 'easeOutQuart' },
           plugins: {
             legend: { display: false },
             tooltip: {
@@ -2797,6 +2931,7 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          animation: { duration: 600, easing: 'easeOutQuart' },
           plugins: {
             legend: { display: false },
             tooltip: {
@@ -2837,6 +2972,7 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          animation: { duration: 600, easing: 'easeOutQuart' },
           plugins: {
             legend: { display: false },
             tooltip: {
@@ -2903,6 +3039,7 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          animation: { duration: 600, easing: 'easeOutQuart' },
           interaction: { mode: 'index', intersect: false },
           plugins: {
             legend: { display: false },
@@ -2938,40 +3075,6 @@
                 color: '#09090b',
                 callback: (v) => (v >= 1000 ? (v/1000).toFixed(0) + 'k L' : v + ' L')
               }
-            }
-          }
-        }
-      });
-    }
-
-    function renderPaymentPie(cash, cards, credits) {
-      const canvas = document.getElementById('paymentPieChart');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      if (paymentPieChart) paymentPieChart.destroy();
-
-      paymentPieChart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-          labels: ['Efectivo Físico', 'Tarjetas Bancarias', 'Crédito Flotillas'],
-          datasets: [{
-            data: [cash, cards, credits],
-            backgroundColor: ['#ff6600', '#94a3b8', '#09090b'],
-            borderColor: '#ffffff',
-            borderWidth: 2
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              backgroundColor: '#09090b',
-              borderColor: '#ff6600',
-              borderWidth: 1,
-              titleColor: '#ffffff',
-              bodyColor: '#ffffff'
             }
           }
         }
@@ -3207,6 +3310,13 @@
 
                 const { periodKey, monthLabel, startIsoDate, endIsoDate } = extractPeriodDetails(topHeader, `${file.name} ${sheetName}`);
 
+                // Cálculo de la duración en días del corte para desempate inteligente
+                const d1 = new Date(startIsoDate);
+                const d2 = new Date(endIsoDate);
+                const durationDays = (!isNaN(d1) && !isNaN(d2) && d2 >= d1) 
+                  ? Math.round((d2 - d1) / (1000 * 60 * 60 * 24)) + 1 
+                  : 30;
+
                 let totalCombustibles = 0;
                 let litrosCombustibles = 0;
                 let totalAceites = 0;
@@ -3431,8 +3541,9 @@
                   continue;
                 }
 
+                // ID inteligente basado en estación y periodo
                 const recordId = `${stationKey}_${periodKey}`;
-                const dataFingerprint = `${recordId}_${litrosCombustibles.toFixed(2)}_${ventaTotal.toFixed(2)}_${totalAceites.toFixed(2)}_${creditos.toFixed(2)}_${debitos.toFixed(2)}`;
+                const dataFingerprint = `${stationKey}_${startIsoDate}_${endIsoDate}_${litrosCombustibles.toFixed(2)}_${ventaTotal.toFixed(2)}_${totalAceites.toFixed(2)}`;
 
                 cuts.push({
                   id: recordId,
@@ -3443,6 +3554,7 @@
                   periodo: period,
                   startIsoDate: startIsoDate,
                   endIsoDate: endIsoDate,
+                  durationDays: durationDays,
                   litros: litrosCombustibles,
                   jarras: jarrasTotal,
                   totalCombustibles: totalCombustibles,
@@ -3475,6 +3587,7 @@
       });
     }
 
+    // MOTOR DE INGESTA INTELIGENTE CON RESOLUCIÓN DE TRASLAPES Y ACUMULADOS
     async function handleIncomingFiles(fileList) {
       if (!fileList || fileList.length === 0) return;
 
@@ -3491,51 +3604,80 @@
             if (!cuts || cuts.length === 0) {
               logEntries.push(`
                 <div class="text-amber-700 bg-amber-50 px-2 py-1 rounded">
-                  ⚠️ Archivo <strong>${file.name}</strong> sin datos de ventas legibles.
+                  ⚠️ Archivo <strong>${file.name}</strong> sin datos legibles de ventas o combustibles.
                 </div>
               `);
               continue;
             }
 
-            cuts.forEach(stObj => {
-              const fp = stObj.fileFingerprint;
+            cuts.forEach(newCut => {
+              const fp = newCut.fileFingerprint;
 
-              const isExactDuplicate = window.currentStations.some(s => 
-                s.fileFingerprint === fp || 
-                (s.id === stObj.id && Math.abs((s.ventaTotal || 0) - stObj.ventaTotal) < 0.01 && Math.abs((s.litros || 0) - stObj.litros) < 0.01)
+              // 1. REGLA ANTI-DUPLICADO EXACTO
+              const isExactDuplicate = window.currentStations.some(existing => 
+                existing.fileFingerprint === fp || 
+                (existing.stationId === newCut.stationId &&
+                 existing.startIsoDate === newCut.startIsoDate &&
+                 existing.endIsoDate === newCut.endIsoDate &&
+                 Math.abs((existing.ventaTotal || 0) - newCut.ventaTotal) < 0.05 &&
+                 Math.abs((existing.litros || 0) - newCut.litros) < 0.05)
               );
 
               if (isExactDuplicate) {
                 duplicateCount++;
                 logEntries.push(`
-                  <div class="flex items-center justify-between text-amber-700 bg-amber-50 px-2 py-1 rounded">
-                    <span>⚠️ <strong>${stObj.nombre}</strong> (${stObj.monthLabel}): Corte idéntico ignorado (evita duplicidad).</span>
-                    <span class="text-[10px] uppercase font-bold text-amber-600">Duplicado</span>
+                  <div class="flex items-center justify-between text-amber-700 bg-amber-50 px-2.5 py-1.5 rounded-lg border border-amber-200">
+                    <span>⚠️ <strong>${newCut.nombre}</strong> (${newCut.periodo}): Reporte idéntico ignorado para evitar duplicar cifras.</span>
+                    <span class="text-[10px] uppercase font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded">Duplicado</span>
                   </div>
                 `);
                 return;
               }
 
-              const existingIdx = window.currentStations.findIndex(s => s.id === stObj.id);
+              // 2. REGLA DE TRASLAPE Y ACUMULADOS EN EL MISMO MES
+              // Buscar si ya existe algún corte para esta misma estación en el mismo mes/periodo
+              const existingIdx = window.currentStations.findIndex(existing => 
+                existing.stationId === newCut.stationId && 
+                existing.periodKey === newCut.periodKey
+              );
 
               if (existingIdx >= 0) {
-                window.currentStations[existingIdx] = stObj;
-                processedFileHashes.add(fp);
-                updatedCount++;
-                logEntries.push(`
-                  <div class="flex items-center justify-between text-blue-700 bg-blue-50 px-2 py-1 rounded">
-                    <span>🔄 <strong>${stObj.nombre}</strong> (${stObj.monthLabel}): Corte actualizado (${formatCurrency(stObj.ventaTotal)}).</span>
-                    <span class="text-[10px] uppercase font-bold text-blue-600">Actualizado</span>
-                  </div>
-                `);
-              } else {
-                window.currentStations.push(stObj);
+                const currentCut = window.currentStations[existingIdx];
+                const currentDays = Number(currentCut.durationDays) || 0;
+                const newDays = Number(newCut.durationDays) || 0;
+
+                // CASO A: El nuevo reporte tiene mayor o igual cobertura de días (Ej: del 1 al 26 reemplaza al del 1 al 19)
+                if (newDays >= currentDays) {
+                  window.currentStations[existingIdx] = newCut;
+                  processedFileHashes.add(fp);
+                  updatedCount++;
+                  logEntries.push(`
+                    <div class="flex items-center justify-between text-blue-700 bg-blue-50 px-2.5 py-1.5 rounded-lg border border-blue-200">
+                      <span>🔄 <strong>${newCut.nombre}</strong>: Corte anterior (${currentDays} días) actualizado por corte acumulado superior (${newDays} días: ${newCut.periodo}).</span>
+                      <span class="text-[10px] uppercase font-bold text-blue-600 bg-blue-100 px-2 py-0.5 rounded">Acumulado Mayor</span>
+                    </div>
+                  `);
+                } 
+                // CASO B: El corte existente ya tiene más días cubiertos (Ej: ya tenías del 1 al 26 y subes uno viejo del 1 al 19)
+                else {
+                  duplicateCount++;
+                  logEntries.push(`
+                    <div class="flex items-center justify-between text-slate-700 bg-slate-100 px-2.5 py-1.5 rounded-lg border border-slate-200">
+                      <span>ℹ️ <strong>${newCut.nombre}</strong>: Se conservó el acumulado de ${currentDays} días frente al parcial menor entrante (${newDays} días).</span>
+                      <span class="text-[10px] uppercase font-bold text-slate-500 bg-slate-200 px-2 py-0.5 rounded">Conservado</span>
+                    </div>
+                  `);
+                }
+              } 
+              // CASO C: Es un mes nuevo o una estación sin registro previo
+              else {
+                window.currentStations.push(newCut);
                 processedFileHashes.add(fp);
                 addedCount++;
                 logEntries.push(`
-                  <div class="flex items-center justify-between text-emerald-700 bg-emerald-50 px-2 py-1 rounded">
-                    <span>✅ <strong>${stObj.nombre}</strong> (${stObj.monthLabel}): Ingresado con éxito (${formatCurrency(stObj.ventaTotal)}).</span>
-                    <span class="text-[10px] uppercase font-bold text-emerald-600">Nuevo</span>
+                  <div class="flex items-center justify-between text-emerald-700 bg-emerald-50 px-2.5 py-1.5 rounded-lg border border-emerald-200">
+                    <span>✅ <strong>${newCut.nombre}</strong> (${newCut.monthLabel}): Ingresado con éxito (${formatCurrency(newCut.ventaTotal)} | ${formatNumber(newCut.litros)} L).</span>
+                    <span class="text-[10px] uppercase font-bold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded">Nuevo</span>
                   </div>
                 `);
               }
@@ -3544,8 +3686,8 @@
           } catch (err) {
             console.error("Error al procesar archivo:", file.name, err);
             logEntries.push(`
-              <div class="text-rose-700 bg-rose-50 px-2 py-1 rounded">
-                ❌ Error en <strong>${file.name}</strong>: ${err.message}
+              <div class="text-rose-700 bg-rose-50 px-2.5 py-1.5 rounded-lg border border-rose-200">
+                ❌ Error al procesar <strong>${file.name}</strong>: ${err.message}
               </div>
             `);
           }
@@ -3571,9 +3713,9 @@
         populateMonthPeriodSelect();
         updateDashboard();
 
-        showBanner(`✅ Procesamiento finalizado: ${addedCount} agregado(s), ${updatedCount} actualizado(s), ${duplicateCount} duplicado(s).`);
+        showBanner(`✅ Ingesta finalizada: ${addedCount} nuevo(s), ${updatedCount} actualizado(s) por corte acumulado superior, ${duplicateCount} descartado(s).`);
       } else if (duplicateCount > 0) {
-        showBanner(`⚠️ No se agregaron nuevos datos: ${duplicateCount} reporte(s) ya existían.`);
+        showBanner(`ℹ️ Datos protegidos contra duplicidad: ${duplicateCount} reporte(s) ya existían o eran parciales menores.`);
       }
     }
 
@@ -4055,7 +4197,7 @@
     window.addEventListener('DOMContentLoaded', () => {
       initData();
 
-      // Efecto Ripple dinámico al hacer clic en botones de acción
+      // Efecto Ripple interactivo al hacer clic en botones
       document.addEventListener('click', (e) => {
         const targetBtn = e.target.closest('.orange-glow-btn, .period-btn, .admin-nav-tab');
         if (!targetBtn) return;
